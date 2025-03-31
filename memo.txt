@@ -1,0 +1,7 @@
+브라우저
+  │ (요청)
+  ▼
+Next.js (Node.js 서버, 화면 SSR 역할)
+  │ (데이터 요청)
+  ▼
+Spring (Backend API, 데이터 제공 역할)

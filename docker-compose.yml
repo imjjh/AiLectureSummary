@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    container_name: ai_lecture_backend
+    ports:
+      - "8080:8080"
+    volumes:
+      [] # 배포
+
+
+      # 개발
+      # - ./backend/src:/app/src
+      # - ./backend/build.gradle:/app/build.gradle
+      # - ./backend/settings.gradle:/app/settings.gradle
+      # - ./backend/gradle:/app/gradle
+    stdin_open: true
+    tty: true
+    # command: ./gradlew bootRun # 개발
+    # command: java -jar build/libs/AiLectureSummary-0.0.1-SNAPSHOT.jar #배포
+  frontend:
+    build: ./frontend
+    container_name: ai_lecture_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      [] # 배포
+      # - ./frontend:/app
+      # - /app/node_modules
+    working_dir: /app
+    command: npm run dev
