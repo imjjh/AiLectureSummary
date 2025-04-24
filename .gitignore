@@ -1,6 +1,60 @@
+# === OS Files ===
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-문제.md
+# === Editor / IDE ===
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
 
-memo.txt
+# === Logs / Temp ===
+*.log
+*.swp
+*.tmp
+*.bak
 
-.DS_STORE
+# === Environment Files ===
+.env
+.env.*
+
+# === Java (backend) ===
+*.class
+.gradle/
+backend/build/
+backend/out/
+backend/target/
+*.jar
+*.war
+*.ear
+!backend/gradle/wrapper/gradle-wrapper.jar
+backend/gradle-app.setting
+
+# === Node.js (frontend) ===
+frontend/node_modules/
+frontend/.pnp/
+frontend/.pnp.*
+frontend/.yarn/*
+!frontend/.yarn/patches
+!frontend/.yarn/plugins
+!frontend/.yarn/releases
+!frontend/.yarn/versions
+frontend/.next/
+frontend/out/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/.next.cache/
+frontend/coverage/
+frontend/next-env.d.ts
+frontend/.vercel/
+
+# === Python (ai-server) ===
+ai-server/venv/
+ai-server/__pycache__/
+
+# === Misc Certificates / Secrets ===
+*.pem

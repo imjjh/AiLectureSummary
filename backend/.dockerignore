@@ -1,0 +1,30 @@
+# === OS / Editor ===
+.DS_Store
+.idea/
+.vscode/
+
+# === Git ===
+.git
+.gitignore
+
+# === Build / Output ===
+build/
+out/
+target/
+.gradle/
+*.class
+*.jar
+*.war
+*.ear
+
+# === Logs ===
+*.log
+
+# === Env Files ===
+.env
+.env.*
+
+# === Temp Files ===
+*.tmp
+*.bak
+*.swp
