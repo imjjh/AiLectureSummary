@@ -9,6 +9,8 @@ export default function TestPage() {
       </p>
       <button className="mt-6 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded">
         버튼을 눌러보세요!
+
+        vercel preview test
       </button>
     </main>
   );
