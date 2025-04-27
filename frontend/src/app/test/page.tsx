@@ -1,3 +1,8 @@
+/**
+ * Renders a static test page demonstrating Tailwind CSS styling in both light and dark modes.
+ *
+ * The page includes a heading, a descriptive paragraph in Korean, and a styled button with additional test text.
+ */
 export default function TestPage() {
   return (
     <main className="min-h-screen bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white p-10">
