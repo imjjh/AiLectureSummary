@@ -22,6 +22,5 @@ docker-compose up --build
 	•	Java 17
 	•	Spring Boot
 	•	Gradle
-	•	ffmpeg / tesseract (OCR)
 
 ```
