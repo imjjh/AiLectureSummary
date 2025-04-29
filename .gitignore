@@ -58,3 +58,6 @@ ai-server/__pycache__/
 
 # === Misc Certificates / Secrets ===
 *.pem
+
+# MySQL Docker volume data
+mysql-data/
