@@ -52,6 +52,7 @@ services:
       # MYSQL_USER: ${MYSQL_USER}
       # MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
+    # mysql-data 없으면 자동 생성
       - ./mysql-data:/var/lib/mysql
     command:
       - --character-set-server=utf8mb4
