@@ -1,0 +1,119 @@
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/mode-toggle"
+import { LanguageSelector } from "@/components/language-selector"
+import { UserMenu } from "@/components/user-menu"
+import { Menu, X } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { useLanguage } from "@/hooks/use-language"
+import { motion } from "framer-motion"
+
+export default function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const pathname = usePathname()
+  const { t } = useLanguage()
+
+  // 로그인 페이지와 회원가입 페이지에서는 헤더를 표시하지 않음
+  if (pathname === "/login" || pathname === "/register") {
+    return null
+  }
+
+  return (
+    <header className="sticky top-0 z-50 w-full backdrop-blur-sm supports-backdrop-filter:bg-background/60 border-b border-border/40">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="font-bold text-xl bg-linear-to-r from-pink-500 to-orange-500 text-transparent bg-clip-text"
+          >
+            LectureSum
+          </Link>
+        </div>
+
+        <nav className="hidden md:flex items-center gap-6">
+          <Link
+            href="/"
+            className={`text-sm font-medium hover:text-primary transition-colors ${
+              pathname === "/" ? "text-primary" : ""
+            }`}
+          >
+            {t("home")}
+          </Link>
+          <Link
+            href="/about"
+            className={`text-sm font-medium hover:text-primary transition-colors ${
+              pathname === "/about" ? "text-primary" : ""
+            }`}
+          >
+            {t("about")}
+          </Link>
+          <Link
+            href="/dashboard"
+            className={`text-sm font-medium hover:text-primary transition-colors ${
+              pathname === "/dashboard" ? "text-primary" : ""
+            }`}
+          >
+            {t("Summary")}
+          </Link>
+        </nav>
+
+        <div className="hidden md:flex items-center gap-2">
+          <LanguageSelector />
+          <ModeToggle />
+          <UserMenu />
+        </div>
+
+        <div className="flex md:hidden items-center gap-2">
+          <LanguageSelector />
+          <ModeToggle />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle Menu"
+            className="rounded-full"
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </Button>
+        </div>
+      </div>
+
+      {isMenuOpen && (
+        <motion.div
+          className="md:hidden border-t"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="container py-4 grid gap-4">
+            <Link
+              href="/"
+              className={`text-sm font-medium hover:text-primary transition-colors ${
+                pathname === "/" ? "text-primary" : ""
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {t("home")}
+            </Link>
+            <Link
+              href="/about"
+              className={`text-sm font-medium hover:text-primary transition-colors ${
+                pathname === "/about" ? "text-primary" : ""
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {t("about")}
+            </Link>
+            <div className="flex flex-col gap-2 pt-2 border-t">
+              <UserMenu />
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </header>
+  )
+}
