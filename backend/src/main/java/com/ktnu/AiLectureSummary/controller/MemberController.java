@@ -1,10 +1,10 @@
-package com.ktnu.AiLectureSummary.Member.interfaces;
+package com.ktnu.AiLectureSummary.controller;
 
 
-import com.ktnu.AiLectureSummary.Member.application.MemberService;
-import com.ktnu.AiLectureSummary.Member.domain.Member;
-import com.ktnu.AiLectureSummary.Member.dto.MemberRegisterRequest;
-import com.ktnu.AiLectureSummary.Member.dto.MemberResponse;
+import com.ktnu.AiLectureSummary.service.MemberService;
+import com.ktnu.AiLectureSummary.domain.Member;
+import com.ktnu.AiLectureSummary.dto.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.dto.MemberResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

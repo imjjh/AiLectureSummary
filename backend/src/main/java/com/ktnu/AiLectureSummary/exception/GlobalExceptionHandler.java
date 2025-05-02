@@ -1,6 +1,5 @@
-package com.ktnu.AiLectureSummary.common.exception;
+package com.ktnu.AiLectureSummary.exception;
 
-import com.ktnu.AiLectureSummary.Member.exception.DuplicateLoginIdException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

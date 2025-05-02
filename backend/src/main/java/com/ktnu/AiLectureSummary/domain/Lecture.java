@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.Lecture;
+package com.ktnu.AiLectureSummary.domain;
 
 import lombok.Getter;
 import lombok.Setter;
