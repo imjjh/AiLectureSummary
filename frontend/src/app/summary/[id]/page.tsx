@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
@@ -8,10 +7,16 @@ import Image from "next/image"
 
 
 // This is a demo page that would normally fetch data based on the ID
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  // Await the async params directly
+  const { id } = await params;
   // In a real app, you would fetch the summary data based on the ID
   const summaryData = {
-    id: params.id,
+    id: id,
     title: "데이터 구조와 알고리즘: 이진 트리의 이해",
     duration: "45:32",
     thumbnailUrl: "/placeholder.svg?height=300&width=500",
