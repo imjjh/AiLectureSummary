@@ -1,6 +1,6 @@
-package com.ktnu.AiLectureSummary.Member.infrastructure;
+package com.ktnu.AiLectureSummary.repository;
 
-import com.ktnu.AiLectureSummary.Member.domain.Member;
+import com.ktnu.AiLectureSummary.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

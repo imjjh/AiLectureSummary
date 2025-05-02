@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.Member.dto;
+package com.ktnu.AiLectureSummary.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

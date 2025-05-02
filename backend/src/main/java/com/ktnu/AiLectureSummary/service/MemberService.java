@@ -1,9 +1,9 @@
-package com.ktnu.AiLectureSummary.Member.application;
+package com.ktnu.AiLectureSummary.service;
 
-import com.ktnu.AiLectureSummary.Member.domain.Member;
-import com.ktnu.AiLectureSummary.Member.dto.MemberRegisterRequest;
-import com.ktnu.AiLectureSummary.Member.exception.DuplicateLoginIdException;
-import com.ktnu.AiLectureSummary.Member.infrastructure.MemberRepository;
+import com.ktnu.AiLectureSummary.domain.Member;
+import com.ktnu.AiLectureSummary.dto.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
+import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

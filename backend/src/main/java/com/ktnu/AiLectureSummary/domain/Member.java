@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.Member.domain;
+package com.ktnu.AiLectureSummary.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
