@@ -4,42 +4,37 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev # 개발용
     container_name: ai_lecture_frontend
     ports:
       - "3000:3000"
     volumes:
-      [] # 배포
-      # - ./frontend:/app
-      # - /app/node_modules
+      - ./frontend:/app
+      - /app/node_modules
     working_dir: /app
-    command: npm run start #prod
 
 
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev # 개발용
     container_name: ai_lecture_backend
     ports:
       - "8080:8080"
     volumes:
-      [] # 배포
-
-
-      # 개발
-      # - ./backend/src:/app/src
-      # - ./backend/build.gradle:/app/build.gradle
-      # - ./backend/settings.gradle:/app/settings.gradle
-      # - ./backend/gradle:/app/gradle
+      - ./backend/src:/app/src
+      - ./backend/build.gradle:/app/build.gradle
+      - ./backend/settings.gradle:/app/settings.gradle
+      - ./backend/gradle:/app/gradle
     stdin_open: true
     tty: true
-    # command: ./gradlew bootRun # 개발
-    command: java -jar build/libs/AiLectureSummary-0.0.1-SNAPSHOT.jar #배포
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       - mysql
+    env_file:
+      - .env
   
   mysql:
     image: mysql:8.0
@@ -57,3 +52,5 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+    env_file:
+      - .env

@@ -33,7 +33,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if user is logged in from localStorage
     const storedUser = localStorage.getItem("user")
     if (storedUser) {
       setUser(JSON.parse(storedUser))
@@ -42,10 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    // Simple validation (in a real app, this would be a server call)
     if (email && password.length >= 6) {
       const newUser: User = {
         id: "user-" + Math.random().toString(36).substr(2, 9),
@@ -62,23 +59,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const res = await fetch("http://localhost:8080/api/members/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: name, email, password }),
+      });
 
-    // Simple validation (in a real app, this would be a server call)
-    if (name && email && password.length >= 6) {
-      const newUser: User = {
-        id: "user-" + Math.random().toString(36).substr(2, 9),
-        name,
-        email,
-        joinDate: new Date().toLocaleDateString(),
-        membership: "무료 회원",
+      if (res.status === 201) {
+        const data = await res.json();
+        const newUser: User = {
+          id: data.id.toString(),
+          name,
+          email,
+          joinDate: new Date().toLocaleDateString(),
+          membership: "무료 회원",
+        };
+        setUser(newUser);
+        localStorage.setItem("user", JSON.stringify(newUser));
+        return true;
+      } else {
+        // const error = await res.text();
+        // alert(`❌ 회원가입 실패: ${error}`);
+        // console.error("회원가입 실패:", error);
+///
+        let message = "회원가입에 실패했습니다.";
+try {
+  const errorBody = await res.clone().json();
+  if (Array.isArray(errorBody?.errors) && errorBody.errors[0]?.defaultMessage) {
+    message = errorBody.errors[0].defaultMessage;
+  } else if (typeof errorBody?.message === "string") {
+    message = errorBody.message;
+  }
+} catch {
+  const fallback = await res.text();
+  if (fallback) message = fallback;
+}
+alert(`❌ 회원가입 실패: ${message}`);
+console.error("회원가입 실패:", message);
+///
+        return false;
       }
-      setUser(newUser)
-      localStorage.setItem("user", JSON.stringify(newUser))
-      return true
+    } catch (error) {
+      console.error("API 오류:", error);
+      alert("서버 오류가 발생했습니다.");
+      return false;
     }
-    return false
   }
 
   const logout = () => {
@@ -87,7 +115,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push("/")
   }
 
-  return <AuthContext.Provider value={{ user, isLoading, login, logout, register }}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ user, isLoading, login, logout, register }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export const useAuth = () => useContext(AuthContext)

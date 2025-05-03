@@ -2,7 +2,7 @@
 
 build:
 	@echo "빌드 중... (ai_lecture_frontend)"
-	docker build -t ai_lecture_frontend -f Dockerfile.prod .
+	docker build -t ai_lecture_frontend -f Dockerfile.dev .
 
 run:
 	@echo "기존에 'front' 컨테이너가 있으면 삭제합니다."

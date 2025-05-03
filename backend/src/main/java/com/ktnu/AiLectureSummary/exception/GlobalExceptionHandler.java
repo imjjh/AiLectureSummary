@@ -21,4 +21,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleDuplicateLoginIdException(DuplicateLoginIdException e){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
+
+    /**
+     * 로그인 시도 중 ID 없음 예외 처리 핸들러
+     * @param e 로그인 시도 중 ID 없음으로 발생한 예외 객체
+     * @return 401 (Unauthorized)
+     */
+    @ExceptionHandler(MemberNotFoundException.class)
+    public  ResponseEntity<String> handleMemberNotFoundException(MemberNotFoundException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
+
+    /**
+     * 로그인 시도 중 비밀번호 틀림 예외 처리 핸들러
+     * @param e 로그인 시도 중 비밀번호 틀림으로 발생한 예외 객체
+     * @return 401 (Unauthorized)
+     */
+    @ExceptionHandler(InvalidPasswordException.class)
+    public  ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
 }
