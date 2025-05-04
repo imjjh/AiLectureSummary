@@ -1,0 +1,23 @@
+FROM openjdk:17-slim-buster
+
+# 필수 도구 설치
+RUN apt update && apt install -y curl git
+
+# 작업 디렉토리 생성
+WORKDIR /app
+
+# gradle wrapper 복사 및 실행 권한 부여
+COPY gradlew build.gradle settings.gradle ./
+COPY gradle/ gradle/
+RUN chmod +x gradlew
+
+# 의존성 미리 설치 (캐싱 효과)
+RUN ./gradlew dependencies --no-daemon
+
+# 소스코드는 실시간 변경 감지를 위해 volume으로 마운트 (복사 X)
+
+# Spring Boot DevTools 사용 위해 포트 오픈
+EXPOSE 8080
+
+# 개발용 실행 명령어 (파일 변경 자동 반영은 IDE나 Devtools 설정 필요)
+CMD ["./gradlew", "bootRun", "--no-daemon"]

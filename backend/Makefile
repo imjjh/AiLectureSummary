@@ -2,7 +2,7 @@
 
 build:
 	@echo "빌드 중... (ai_lecture_backend, using Dockerfile.prod)"
-	docker build -t ai_lecture_backend -f Dockerfile.prod .
+	docker build -t ai_lecture_backend -f Dockerfile.dev .
 
 run:
 	@echo "기존에 'back' 컨테이너가 있으면 삭제합니다."
