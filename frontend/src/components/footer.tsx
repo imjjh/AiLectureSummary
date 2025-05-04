@@ -24,22 +24,15 @@ export default function Footer() {
             LectureSum
           </Link>
           <p className="text-center text-sm text-muted-foreground md:text-left">
-            &copy; 2023 LectureSum. All rights reserved.
+            &copy; 2025 LectureSum. All rights reserved.
           </p>
         </div>
-        <div className="flex gap-4 md:gap-6">
-          <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
-            {t("about")}
-          </Link>
-          <Link href="#" className="text-sm font-medium hover:text-primary transition-colors">
-            이용약관
-          </Link>
-          <Link href="#" className="text-sm font-medium hover:text-primary transition-colors">
-            개인정보처리방침
-          </Link>
-          <Link href="#" className="text-sm font-medium hover:text-primary transition-colors">
-            고객센터
-          </Link>
+        <div className="text-sm text-muted-foreground text-right leading-6">
+          <p><strong>KTNU 팀원</strong></p>
+          <p><a href="https://github.com/ddoyo" target="_blank" rel="noopener noreferrer">김서연</a></p>
+          <p><a href="https://github.com/jangjunho2" target="_blank" rel="noopener noreferrer">장준호</a></p>
+          <p><a href="https://github.com/light-castle" target="_blank" rel="noopener noreferrer">조희성</a></p>
+          <p><a href="https://github.com/minwoChoi" target="_blank" rel="noopener noreferrer">최민우</a></p>
         </div>
       </div>
     </footer>

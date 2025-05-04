@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useState, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 
 type User = {
@@ -8,14 +8,13 @@ type User = {
   name: string
   email: string
   joinDate: string
-  membership: string
 }
 
 type AuthContextType = {
   user: User | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<boolean>
-  logout: () => void
+  logout: () => Promise<void>
   register: (name: string, email: string, password: string) => Promise<boolean>
 }
 
@@ -23,7 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   login: async () => false,
-  logout: () => {},
+  logout: async () => {},
   register: async () => false,
 })
 
@@ -32,30 +31,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-    setIsLoading(false)
-  }, [])
-
   const login = async (email: string, password: string): Promise<boolean> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const res = await fetch("http://localhost:8080/api/members/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      })
 
-    if (email && password.length >= 6) {
-      const newUser: User = {
-        id: "user-" + Math.random().toString(36).substr(2, 9),
-        name: email.split("@")[0],
-        email,
-        joinDate: new Date().toLocaleDateString(),
-        membership: "무료 회원",
+      if (res.ok) {
+        const data = await res.json()
+        const newUser: User = {
+          id: data.id,
+          name: data.username,
+          email: data.email,
+          joinDate: data.createdAt,
+        }
+        setUser(newUser)
+        return true
+      } else {
+        const errorText = await res.text()
+        console.error("로그인 실패:", errorText)
+        alert("로그인 실패: " + errorText)
+        return false
       }
-      setUser(newUser)
-      localStorage.setItem("user", JSON.stringify(newUser))
-      return true
+    } catch (error) {
+      console.error("로그인 요청 중 오류 발생:", error)
+      alert("서버 오류로 로그인에 실패했습니다.")
+      return false
     }
-    return false
   }
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
@@ -66,53 +73,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username: name, email, password }),
-      });
+      })
 
       if (res.status === 201) {
-        const data = await res.json();
-        const newUser: User = {
-          id: data.id.toString(),
-          name,
-          email,
-          joinDate: new Date().toLocaleDateString(),
-          membership: "무료 회원",
-        };
-        setUser(newUser);
-        localStorage.setItem("user", JSON.stringify(newUser));
-        return true;
+        const data = await res.json()
+        return true
       } else {
-        // const error = await res.text();
-        // alert(`❌ 회원가입 실패: ${error}`);
-        // console.error("회원가입 실패:", error);
-///
-        let message = "회원가입에 실패했습니다.";
-try {
-  const errorBody = await res.clone().json();
-  if (Array.isArray(errorBody?.errors) && errorBody.errors[0]?.defaultMessage) {
-    message = errorBody.errors[0].defaultMessage;
-  } else if (typeof errorBody?.message === "string") {
-    message = errorBody.message;
-  }
-} catch {
-  const fallback = await res.text();
-  if (fallback) message = fallback;
-}
-alert(`❌ 회원가입 실패: ${message}`);
-console.error("회원가입 실패:", message);
-///
-        return false;
+        let message = "회원가입에 실패했습니다."
+        try {
+          const errorBody = await res.clone().json()
+          if (Array.isArray(errorBody?.errors) && errorBody.errors[0]?.defaultMessage) {
+            message = errorBody.errors[0].defaultMessage
+          } else if (typeof errorBody?.message === "string") {
+            message = errorBody.message
+          }
+        } catch {
+          const fallback = await res.text()
+          if (fallback) message = fallback
+        }
+        alert(`❌ 회원가입 실패: ${message}`)
+        console.error("회원가입 실패:", message)
+        return false
       }
     } catch (error) {
-      console.error("API 오류:", error);
-      alert("서버 오류가 발생했습니다.");
-      return false;
+      console.error("API 오류:", error)
+      alert("서버 오류가 발생했습니다.")
+      return false
     }
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem("user")
-    router.push("/")
+  const logout = async () => {
+    try {
+      await fetch("http://localhost:8080/api/members/logout", {
+        method: "POST",
+        credentials: "include",
+      })
+    } catch (error) {
+      console.error("로그아웃 요청 중 오류 발생:", error)
+    } finally {
+      setUser(null)
+      router.push("/")
+    }
   }
 
   return (

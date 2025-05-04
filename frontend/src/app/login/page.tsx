@@ -55,6 +55,7 @@ export default function LoginPage() {
               <CardDescription>이메일과 비밀번호를 입력하세요</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
+              {/* 
               <div className="grid grid-cols-2 gap-6">
                 <Button variant="outline" className="w-full rounded-full">
                   <Github className="mr-2 h-4 w-4" />
@@ -65,6 +66,7 @@ export default function LoginPage() {
                   Google
                 </Button>
               </div>
+              */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />

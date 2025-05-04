@@ -1,14 +1,13 @@
 "use client"
+
 import { Check, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useLanguage } from "@/hooks/use-language"
 
+// 한국어만 지원
 const languages = [
-  { code: "ko", name: "한국어" },
-  { code: "en", name: "English" },
-  { code: "ja", name: "日本語" },
-  { code: "zh", name: "中文" },
+  { code: "ko", name: "한국어" }
 ]
 
 export function LanguageSelector() {
