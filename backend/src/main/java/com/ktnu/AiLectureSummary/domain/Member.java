@@ -3,8 +3,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Member 엔티티 클래스
@@ -13,6 +18,7 @@ import java.time.LocalDateTime;
  * - 회원 정보를 저장하는 테이블의 역할을 함
  */
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 public class Member {
@@ -53,35 +59,30 @@ public class Member {
     private boolean active = true;
 
     /**
-     * 생성일시 (레코드 최초 생성 시)
+     * DB에 처음 저장될 떄 자동 생성되는 일시
      */
+    @CreatedDate
     @Column(updatable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // 직렬화시 포맷지정
+    private LocalDateTime createdAt;
 
     /**
-     * 수정일시 (업데이트될 때마다 자동 변경)
+     * 엔티티가 수정될 때마다 자동 갱신되는 일시
      */
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
+    @LastModifiedDate
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") // 직렬화시 포맷지정
+    private LocalDateTime updatedAt;
 
     /**
-     * JPA 내부 이벤트로 엔티티가 최초 저장될 때 생성일시와 수정일시를 초기화
-     * PrePersist는 JPA 라이프사이클 콜백 어노테이션
-     * 해당 엔티티가 DB에 insert되기 직전에 자동으로 호출되는 메서드를 지정하는 기능
+     * 회원이 요약한 강의 정보 리스트 (MemberLecture 중간 테이블을 통해 연결)
+     *
+     * - @OneToMany -> 1:N 관계 member:memberLecture
+     * - mappedby = "member" -> memberLecture 클래스에 있는 Member 필드가 주인?, 여기서는 읽기 전용 관계
+     * - cascade = CascadeType.ALL -> Member를 저장/삭제할 때 관련된 MemberLecture도 같이 저장/삭제함
+     * - orphanRemoval = true -> MemberLecture에서 제거된 항목은 DB에서 삭제됨 (고아 객체 제거)
+     * - List<MemberLecture> -> 다대다 중간 테이블인 MemberLecture를 담는 리스트
+     * - new ArrayList<>() -> null 방지를 위해 초기화
      */
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now(); // 생성 시에도 updatedAt 초기화
-    }
-    /**
-     * JPA 내부 이벤트로 엔티티가 업데이트될 때 수정일 갱신
-     * PreUpdate는 JPA 라이프사이클 콜백 어노테이션
-     * 해당 엔티티가 DB에 update되기 직전에 자동으로 호출되는 메서드를 지정하는 기능
-     */
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberLecture> memberLectureList = new ArrayList<>();
 }
