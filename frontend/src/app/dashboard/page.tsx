@@ -6,41 +6,6 @@ import Link from "next/link"
 import Image from "next/image"
 
 export default function DashboardPage() {
-  // 이 데이터는 실제로는 데이터베이스에서 가져와야 합니다
-  const summaries = [
-    {
-      id: "demo-result",
-      title: "머신러닝 기초: 지도학습과 비지도학습",
-      date: "2023년 11월 5일",
-      duration: "52:18",
-      thumbnail: "/placeholder.svg?height=200&width=300",
-    },
-    {
-      id: "binary-tree",
-      title: "데이터 구조와 알고리즘: 이진 트리의 이해",
-      date: "2023년 10월 15일",
-      duration: "45:32",
-      thumbnail: "/placeholder.svg?height=200&width=300",
-    },
-    {
-      id: "react-hooks",
-      title: "React Hooks 완벽 가이드",
-      date: "2023년 9월 22일",
-      duration: "1:12:45",
-      thumbnail: "/placeholder.svg?height=200&width=300",
-    },
-    {
-      id: "python-basics",
-      title: "파이썬 기초 프로그래밍",
-      date: "2023년 8월 10일",
-      duration: "38:21",
-      thumbnail: "/placeholder.svg?height=200&width=300",
-    },
-  ]
-
-  const recentSummaries = summaries.slice(0, 2)
-  const allSummaries = summaries
-
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-6xl mx-auto">
@@ -62,7 +27,7 @@ export default function DashboardPage() {
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <FileText className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold mb-1">4</h3>
+              <h3 className="text-2xl font-bold mb-1">0</h3>
               <p className="text-sm text-muted-foreground">요약한 동영상</p>
             </CardContent>
           </Card>
@@ -72,7 +37,7 @@ export default function DashboardPage() {
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Clock className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold mb-1">3시간 28분</h3>
+              <h3 className="text-2xl font-bold mb-1">0시간 0분</h3>
               <p className="text-sm text-muted-foreground">절약한 시간</p>
             </CardContent>
           </Card>
@@ -80,24 +45,7 @@ export default function DashboardPage() {
           <Card className="md:col-span-2">
             <CardContent className="p-6">
               <h3 className="text-lg font-medium mb-4">계정 정보</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">이름:</span>
-                  <span className="font-medium">홍길동</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">이메일:</span>
-                  <span className="font-medium">hong@example.com</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">가입일:</span>
-                  <span className="font-medium">2023년 8월 1일</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">멤버십:</span>
-                  <span className="font-medium">무료 회원</span>
-                </div>
-              </div>
+              <p className="text-muted-foreground">로그인된 사용자 정보가 여기에 표시됩니다.</p>
               <div className="mt-4 pt-4 border-t">
                 <Button variant="outline" size="sm" className="w-full">
                   계정 설정
@@ -113,52 +61,10 @@ export default function DashboardPage() {
             <TabsTrigger value="all">모든 요약</TabsTrigger>
           </TabsList>
           <TabsContent value="recent" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {recentSummaries.map((summary) => (
-                <Link href={`/summary/${summary.id}`} key={summary.id}>
-                  <Card className="overflow-hidden hover:shadow-md transition-shadow">
-                    <Image
-                      src={summary.thumbnail || "/placeholder.svg"}
-                      width={300}
-                      height={200}
-                      alt={summary.title}
-                      className="w-full object-cover aspect-video"
-                    />
-                    <CardContent className="p-4">
-                      <h3 className="font-medium line-clamp-1 mb-1">{summary.title}</h3>
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>{summary.date}</span>
-                        <span>{summary.duration}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+            <p className="text-muted-foreground text-center">최근 요약 데이터가 없습니다.</p>
           </TabsContent>
           <TabsContent value="all" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {allSummaries.map((summary) => (
-                <Link href={`/summary/${summary.id}`} key={summary.id}>
-                  <Card className="overflow-hidden hover:shadow-md transition-shadow">
-                    <Image
-                      src={summary.thumbnail || "/placeholder.svg"}
-                      width={300}
-                      height={200}
-                      alt={summary.title}
-                      className="w-full object-cover aspect-video"
-                    />
-                    <CardContent className="p-4">
-                      <h3 className="font-medium line-clamp-1 mb-1">{summary.title}</h3>
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>{summary.date}</span>
-                        <span>{summary.duration}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+            <p className="text-muted-foreground text-center">모든 요약 데이터를 불러올 수 없습니다.</p>
           </TabsContent>
         </Tabs>
       </div>

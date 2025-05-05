@@ -30,6 +30,11 @@ export default function RegisterPage() {
     e.preventDefault()
     setError("")
 
+    if (password !== confirmPassword) {
+      setError("비밀번호가 일치하지 않습니다.")
+      return
+    }
+
     if (!termsAccepted) {
       setError("이용약관에 동의해주세요.")
       return
@@ -40,7 +45,7 @@ export default function RegisterPage() {
     try {
       const success = await register(name, email, password)
       if (success) {
-        router.push("/dashboard")
+        router.push("/") // Redirect to root after registration
       } else {
         setError("회원가입에 실패했습니다. 입력 정보를 확인해주세요.")
       }
@@ -65,6 +70,7 @@ export default function RegisterPage() {
               <CardDescription>소셜 계정으로 가입하거나 이메일을 사용하세요</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
+              {/*
               <div className="grid grid-cols-2 gap-6">
                 <Button variant="outline" className="w-full rounded-full">
                   <Github className="mr-2 h-4 w-4" />
@@ -75,6 +81,7 @@ export default function RegisterPage() {
                   Google
                 </Button>
               </div>
+              */}
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <span className="w-full border-t" />
@@ -88,7 +95,7 @@ export default function RegisterPage() {
                 <Input
                   id="name"
                   type="text"
-                  placeholder="홍길동"
+                  placeholder=""
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="rounded-full"
@@ -100,7 +107,7 @@ export default function RegisterPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder=""
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="rounded-full"
