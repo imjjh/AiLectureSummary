@@ -1,7 +1,6 @@
-package com.ktnu.AiLectureSummary.dto;
+package com.ktnu.AiLectureSummary.dto.member;
 
 import com.ktnu.AiLectureSummary.domain.Member;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
@@ -17,4 +16,8 @@ public class MemberResponse {
         this.username = member.getUsername();
     }
 
+    public  static  MemberResponse from(Member member){
+
+        return new MemberResponse(member);
+    }
 }

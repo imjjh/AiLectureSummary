@@ -1,22 +1,22 @@
 package com.ktnu.AiLectureSummary.controller;
 
 
-import com.ktnu.AiLectureSummary.dto.LoginResponse;
-import com.ktnu.AiLectureSummary.dto.MemberLoginRequest;
+import com.ktnu.AiLectureSummary.dto.member.LoginResponse;
+import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
 import com.ktnu.AiLectureSummary.service.MemberService;
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.MemberRegisterRequest;
-import com.ktnu.AiLectureSummary.dto.MemberResponse;
+import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.dto.member.MemberResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/members")
@@ -62,4 +62,33 @@ public class MemberController {
                     .body(response); // 사용자 정보 + 토큰 응답 바디 전달
     }
 
+
+    /**
+     * 로그아웃 요청 처리
+     * @param response 클라이언트에 쿠키 제거 명령을 전달하기 위한 응답 객체
+     * @return 생성된 회원 정보와 200 ok 상태 코드
+     */
+    @Operation(summary = "로그아웃", description = "httpOnly 쿠키에 저장된 JWT 토큰을 제거하여 로그아웃합니다.")
+    @PostMapping("/api/member/logout")
+    public  ResponseEntity<Void> logout(HttpServletResponse response){
+        // 쿠키 삭제 -> Max-Age=0; // 덮어쓰기 방식으로 삭제
+        Cookie cookie = new Cookie("token", null); // 쿠키를 값 없이 (null)로 생성
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 즉시 만료
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 사용자 정보 조회
+     * @param member member 인증된 사용자 정보 (스프링 시큐리티에서 주입)
+     * @return 사용자 정보와 200 OK 응답 코드
+     */
+    @Operation(summary = "사용자 정보 조회", description = "현재 로그인된 사용자의 정보를 반환합니다.")
+    @GetMapping("/me")
+    public ResponseEntity<MemberResponse> getMe(@AuthenticationPrincipal Member member){
+        return ResponseEntity.ok(MemberResponse.from(member));
+    }
 }

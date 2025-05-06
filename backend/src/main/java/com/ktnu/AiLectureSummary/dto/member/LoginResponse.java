@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.dto;
+package com.ktnu.AiLectureSummary.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

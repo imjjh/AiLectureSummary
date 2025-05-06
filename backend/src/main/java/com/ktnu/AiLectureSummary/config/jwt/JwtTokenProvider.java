@@ -2,6 +2,8 @@ package com.ktnu.AiLectureSummary.config.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -51,5 +53,23 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+    /**
+     * JWT 추출 방식 두 가지:
+     *    [1] Authorization 헤더에서 Bearer 토큰 추출
+     *    [2] 쿠키에서 token 값 추출
+     * 이 프로젝트에서는 HttpOnly 쿠키 사용으로 [2]번 방식 사용
+     *
+     * @param request 클라이언트의 HTTP 요청
+     * @return 유효한 JWT 토큰 문자열, 없으면 null
+     */
+    public String resolveToken(HttpServletRequest request) {
+        if(request.getCookies()!=null){
+            for(Cookie cookie:request.getCookies()){
+                if("token".equals(cookie.getName()))
+                    return cookie.getValue();
+            }
+        }
+        return null;
     }
 }

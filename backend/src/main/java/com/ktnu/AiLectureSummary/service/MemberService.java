@@ -2,14 +2,15 @@ package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.config.jwt.JwtTokenProvider;
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.LoginResponse;
-import com.ktnu.AiLectureSummary.dto.MemberLoginRequest;
-import com.ktnu.AiLectureSummary.dto.MemberRegisterRequest;
-import com.ktnu.AiLectureSummary.dto.MemberResponse;
+import com.ktnu.AiLectureSummary.dto.member.LoginResponse;
+import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
+import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.dto.member.MemberResponse;
 import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
 import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +25,7 @@ public class MemberService {
     private final JwtTokenProvider jwtTokenProvider;
 
     // 회원가입
+    @Transactional
     public Member register(MemberRegisterRequest request) {
         // 중복체크
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -53,5 +55,8 @@ public class MemberService {
         // 토큰 + 유저정보 DTO로 감싸서 반환
         return new LoginResponse(new MemberResponse(member), token);
     }
+
+    // 로그아웃 (토큰 제거) -> Controller 에서 바로 처리
+
 
 }
