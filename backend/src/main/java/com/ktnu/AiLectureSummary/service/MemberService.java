@@ -1,6 +1,6 @@
 package com.ktnu.AiLectureSummary.service;
 
-import com.ktnu.AiLectureSummary.config.jwt.JwtTokenProvider;
+import com.ktnu.AiLectureSummary.security.jwt.JwtTokenProvider;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.dto.member.LoginResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
@@ -12,13 +12,21 @@ import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+
 
 @Service
 @RequiredArgsConstructor // final 필드만 포함한 생성자 자동 생성
 // 스프링이 생성자 주입 방식으로 의존성을 주입해줌.
 
+
+/**
+ * 사용자가 /login, /register 요청 등을 보낼 때 동작
+ * 사용자 직접 호출
+ * 사용 목적: 로그인 처리 + 토큰 발급 , 회원가입 등
+ */
 public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder encoder;

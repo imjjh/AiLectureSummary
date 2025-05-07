@@ -3,8 +3,9 @@ package com.ktnu.AiLectureSummary.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *   강의 정보를 나타내는 엔티티 클래스

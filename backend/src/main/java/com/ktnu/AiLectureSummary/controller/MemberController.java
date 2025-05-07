@@ -1,12 +1,13 @@
 package com.ktnu.AiLectureSummary.controller;
 
 
+import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
+import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.dto.member.LoginResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
-import com.ktnu.AiLectureSummary.service.MemberService;
-import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
 import com.ktnu.AiLectureSummary.dto.member.MemberResponse;
+import com.ktnu.AiLectureSummary.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -69,7 +70,7 @@ public class MemberController {
      * @return 생성된 회원 정보와 200 ok 상태 코드
      */
     @Operation(summary = "로그아웃", description = "httpOnly 쿠키에 저장된 JWT 토큰을 제거하여 로그아웃합니다.")
-    @PostMapping("/api/member/logout")
+    @PostMapping("/logout")
     public  ResponseEntity<Void> logout(HttpServletResponse response){
         // 쿠키 삭제 -> Max-Age=0; // 덮어쓰기 방식으로 삭제
         Cookie cookie = new Cookie("token", null); // 쿠키를 값 없이 (null)로 생성
@@ -82,13 +83,12 @@ public class MemberController {
     }
 
     /**
-     * 사용자 정보 조회
-     * @param member member 인증된 사용자 정보 (스프링 시큐리티에서 주입)
-     * @return 사용자 정보와 200 OK 응답 코드
+     * @AuthenticationPrincipal은 SecurityContextHolder.getContext().getAuthentication()에서 Principal을 꺼내서 매핑함
+     * JwtAuthenticationFilter에서 넣은 UsernamePasswordAuthenticationToken 안의 userDetails가 여기로 들어옴
+     * CustomUserDetails는 내부에 Member 객체를 들고 있음 → .getMember()로 실제 사용자 정보 반환 가능
      */
-    @Operation(summary = "사용자 정보 조회", description = "현재 로그인된 사용자의 정보를 반환합니다.")
     @GetMapping("/me")
-    public ResponseEntity<MemberResponse> getMe(@AuthenticationPrincipal Member member){
-        return ResponseEntity.ok(MemberResponse.from(member));
+    public ResponseEntity<MemberResponse> getMe(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(MemberResponse.from(userDetails.getMember()));
     }
 }
