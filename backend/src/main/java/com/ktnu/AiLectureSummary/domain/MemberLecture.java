@@ -11,6 +11,11 @@ import java.time.LocalDateTime;
  * MemberLecture 엔티티 클래스
  * - 회원이 특정 강의를 요약한 이력을 나타냄
  * - Member ↔ Lecture 간 N:M 관계를 중간 테이블로 표현
+ *
+ * MemberLecture는 특정 사용자와 강의 간의 관계이므로,
+ * 	•	“내가 본 강의의 메모”
+ * 	•	“내가 요약 요청한 날짜”
+ * 	•	“내가 직접 수정한 요약”
  */
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -26,7 +31,7 @@ public class MemberLecture {
 
     // Member 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id") // 외래 키 컬럼 이름을 'member_id'로 지정하여 Member의 PK(id)를 참조    private Member member;
+    @JoinColumn(name = "member_id") // 외래 키 컬럼 이름을 'member_id'로 지정하여 Member의 PK(id)를 참조
     private Member member;
 
     // Lecture 연관 관계

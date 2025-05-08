@@ -3,11 +3,14 @@ package com.ktnu.AiLectureSummary.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.List;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *   강의 정보를 나타내는 엔티티 클래스
+ *   공통된 정보만 작성,
+ *   특정 사용자와 강의 간의 관계는 MemberLecture에 작성
  */
 
 @Entity
@@ -25,10 +28,15 @@ public class Lecture {
 
 
     @Column(nullable = false)
+    private String OriginalText;
+
+    @Column(nullable = false)
     private  String aisummary;
+
+    @Column(nullable = false,unique = true)
+    private String hash; // 영상 내용 기반 해시 // 중복 저장 방지
+
 
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLecture> memberLectures = new ArrayList<>();
-
-
 }

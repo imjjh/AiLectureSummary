@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.dto;
+package com.ktnu.AiLectureSummary.dto.member;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

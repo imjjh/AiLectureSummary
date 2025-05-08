@@ -2,6 +2,7 @@ package com.ktnu.AiLectureSummary.repository;
 
 import com.ktnu.AiLectureSummary.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
@@ -22,6 +23,10 @@ import java.util.Optional;
  *
  * 복잡한 조건이 필요한 경우에는 @Query를 이용해 JPQL을 직접 작성할 수 있다.
  */
+
+
+
+@Repository
 public interface MemberRepository extends JpaRepository<Member,Long> {
     Optional <Member> findByEmail(String email);
     Optional <Member> findByUsername(String username);

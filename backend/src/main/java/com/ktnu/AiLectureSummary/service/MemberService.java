@@ -1,29 +1,39 @@
 package com.ktnu.AiLectureSummary.service;
 
-import com.ktnu.AiLectureSummary.config.jwt.JwtTokenProvider;
+import com.ktnu.AiLectureSummary.security.jwt.JwtTokenProvider;
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.LoginResponse;
-import com.ktnu.AiLectureSummary.dto.MemberLoginRequest;
-import com.ktnu.AiLectureSummary.dto.MemberRegisterRequest;
-import com.ktnu.AiLectureSummary.dto.MemberResponse;
+import com.ktnu.AiLectureSummary.dto.member.LoginResponse;
+import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
+import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.dto.member.MemberResponse;
 import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
 import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+
 
 @Service
 @RequiredArgsConstructor // final 필드만 포함한 생성자 자동 생성
 // 스프링이 생성자 주입 방식으로 의존성을 주입해줌.
 
+
+/**
+ * 사용자가 /login, /register 요청 등을 보낼 때 동작
+ * 사용자 직접 호출
+ * 사용 목적: 로그인 처리 + 토큰 발급 , 회원가입 등
+ */
 public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder encoder;
     private final JwtTokenProvider jwtTokenProvider;
 
     // 회원가입
+    @Transactional
     public Member register(MemberRegisterRequest request) {
         // 중복체크
         if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -53,5 +63,8 @@ public class MemberService {
         // 토큰 + 유저정보 DTO로 감싸서 반환
         return new LoginResponse(new MemberResponse(member), token);
     }
+
+    // 로그아웃 (토큰 제거) -> Controller 에서 바로 처리
+
 
 }

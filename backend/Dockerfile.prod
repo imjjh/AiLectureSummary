@@ -20,10 +20,7 @@ RUN ./gradlew clean dependencies --no-daemon
 COPY src/ src/
 
 # 최종 빌드: 변경된 소스 코드 반영
-# RUN ./gradlew clean build --no-daemon
-
-# 최종 빌드: 변경된 소스 코드 반영 (테스트 빼고 빌드)
-RUN ./gradlew clean build -x test --no-daemon 
+RUN ./gradlew clean build --no-daemon
 
 # 생성된 실행 가능한 JAR 파일 실행 (와일드카드로 최신 SNAPSHOT JAR 선택)
 CMD ["sh", "-c", "java -jar build/libs/*SNAPSHOT.jar"]

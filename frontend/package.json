@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next dev", 
+    "start": "next start", 
+    "start 나중에 next start?로 수정필요": "",
     "lint": "next lint"
   },
   "dependencies": {
