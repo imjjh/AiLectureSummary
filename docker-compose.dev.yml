@@ -54,3 +54,17 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     env_file:
       - .env
+  
+  fastapi:
+    build:
+      context: ./fastapi
+      dockerfile: Dockerfile
+    container_name: ai_lecture_fastapi
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./fastapi:/app
+    depends_on:
+      - backend
+    restart: always
+

@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -14,7 +13,7 @@ export default function VideoUploader() {
   const router = useRouter()
   const { t } = useLanguage()
   const [isDragging, setIsDragging] = useState(false)
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
 
@@ -33,43 +32,94 @@ export default function VideoUploader() {
     setIsDragging(false)
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const droppedFile = e.dataTransfer.files[0]
-      if (droppedFile.type.startsWith("video/")) {
-        setFile(droppedFile)
-      } else {
-        alert("비디오 파일만 업로드 가능합니다.")
-      }
+      const droppedFiles = Array.from(e.dataTransfer.files)
+      const videoFiles = droppedFiles.filter(file => file.type.startsWith("video/"))
+
+      // 중복 제거: 기존 files와 새로 드롭된 videoFiles를 합치되 중복은 제거
+      setFiles(prevFiles => {
+        const combined = [...prevFiles]
+        videoFiles.forEach(newFile => {
+          const isDuplicate = combined.some(
+            existingFile => existingFile.name === newFile.name && existingFile.size === newFile.size
+          )
+          if (!isDuplicate) {
+            combined.push(newFile)
+          }
+        })
+        return combined
+      })
     }
   }, [])
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0])
+      const selectedFiles = Array.from(e.target.files)
+      const videoFiles = selectedFiles.filter(file => file.type.startsWith("video/"))
+
+      setFiles(prevFiles => {
+        const combined = [...prevFiles]
+        videoFiles.forEach(newFile => {
+          const isDuplicate = combined.some(
+            existingFile => existingFile.name === newFile.name && existingFile.size === newFile.size
+          )
+          if (!isDuplicate) {
+            combined.push(newFile)
+          }
+        })
+        return combined
+      })
     }
   }, [])
 
-  const handleUpload = useCallback(() => {
-    if (!file) return
-
-    setUploading(true)
-
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setTimeout(() => {
-            router.push("/summary/demo-result")
-          }, 500)
-          return 100
-        }
-        return prev + 5
-      })
-    }, 200)
-
-    // In a real application, you would upload the file to your server here
-    // and then redirect to the summary page once processing is complete
-  }, [file, router])
+  const handleUpload = useCallback(async () => {
+    if (files.length === 0) return;
+  
+    setUploading(true);
+    setProgress(0);
+  
+    try {
+      const file = files[0]; // 첫 번째 파일만 처리
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      // 서버 응답을 받아서 파싱
+      const response = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            setProgress(Math.round((event.loaded / event.total) * 100));
+          }
+        });
+  
+        xhr.onreadystatechange = () => {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              // 성공적으로 응답 받음 - JSON 파싱
+              resolve(JSON.parse(xhr.responseText));
+            } else {
+              reject(new Error('Upload failed'));
+            }
+          }
+        };
+  
+        xhr.open('POST', 'http://localhost:9090/upload');
+        xhr.send(formData);
+      });
+  
+      // 서버에서 받은 응답 그대로 전달
+      const encodedData = encodeURIComponent(JSON.stringify(response));
+      router.push(`/summary/demo-result?data=${encodedData}`);
+      
+    } catch (error) {
+      alert(t("upload_failed"));
+      console.error('Upload Error:', error);
+    } finally {
+      setUploading(false);
+      setProgress(0);
+    }
+  }, [files, router, t]);
+  
 
   return (
     <div className="w-full">
@@ -92,7 +142,7 @@ export default function VideoUploader() {
             <p className="text-sm text-muted-foreground mt-1">{t("drag_drop")}</p>
           </div>
 
-          <input type="file" id="video-upload" className="hidden" accept="video/*" onChange={handleFileChange} />
+          <input type="file" id="video-upload" className="hidden" accept="video/*" multiple onChange={handleFileChange} />
           <label htmlFor="video-upload">
             <Button variant="outline" className="cursor-pointer rounded-full px-6 bg-background dark:bg-gray-800
              hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" asChild>
@@ -102,10 +152,15 @@ export default function VideoUploader() {
         </div>
       </div>
 
-      {file && (
+      {files.length > 0 && (
         <div className="mt-4">
           <p className="text-sm font-medium mb-2">
-            선택된 파일: {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+            선택된 파일:
+            {files.map((file, index) => (
+              <span key={file.name + file.size} className="block">
+                {file.name} ({(file.size / (1024 * 1024)).toFixed(2)} MB)
+              </span>
+            ))}
           </p>
 
           {uploading ? (

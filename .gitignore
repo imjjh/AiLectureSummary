@@ -61,3 +61,34 @@ ai-server/__pycache__/
 
 # MySQL Docker volume data
 mysql-data/
+
+
+# === Python (FastAPI/AI 서버) ===
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Whisper/AI 모델 및 캐시
+/app/models/
+models/
+*.bin
+*.pt
+*.onnx
+*.npz
+*.ckpt
+*.h5
+*.pth
+*.tflite
+*.pb
+
+# FastAPI 임시파일, 캐시
+*.sqlite3
+*.db
+*.cache/
+*.egg-info/
+build/
+dist/
