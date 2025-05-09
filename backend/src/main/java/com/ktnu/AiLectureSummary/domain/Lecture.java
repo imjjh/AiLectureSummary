@@ -24,14 +24,14 @@ public class Lecture {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String title;
 
 
     @Column(nullable = false)
     private String OriginalText;
 
     @Column(nullable = false)
-    private  String aisummary;
+    private  String aiSummary;
 
     @Column(nullable = false,unique = true)
     private String hash; // 영상 내용 기반 해시 // 중복 저장 방지
