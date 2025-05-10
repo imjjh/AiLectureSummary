@@ -87,6 +87,7 @@ public class MemberController {
      * JwtAuthenticationFilter에서 넣은 UsernamePasswordAuthenticationToken 안의 userDetails가 여기로 들어옴
      * CustomUserDetails는 내부에 Member 객체를 들고 있음 → .getMember()로 실제 사용자 정보 반환 가능
      */
+    @Operation(summary = "회원정보", description = "로그인한 사용자의 이메일, 이름을 반환합니다.")
     @GetMapping("/me")
     public ResponseEntity<MemberResponse> getMe(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(MemberResponse.from(userDetails.getMember()));

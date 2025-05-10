@@ -1,6 +1,10 @@
 package com.ktnu.AiLectureSummary.dto.lecture;
 // FastAPI -> Spring
-public class LectureCreateRequest {
+
+import lombok.Getter;
+
+@Getter
+public class LectureRegisterRequest {
     private String title;
     private String originalText;
     private String aiSummary;

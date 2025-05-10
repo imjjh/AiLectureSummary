@@ -8,37 +8,69 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * 전역 예외 처리 클래스
  * - controller에서 발생하는 예외를 한 곳에서 처리
- * - DuplicateLoginIdException 발생 시 HTTP 409 상태 코드와 메시지를 반환
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     /**
      * 로그인 ID 중복 예외 처리 핸들러
+     *
      * @param e 로그인 ID 중복 시 발생한 예외 객체
      * @return 409 Conflict 응답과 예외 메세지
      */
     @ExceptionHandler(DuplicateLoginIdException.class)
-    public ResponseEntity<String> handleDuplicateLoginIdException(DuplicateLoginIdException e){
+    public ResponseEntity<String> handleDuplicateLoginIdException(DuplicateLoginIdException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     /**
      * 로그인 시도 중 ID 없음 예외 처리 핸들러
+     *
      * @param e 로그인 시도 중 ID 없음으로 발생한 예외 객체
      * @return 401 (Unauthorized)
      */
     @ExceptionHandler(MemberNotFoundException.class)
-    public  ResponseEntity<String> handleMemberNotFoundException(MemberNotFoundException e){
+    public ResponseEntity<String> handleMemberNotFoundException(MemberNotFoundException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     /**
      * 로그인 시도 중 비밀번호 틀림 예외 처리 핸들러
+     *
      * @param e 로그인 시도 중 비밀번호 틀림으로 발생한 예외 객체
      * @return 401 (Unauthorized)
      */
     @ExceptionHandler(InvalidPasswordException.class)
-    public  ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e){
+    public ResponseEntity<String> handleInvalidPasswordException(InvalidPasswordException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
+
+    /**
+     * 파일 처리 중 발생한 예외 처리 핸들러
+     * @param e 파일 읽기/쓰기 등 내부 처리 중 발생한 예외 객체
+     * @return 500 (Interval Server Erorr)
+     */
+    @ExceptionHandler(FileProcessingException.class)
+    public ResponseEntity<String> handleFileProcessingException(FileProcessingException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+
+    /**
+     *  외부 API(FastAPI 등) 호출 중 발생한 예외 처리 핸들러
+     * @param e 외부 API 호출 실패로 발생한 예외 객체
+     * @return 502 (Bad Gateway)
+     */
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<String> handleExternalApiException(ExternalApiException e) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
+    }
+
+    /**
+     * 사용자의 잘못된 파라미터 입력으로 발생한 예외 처리 핸들러
+     * @param e 잘못된 파라미터 입력으로 발생한 예외 객체
+     * @return 400 (Bad Request)
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleBadRequest(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

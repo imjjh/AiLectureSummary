@@ -1,5 +1,6 @@
 package com.ktnu.AiLectureSummary.domain;
 
+import com.ktnu.AiLectureSummary.dto.lecture.LectureRegisterRequest;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,4 +40,13 @@ public class Lecture {
 
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLecture> memberLectures = new ArrayList<>();
+
+    public static Lecture from(LectureRegisterRequest request, String hash) {
+        Lecture lecture = new Lecture();
+        lecture.setTitle(request.getTitle());
+        lecture.setHash(hash);
+        lecture.setAiSummary(request.getAiSummary());
+        lecture.setOriginalText(request.getOriginalText());
+        return lecture;
+    }
 }
