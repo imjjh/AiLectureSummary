@@ -5,7 +5,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev # 개발용
-    container_name: ai_lecture_frontend
+    container_name: frontend
     ports:
       - "3000:3000"
     volumes:
@@ -18,7 +18,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev # 개발용
-    container_name: ai_lecture_backend
+    container_name: backend
     ports:
       - "8080:8080"
     volumes:
@@ -59,7 +59,7 @@ services:
     build:
       context: ./fastapi
       dockerfile: Dockerfile
-    container_name: ai_lecture_fastapi
+    container_name: ai
     ports:
       - "9090:9090"
     volumes:
@@ -67,4 +67,3 @@ services:
     depends_on:
       - backend
     restart: always
-

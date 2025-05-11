@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Map;
+
 /**
  * 전역 예외 처리 클래스
  * - controller에서 발생하는 예외를 한 곳에서 처리
@@ -73,4 +76,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBadRequest(IllegalArgumentException e) {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
-}
+
+
+    /**
+     * DB 제약 조건 위반 예외 처리 핸들러
+     *
+     * @param e SQL 제약 조건 위반으로 발생한 예외 객체 (예: NOT NULL 컬럼에 null 저장 시)
+     * @return 400 (Bad Request) 응답과 함께 상세 에러 메시지 반환
+     */
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<?> handleSqlException(SQLIntegrityConstraintViolationException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "DB 제약 조건 위반", "detail", e.getMessage()));
+    }}
