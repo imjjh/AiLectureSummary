@@ -28,10 +28,10 @@ public class Lecture {
     private String title;
 
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String originalText;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private  String aiSummary;
 
     @Column(nullable = false,unique = true)
