@@ -7,6 +7,7 @@ import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
 import com.ktnu.AiLectureSummary.exception.ExternalApiException;
 import com.ktnu.AiLectureSummary.exception.FileProcessingException;
 import com.ktnu.AiLectureSummary.repository.LectureRepository;
+import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
 import com.ktnu.AiLectureSummary.util.MultipartFileResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -37,10 +38,11 @@ public class LectureService {
      * 업로드된 비디오 파일을 해싱하여 중복 여부를 검사하고,
      * FastAPI 서버에 전송하여 요약 정보를 받은 후, 이를 DB에 저장한다.
      *
+     * @param user
      * @param file 사용자가 업로드한 비디오 파일
      * @return 요약된 강의 정보를 담은 응답 객체
      */
-    public LectureResponse processVideoUpload(MultipartFile file) {
+    public LectureResponse processVideoUpload(CustomUserDetails user, MultipartFile file) {
         validateVideoFile(file);
 
         // VideoHasing & DB에 중복되는 영상이 존재하는지 확인
@@ -98,7 +100,7 @@ public class LectureService {
         // 동기식 처리로 fastAPI에서 요청을 계속 기다림
         try {
             ResponseEntity<LectureRegisterRequest> response = restTemplate.exchange(
-                    "http://localhost:9090/api/summary",  // FastAPI 엔드포인트
+                    "http://fastapi:9090/api/summary",  // FastAPI 엔드포인트
                     HttpMethod.POST,
                     requestEntity,
                     LectureRegisterRequest.class // 받은 json 응답을 역직렬화

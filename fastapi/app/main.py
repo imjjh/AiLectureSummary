@@ -83,7 +83,7 @@ def format_duration(seconds: float) -> str:
     seconds = int(seconds % 60)
     return f"{minutes}:{seconds:02d}"
 
-@app.post("/upload", response_model=SummaryResponse)
+@app.post("/api/summary", response_model=SummaryResponse)
 async def process_video(file: UploadFile = File(...)):
     temp_video_path = None
     temp_audio_path = None

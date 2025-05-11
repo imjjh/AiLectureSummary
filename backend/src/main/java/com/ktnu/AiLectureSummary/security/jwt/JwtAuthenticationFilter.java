@@ -37,6 +37,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
     }
+
+
+        /**
+     * 인증 필터 제외 대상 설정
+     *
+     * 아래 경로들은 인증 없이 접근할 수 있어야 하므로,
+     * JWT 인증 필터를 적용하지 않도록 제외 처리한다.
+     * - Swagger UI: /swagger-ui, /v3/api-docs
+     * - 회원가입 및 로그인: /api/members/register, /api/members/login
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return path.startsWith("/api/members/register") ||
+               path.startsWith("/api/members/login") ||
+               path.startsWith("/swagger-ui") ||
+               path.startsWith("/v3/api-docs");
+    }
+
     /**
      * JWT 인증 필터
      * - HTTP 요청의 쿠키에서 JWT 토큰을 추출한 후 유효성을 검사함
