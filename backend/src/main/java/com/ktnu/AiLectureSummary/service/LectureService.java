@@ -41,6 +41,8 @@ public class LectureService {
      * @return 요약된 강의 정보를 담은 응답 객체
      */
     public LectureResponse processVideoUpload(MultipartFile file) {
+        validateVideoFile(file);
+
         // VideoHasing & DB에 중복되는 영상이 존재하는지 확인
         String videoHash = VideoHashing(file);
         Optional<Lecture> optionalLecture = lectureRepository.findByHash(videoHash);
@@ -152,6 +154,18 @@ public class LectureService {
         }
     }
 
+
+    private void validateVideoFile(MultipartFile file) {
+        // 파일 확장자는 사용자가 쉽게 변경할 수 있으므로 신뢰할 수 없음
+        // MIME 타입(Content-Type)을 기반으로 파일 형식을 검증함
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("파일이 비어 있습니다.");
+        }
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("video/")) {
+            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. 비디오 파일만 업로드 가능합니다.");
+        }
+    }
     // 비디오 삭제?
 
 

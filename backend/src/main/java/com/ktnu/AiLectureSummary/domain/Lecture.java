@@ -29,7 +29,7 @@ public class Lecture {
 
 
     @Column(nullable = false)
-    private String OriginalText;
+    private String originalText;
 
     @Column(nullable = false)
     private  String aiSummary;
