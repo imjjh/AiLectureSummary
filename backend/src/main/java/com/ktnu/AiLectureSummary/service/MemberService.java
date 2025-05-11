@@ -48,8 +48,12 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    // 로그인 (아이디 + 비밀번호 확인 + 토큰 생성)
-    public LoginResponse login(MemberLoginRequest request){
+    /**
+     * 로그인 (아이디 + 비밀번호 확인 + 토큰 생성)
+     * @param request 사용자의 로그인 요청 정보 (이메일, 비밀번호)
+     * @return 로그인에 성공한 사용자 정보와 JWT 토큰을 포함한 응답 객체
+     */
+     public LoginResponse login(MemberLoginRequest request){
         // 이메일이 존재 여부 확인
         Member member = memberRepository.findByEmail(request.getEmail())
                 .orElseThrow(()-> new MemberNotFoundException("존재하지 않는 이메일입니다."));
@@ -64,7 +68,8 @@ public class MemberService {
         return new LoginResponse(new MemberResponse(member), token);
     }
 
-    // 로그아웃 (토큰 제거) -> Controller 에서 바로 처리
+    // 로그아웃 (토큰 제거) -> Controller 에서 처리
 
+    // /me -> Controller 에서 처리
 
 }

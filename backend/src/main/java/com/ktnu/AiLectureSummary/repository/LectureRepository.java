@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface LectureRepository extends JpaRepository<Lecture, Long> {
-    Optional<Lecture> findByName(String name);
+    Optional<Lecture> findByTitle(String name);
+    Optional<Lecture> findByHash(String hash);
 }
