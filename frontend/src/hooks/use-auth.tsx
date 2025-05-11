@@ -38,18 +38,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
+        credentials: "include", // 쿠키 인증용
         body: JSON.stringify({ email, password }),
       })
-
+  
       if (res.ok) {
         const data = await res.json()
+  
         const newUser: User = {
-          id: data.id,
-          name: data.username,
-          email: data.email,
-          joinDate: data.createdAt,
+          id: String(data.member.id),
+          name: data.member.username,
+          email: data.member.email,
+          joinDate: new Date().toISOString(), // 서버가 제공하지 않으면 현재 시각으로 대체
         }
+  
         setUser(newUser)
         return true
       } else {
@@ -64,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false
     }
   }
-
+  
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch("http://localhost:8080/api/members/register", {
