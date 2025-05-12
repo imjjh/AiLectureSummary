@@ -13,7 +13,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 @Getter
 public class CustomUserDetails implements UserDetails {
-
+    // Member로 쓰면 편리하지만, 직렬화나 세션/캐시 저장시 무거울수 있고, 보안성이 낮음
     private final Member member;
 
 
@@ -30,6 +30,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return member.getEmail(); // 로그인 ID 기준 (email)
+    }
+
+    public Long getId(){
+        return member.getId();
     }
 
     @Override

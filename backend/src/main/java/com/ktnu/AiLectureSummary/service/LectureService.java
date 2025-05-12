@@ -7,12 +7,14 @@ import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
 import com.ktnu.AiLectureSummary.exception.ExternalApiException;
 import com.ktnu.AiLectureSummary.exception.FileProcessingException;
 import com.ktnu.AiLectureSummary.repository.LectureRepository;
+import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
 import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
 import com.ktnu.AiLectureSummary.util.MultipartFileResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -31,6 +33,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LectureService {
     private final LectureRepository lectureRepository;
+    private final MemberLectureRepository memberLectureRepository;
+    private final MemberLectureService memberLectureService;
 
     // Client -> Spring -> FastAPI -> Spring&DB -> Client
 
@@ -42,6 +46,7 @@ public class LectureService {
      * @param file 사용자가 업로드한 비디오 파일
      * @return 요약된 강의 정보를 담은 응답 객체
      */
+    @Transactional
     public LectureResponse processVideoUpload(CustomUserDetails user, MultipartFile file) {
         validateVideoFile(file);
 
@@ -57,8 +62,11 @@ public class LectureService {
         // FastAPI 호출
         LectureRegisterRequest registerRequest =sendToAi(file);
 
-        // DB에 내용 저장
+        // DB에 강의 내용 저장
         Lecture saved=lectureRepository.save(Lecture.from(registerRequest, videoHash));
+
+        // 사용자와 강의 간의 소유 관계 기록 (MemberLecture 생성)
+        memberLectureService.save(user, saved);
 
         return LectureResponse.from(saved);
 
