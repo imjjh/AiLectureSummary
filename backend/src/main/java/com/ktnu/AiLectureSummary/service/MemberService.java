@@ -1,6 +1,5 @@
 package com.ktnu.AiLectureSummary.service;
 
-import com.ktnu.AiLectureSummary.security.jwt.JwtTokenProvider;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.dto.member.LoginResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
@@ -10,11 +9,11 @@ import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
 import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
-import jakarta.transaction.Transactional;
+import com.ktnu.AiLectureSummary.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -72,4 +71,14 @@ public class MemberService {
 
     // /me -> Controller 에서 처리
 
+    /**
+     * id를 이용하여 DB에서  회원 조회, 존재 하지 않으면 MemberNotFoundException 발생
+     * @param id 조회할 회원의 고유 ID
+     * @return 해당 ID에 대응하는 Member 객체
+     * @throws MemberNotFoundException 존재하지 않는 ID일 경우 발생
+     */
+    public Member findById(long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("해당 ID의 회원이 존재하지 않습니다."));
+    }
 }
