@@ -3,18 +3,15 @@ package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.dto.lecture.LectureRegisterRequest;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
 import com.ktnu.AiLectureSummary.exception.ExternalApiException;
 import com.ktnu.AiLectureSummary.exception.FileProcessingException;
+import com.ktnu.AiLectureSummary.exception.InvalidVideoFileException;
 import com.ktnu.AiLectureSummary.repository.LectureRepository;
-import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
-import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
 import com.ktnu.AiLectureSummary.util.MultipartFileResource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -33,21 +30,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LectureService {
     private final LectureRepository lectureRepository;
-    private final MemberLectureRepository memberLectureRepository;
-    private final MemberLectureService memberLectureService;
-
-    // Client -> Spring -> FastAPI -> Spring&DB -> Client
 
     /**
      * 업로드된 비디오 파일을 해싱하여 중복 여부를 검사하고,
      * FastAPI 서버에 전송하여 요약 정보를 받은 후, 이를 DB에 저장한다.
      *
-     * @param user
+     *
      * @param file 사용자가 업로드한 비디오 파일
-     * @return 요약된 강의 정보를 담은 응답 객체
+     * @return lecture 객체
      */
-    @Transactional
-    public LectureResponse processVideoUpload(CustomUserDetails user, MultipartFile file) {
+    public Lecture processLecture(MultipartFile file) {
         validateVideoFile(file);
 
         // VideoHasing & DB에 중복되는 영상이 존재하는지 확인
@@ -56,21 +48,16 @@ public class LectureService {
 
         // 이미 존재하는 경우 바로 바로 반환
         if (optionalLecture.isPresent()) {
-            return LectureResponse.from(optionalLecture.get());
+            return optionalLecture.get();
         }
 
         // FastAPI 호출
         LectureRegisterRequest registerRequest =sendToAi(file);
 
         // DB에 강의 내용 저장
-        Lecture saved=lectureRepository.save(Lecture.from(registerRequest, videoHash));
-
-        // 사용자와 강의 간의 소유 관계 기록 (MemberLecture 생성)
-        memberLectureService.save(user, saved);
-
-        return LectureResponse.from(saved);
-
+        return lectureRepository.save(Lecture.from(registerRequest, videoHash));
     }
+
 
     /**
      * 업로드된 비디오 파일을 FastAPI 서버로 전송하고,
@@ -169,13 +156,15 @@ public class LectureService {
         // 파일 확장자는 사용자가 쉽게 변경할 수 있으므로 신뢰할 수 없음
         // MIME 타입(Content-Type)을 기반으로 파일 형식을 검증함
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("파일이 비어 있습니다.");
+            throw new InvalidVideoFileException("파일이 비어 있습니다.");
         }
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("video/")) {
-            throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. 비디오 파일만 업로드 가능합니다.");
+            throw new InvalidVideoFileException("지원하지 않는 파일 형식입니다. 비디오 파일만 업로드 가능합니다.");
         }
     }
+
+
     // 비디오 삭제?
 
 

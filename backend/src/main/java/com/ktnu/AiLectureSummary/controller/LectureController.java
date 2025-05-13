@@ -3,6 +3,7 @@ package com.ktnu.AiLectureSummary.controller;
 
 import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
 import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
+import com.ktnu.AiLectureSummary.service.LectureApplicationService;
 import com.ktnu.AiLectureSummary.service.LectureService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/lecture")
 public class LectureController {
-    private final LectureService lectureService;
+    private final LectureApplicationService lectureApplicationService;
 
 
     @PostMapping("/upload")
@@ -26,7 +27,7 @@ public class LectureController {
     public ResponseEntity<LectureResponse> uploadLecture(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestPart("file") MultipartFile file) {
-        LectureResponse response = lectureService.processVideoUpload(user, file);
+        LectureResponse response = lectureApplicationService.uploadLecture(user, file);
         return ResponseEntity.ok(response);
     }
 

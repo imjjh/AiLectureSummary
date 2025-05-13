@@ -17,12 +17,16 @@ public class MemberLectureService {
 
     public void save(CustomUserDetails user, Lecture lecture) {
         Member member = memberService.findById(user.getId());
-        memberLectureRepository.save(
-                MemberLecture.builder()
-                        .member(member)
-                        .lecture(lecture)
-                        .build()
-        );
+
+        if (!memberLectureRepository.existsByMemberAndLecture(member, lecture)) {
+            memberLectureRepository.save(
+                    MemberLecture.builder()
+                            .member(member)
+                            .lecture(lecture)
+                            .build()
+            );
+        }
+
     }
 
 

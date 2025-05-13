@@ -1,5 +1,7 @@
 package com.ktnu.AiLectureSummary.repository;
 
+import com.ktnu.AiLectureSummary.domain.Lecture;
+import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.domain.MemberLecture;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,6 +15,5 @@ public interface MemberLectureRepository extends JpaRepository<MemberLecture, Lo
 
     // 특정 회원이 등록한 모든 강의 목록 조회
     List<MemberLecture> findAllByMember_Id(Long memberId);
-
-
+    boolean existsByMemberAndLecture(Member member, Lecture lecture);
 }
