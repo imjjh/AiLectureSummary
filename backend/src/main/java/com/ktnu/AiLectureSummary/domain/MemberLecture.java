@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+// member_id와 lecture_id을 조합해서 도일한 조합이 두번 이상 들어가지 못하게 함
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "lecture_id"}))
 public class MemberLecture {
 
     /**
