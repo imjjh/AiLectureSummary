@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 
 type User = {
@@ -31,6 +31,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
+  // ✅ 로그인 유지용 - 컴포넌트 마운트 시 자동 호출
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:8080/api/members/me", {
+          credentials: "include",
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const loggedInUser: User = {
+            id: String(data.id),
+            name: data.username,
+            email: data.email,
+            joinDate: "", // 서버에 joinDate가 없으면 빈 값
+          }
+          setUser(loggedInUser)
+        }
+      } catch (err) {
+        console.error("자동 로그인 확인 실패:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchUser()
+  }, [])
+
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch("http://localhost:8080/api/members/login", {
@@ -38,20 +65,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // 쿠키 인증용
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       })
-  
+
       if (res.ok) {
         const data = await res.json()
-  
         const newUser: User = {
           id: String(data.member.id),
           name: data.member.username,
           email: data.member.email,
-          joinDate: new Date().toISOString(), // 서버가 제공하지 않으면 현재 시각으로 대체
+          joinDate: new Date().toISOString(),
         }
-  
         setUser(newUser)
         return true
       } else {
@@ -66,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return false
     }
   }
-  
+
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch("http://localhost:8080/api/members/register", {
@@ -78,7 +103,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
 
       if (res.status === 201) {
-        const data = await res.json()
         return true
       } else {
         let message = "회원가입에 실패했습니다."
