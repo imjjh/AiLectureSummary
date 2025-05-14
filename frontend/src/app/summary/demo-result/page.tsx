@@ -4,6 +4,10 @@ import { useRouter } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Download, Share2, Bookmark } from "lucide-react"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { useAuth } from "@/hooks/use-auth"
+import { toast } from "@/hooks/use-toast"
 import Link from "next/link"
 
 interface SummaryData {
@@ -17,6 +21,9 @@ interface SummaryData {
 
 export default function DemoSummaryPage() {
   const router = useRouter()
+  const [note, setNote] = useState("")
+  const { user } = useAuth()
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
   const [data, setData] = useState<SummaryData>({
     title: "제목 없음",
     summary: "",
@@ -25,6 +32,59 @@ export default function DemoSummaryPage() {
     filename: "파일 없음",
     timestamp: "시간 정보 없음"
   })
+
+  useEffect(() => {
+    if (!data.filename || data.filename === "파일 없음") return
+
+    const saved = localStorage.getItem(`note-${data.filename}`)
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved)
+          setNote(parsed.content || "")
+          setLastUpdated(parsed.updatedAt || null)
+        } catch {
+          setNote(saved) // fallback for 예전 구조
+        }
+      }
+    }, [data.filename])
+
+    const handleSaveNote = () => {
+      if (!user) {
+        toast({
+          title: "로그인 후 이용 가능합니다",
+          description: "메모를 저장하려면 로그인해주세요.",
+          variant: "destructive", // 또는 기본으로 바꿔도 됨
+        })
+        return
+      }
+
+      const now = new Date().toISOString()
+      const storageKey = `note-${data.filename}`
+      const saveData = {
+        content: note,
+        updatedAt: now,
+      }
+
+      localStorage.setItem(storageKey, JSON.stringify(saveData))
+      setLastUpdated(now)
+
+      toast({
+        title: "저장 완료",
+        description: "메모가 저장되었습니다.",
+      })
+    }
+
+    const handleDeleteNote = () => {
+      const storageKey = `note-${data.filename}`
+      localStorage.removeItem(storageKey)
+      setNote("")
+      setLastUpdated(null)
+
+      toast({
+        title: "삭제 완료",
+        description: "메모가 삭제되었습니다.",
+      })
+    }
 
   useEffect(() => {
     const parseQueryParams = () => {
@@ -137,6 +197,36 @@ export default function DemoSummaryPage() {
                     <p className="text-gray-400">요약 데이터가 없습니다.</p>
                   )}
                 </div>
+
+                <div className="space-y-2 mt-6">
+                  <h3 className="text-lg font-semibold">내 메모</h3>
+                  {lastUpdated && (
+                    <p className="text-sm text-muted-foreground">
+                      마지막 저장: {new Date(lastUpdated).toLocaleString("ko-KR")}
+                    </p>
+                  )}
+                  <Textarea
+                    placeholder="요약을 보고 생각난 내용을 자유롭게 기록하세요."
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    className="min-h-[120px] focus-visible:ring-0 focus-visible:ring-transparent focus:outline-none"
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      onClick={handleSaveNote}
+                      className="px-6 bg-muted text-foreground hover:bg-gray-200 active:scale-95 transition-all"
+                    >
+                      메모 저장
+                    </Button>
+                    <Button
+                      onClick={handleDeleteNote}
+                      className="px-6 bg-muted text-foreground hover:bg-gray-200 active:scale-95 transition-all"
+                    >
+                      삭제
+                    </Button>
+                  </div>
+                </div>
+
               </CardContent>
             </Card>
           </TabsContent>

@@ -47,7 +47,10 @@ export default function DashboardPage() {
               <h3 className="text-lg font-medium mb-4">계정 정보</h3>
               <p className="text-muted-foreground">로그인된 사용자 정보가 여기에 표시됩니다.</p>
               <div className="mt-4 pt-4 border-t">
-                <Button variant="outline" size="sm" className="w-full">
+                <Button
+                  size="sm"
+                  className="w-full bg-background text-foreground border border-border hover:bg-muted"
+                >
                   계정 설정
                 </Button>
               </div>
