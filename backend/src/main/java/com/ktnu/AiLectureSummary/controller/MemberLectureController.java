@@ -5,7 +5,6 @@ import com.ktnu.AiLectureSummary.dto.lecture.LectureListItemResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
 import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberLectureService;
-import com.ktnu.AiLectureSummary.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
