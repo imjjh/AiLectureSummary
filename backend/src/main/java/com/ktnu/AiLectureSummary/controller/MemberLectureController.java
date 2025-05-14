@@ -29,7 +29,7 @@ public class MemberLectureController {
             description = "로그인한 사용자가 등록한 강의들의 제목 및 간략 정보를 반환합니다."
     )
     public ResponseEntity<List <LectureListItemResponse>> dashBoard(@AuthenticationPrincipal CustomUserDetails user){
-        // s현재 로그인한 사용자의 강의 목록 조회
+        // 현재 로그인한 사용자의 강의 목록 조회
         List<LectureListItemResponse> userLectureList = memberLectureService.getUserLectureList(user);
         // 응답 상태코드 200 OK로 반환
         return ResponseEntity.ok(userLectureList);
