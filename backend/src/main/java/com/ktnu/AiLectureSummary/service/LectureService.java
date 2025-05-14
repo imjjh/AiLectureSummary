@@ -151,7 +151,11 @@ public class LectureService {
         }
     }
 
-
+    /**
+     * 사용자가 업로드한 파일이 기대하는 파일형식과 동일한지 검사한다.
+     *
+     * @param file
+     */
     private void validateVideoFile(MultipartFile file) {
         // 파일 확장자는 사용자가 쉽게 변경할 수 있으므로 신뢰할 수 없음
         // MIME 타입(Content-Type)을 기반으로 파일 형식을 검증함
