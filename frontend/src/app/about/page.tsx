@@ -137,7 +137,12 @@ export default function AboutPage() {
             <Button className="gap-2">시작하기 <ArrowRight size={16} /></Button>
           </Link>
           <Link href="/login">
-            <Button variant="outline">로그인</Button>
+            <Button
+              variant="outline"
+              className="bg-background border border-border text-foreground hover:bg-muted"
+            >
+              로그인
+            </Button>
           </Link>
         </div>
       </motion.section>
