@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { Download, Share2, Bookmark } from "lucide-react"
-import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
 import { toast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { NoteEditor } from "@/components/NoteEditor"
 
 interface SummaryData {
   title: string
@@ -58,6 +58,15 @@ export default function DemoSummaryPage() {
         return
       }
 
+      if (!data.filename || data.filename === "파일 없음") {
+        toast({
+          title: "파일 정보 없음",
+          description: "먼저 동영상을 업로드한 후 메모를 저장할 수 있습니다.",
+          variant: "destructive",
+        })
+        return
+      }
+
       const now = new Date().toISOString()
       const storageKey = `note-${data.filename}`
       const saveData = {
@@ -94,9 +103,7 @@ export default function DemoSummaryPage() {
       if (encodedData) {
         try {
           const decodedData = decodeURIComponent(encodedData)
-          console.log("디코딩된 데이터:", decodedData) // 디버깅용
           const result = JSON.parse(decodedData)
-          console.log("파싱된 결과:", result) // 디버깅용
           
           setData({
             title: result.title || "제목 없음",
@@ -140,7 +147,7 @@ export default function DemoSummaryPage() {
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <Link href="/" className="text-blue-600 hover:underline mb-4 inline-block">
+          <Link href="/" className="text-gray-500 hover:underline mb-4 inline-block">
             ← 홈으로 돌아가기
           </Link>
           <h1 className="text-3xl font-bold tracking-tight mb-2">{data.title}</h1>
@@ -198,34 +205,13 @@ export default function DemoSummaryPage() {
                   )}
                 </div>
 
-                <div className="space-y-2 mt-6">
-                  <h3 className="text-lg font-semibold">내 메모</h3>
-                  {lastUpdated && (
-                    <p className="text-sm text-muted-foreground">
-                      마지막 저장: {new Date(lastUpdated).toLocaleString("ko-KR")}
-                    </p>
-                  )}
-                  <Textarea
-                    placeholder="요약을 보고 생각난 내용을 자유롭게 기록하세요."
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    className="min-h-[120px] focus-visible:ring-0 focus-visible:ring-transparent focus:outline-none"
-                  />
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      onClick={handleSaveNote}
-                      className="px-6 bg-muted text-foreground hover:bg-gray-200 active:scale-95 transition-all"
-                    >
-                      메모 저장
-                    </Button>
-                    <Button
-                      onClick={handleDeleteNote}
-                      className="px-6 bg-muted text-foreground hover:bg-gray-200 active:scale-95 transition-all"
-                    >
-                      삭제
-                    </Button>
-                  </div>
-                </div>
+                <NoteEditor
+                  note={note}
+                  setNote={setNote}
+                  lastUpdated={lastUpdated}
+                  onSave={handleSaveNote}
+                  onDelete={handleDeleteNote}
+                />
 
               </CardContent>
             </Card>
@@ -249,9 +235,9 @@ export default function DemoSummaryPage() {
           <h2 className="text-2xl font-bold mb-4">새로운 요약 생성하기</h2>
           <div className="flex justify-center gap-4">
             <Link href="/upload">
-              <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors">
+              <Button className="rounded-full px-8 py-6 text-lg bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 동영상 업로드
-              </button>
+              </Button>
             </Link>
           </div>
         </div>

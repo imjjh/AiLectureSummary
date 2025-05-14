@@ -103,13 +103,35 @@ export default function VideoUploader() {
           }
         };
   
-        xhr.open('POST', 'http://localhost:9090/upload');
+        xhr.open('POST', 'http://localhost:9090/api/summary');
         xhr.send(formData);
       });
+
+      // 2. 응답에서 요약 결과 추출
+      const { title, originalText, aiSummary } = response as {
+        title: string
+        originalText: string
+        aiSummary: string
+      }
+      const accessToken = localStorage.getItem("accessToken");
+      // 3. 요약 데이터를 DB에 저장
+      const saveRes = await fetch("http://localhost:8080/api/lectures", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}` // ✅ 인증 헤더 추가
+        },
+        body: JSON.stringify({ title, originalText, aiSummary }),
+      })
   
-      // 서버에서 받은 응답 그대로 전달
-      const encodedData = encodeURIComponent(JSON.stringify(response));
-      router.push(`/summary/demo-result?data=${encodedData}`);
+      if (!saveRes.ok) {
+        throw new Error("DB 저장 실패");
+      }
+
+      const { id } = await saveRes.json();
+
+      // 4. 저장된 강의 ID로 summary/[id] 페이지로 이동
+      router.push(`/summary/${id}`);
       
     } catch (error) {
       alert(t("upload_failed"));

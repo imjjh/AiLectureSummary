@@ -46,7 +46,7 @@ export function UserMenu() {
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10 border-2 border-primary">
             <AvatarFallback className="bg-linear-to-r from-pink-500 to-orange-500 text-white">
-              {user.name.substring(0, 2).toUpperCase()}
+              {user.name.slice(-2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </Button>

@@ -124,7 +124,7 @@ export default function Home() {
             </p>*/}
             <Link href="/register">
               <Button className="rounded-full px-8 py-6 text-lg bg-linear-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                무료로 1시작하기
+                <span>무료로 시작하기</span>
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
