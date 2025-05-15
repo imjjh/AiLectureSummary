@@ -2,11 +2,13 @@ package com.ktnu.AiLectureSummary.service;
 
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
-import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.domain.MemberLecture;
+import com.ktnu.AiLectureSummary.dto.lecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.LectureListItemResponse;
+import com.ktnu.AiLectureSummary.exception.LectureNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
 import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -52,5 +54,46 @@ public class MemberLectureService {
                 .toList();
 
         return LectureListItemResponse.fromList(lectures);
+    }
+
+    /**
+     * 강의 상세 요약 정보를 가져옵니다.
+     * member.id, lectureId로  사용자가 등록한 강의가 맞나 확인 하고 강의 상세 요약 정보를 반환합니다.
+     *
+     * @param user 현재 로그인한 사용자 정보
+     * @param lectureId
+     * @return
+     */
+    public LectureDetailResponse getLectureDetail(CustomUserDetails user, long lectureId) {
+
+        MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
+                .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
+
+        return LectureDetailResponse.from(
+                memberLecture.getLecture(),
+                memberLecture.getPersonalNote()
+        );
+
+    }
+
+    /**
+     * 강의에 대한 개인 메모를 작성합니다.
+     * member.id, lectureId로  사용자가 등록한 강의가 맞나 확인 하고, 개인 메모를 저장합니다.
+     *
+     * @param user 현재 로그인한 사용자 정보
+     * @param lectureId
+     * @param note 사용자가 입력한 요약 정보
+     * @return
+     */
+    public LectureDetailResponse writePersonalNote(CustomUserDetails user, Long lectureId, String note) {
+        MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
+                .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
+
+        memberLecture.setPersonalNote(note);
+
+        return LectureDetailResponse.from(
+                memberLecture.getLecture(),
+                memberLecture.getPersonalNote()
+        );
     }
 }

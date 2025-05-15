@@ -152,4 +152,23 @@ public class GlobalExceptionHandler {
                         .build()
         );
     }
+
+    /**
+     * 조회한 강의를 찾을 수 없어 발생한 예외 처리 핸들러
+     *
+     * @param e 강의를 찾을 수 없어 발생한 예외 객체
+     * @return 404 (Not Found) 응답과 함께 상세 에러 메시지 반환
+     */
+    @ExceptionHandler(LectureNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleLectureNotFoundException(LectureNotFoundException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ErrorResponse.builder()
+                        .error("LECTURE_NOT_FOUND")
+                        .message(e.getMessage())
+                        .status(HttpStatus.NOT_FOUND.value())
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
 }
