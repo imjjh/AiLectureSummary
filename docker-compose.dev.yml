@@ -35,6 +35,7 @@ services:
       - mysql
     env_file:
       - .env
+    
   
   mysql:
     image: mysql:8.0
