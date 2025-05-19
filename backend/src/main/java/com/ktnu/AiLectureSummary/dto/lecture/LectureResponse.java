@@ -8,6 +8,7 @@ import lombok.Getter;
  */
 @Getter
 public class LectureResponse {
+    private Long id;  // ✅ ID 필드 추가
     private String title;
     private String originalText;
     private String aiSummary;
@@ -15,6 +16,7 @@ public class LectureResponse {
 
     public static LectureResponse from(Lecture lecture){
         LectureResponse response = new LectureResponse();
+        response.id = lecture.getId();  // ✅ ID 값 설정
         response.title = lecture.getTitle();
         response.originalText = lecture.getOriginalText();
         response.aiSummary = lecture.getAiSummary();
