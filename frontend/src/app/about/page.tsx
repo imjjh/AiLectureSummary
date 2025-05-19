@@ -138,7 +138,6 @@ export default function AboutPage() {
           </Link>
           <Link href="/login">
             <Button
-              variant="outline"
               className="bg-background border border-border text-foreground hover:bg-muted"
             >
               로그인
