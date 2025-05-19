@@ -8,8 +8,16 @@ import { Clock, FileText, Upload } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
+type Lecture = {
+  lectureId: number;
+  title: string;
+  createdAt: string;
+  duration: string;
+  thumbnailUrl?: string;
+};
+
 export default function DashboardPage() {
-  const [lectures, setLectures] = useState([])
+  const [lectures, setLectures] = useState<Lecture[]>([]);
 
   useEffect(() => {
     async function fetchLectures() {
@@ -29,6 +37,38 @@ export default function DashboardPage() {
 
     fetchLectures()
   }, [])
+
+  const handleDelete = (lectureId: number) => {
+    const updated = lectures.filter((lecture) => lecture.lectureId !== lectureId);
+    setLectures(updated);
+    // 서버에도 삭제 요청하고 싶다면 여기에 fetch 추가
+  };
+
+  const getTotalDurationText = (lectures: Lecture[]): string => {
+    let totalSeconds = 0;
+
+    lectures.forEach((lecture) => {
+      const duration = lecture.duration;
+
+      if (!duration || typeof duration !== "string") return;
+
+      const parts = duration.split(":").map((s) => parseInt(s, 10));
+
+      if (parts.length === 2) {
+        // "MM:SS"
+        const [minutes, seconds] = parts;
+        totalSeconds += (minutes * 60) + seconds;
+      } else if (parts.length === 1) {
+        // "MM"
+        totalSeconds += parts[0] * 60;
+      }
+    });
+
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    return `${hours}시간 ${minutes}분`;
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -61,7 +101,7 @@ export default function DashboardPage() {
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Clock className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold mb-1">0시간 0분</h3>
+              <h3 className="text-2xl font-bold mb-1">{getTotalDurationText(lectures)}</h3>
               <p className="text-sm text-muted-foreground">절약한 시간</p>
             </CardContent>
           </Card>
@@ -87,34 +127,76 @@ export default function DashboardPage() {
             <TabsTrigger value="recent">최근 요약</TabsTrigger>
             <TabsTrigger value="all">모든 요약</TabsTrigger>
           </TabsList>
-          <TabsContent value="recent" className="mt-6">
+
+          {/* 최근 요약 */}
+          <TabsContent value="recent" className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {lectures.length > 0 ? (
-              <ul className="space-y-2">
-                {lectures.map((lecture: any) => (
-                  <li key={lecture.lectureId}>
-                    <Link href={`/summary/${lecture.lectureId}`} className="text-primary hover:underline">
-                      {lecture.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              lectures.slice(0, 2).map((lecture: any) => (
+                <Card key={lecture.lectureId} className="relative hover:shadow-lg transition-shadow">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 text-xs text-muted-foreground hover:text-destructive"
+                    onClick={() => handleDelete(lecture.lectureId)}
+                  >
+                    X
+                  </Button>
+                  <Link href={`/summary/${lecture.lectureId}`}>
+                    <CardContent className="p-4">
+                      <div className="aspect-video bg-muted rounded mb-3 overflow-hidden">
+                        <Image
+                          src={lecture.thumbnailUrl || "/images/1.png"}
+                          alt="썸네일"
+                          width={320}
+                          height={180}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="text-base font-medium truncate">{lecture.title}</div>
+                      <div className="text-sm text-muted-foreground">{lecture.createdAt}</div>
+                      <div className="text-sm text-muted-foreground">{lecture.duration}</div>
+                    </CardContent>
+                  </Link>
+                </Card>
+              ))
             ) : (
-              <p className="text-muted-foreground text-center">요약한 동영상이 없습니다.</p>
+              <p className="text-muted-foreground text-center col-span-full">요약한 동영상이 없습니다.</p>
             )}
           </TabsContent>
-          <TabsContent value="all" className="mt-6">
+
+          {/* 모든 요약 */}
+          <TabsContent value="all" className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {lectures.length > 0 ? (
-              <ul className="space-y-2">
-                {lectures.map((lecture: any) => (
-                  <li key={lecture.lectureId}>
-                    <Link href={`/summary/${lecture.lectureId}`} className="text-primary hover:underline">
-                      {lecture.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              lectures.map((lecture: any) => (
+                <Card key={lecture.lectureId} className="relative hover:shadow-lg transition-shadow">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 text-xs text-muted-foreground hover:text-destructive"
+                    onClick={() => handleDelete(lecture.lectureId)}
+                  >
+                    X
+                  </Button>
+                  <Link href={`/summary/${lecture.lectureId}`}>
+                    <CardContent className="p-4">
+                      <div className="aspect-video bg-muted rounded mb-3 overflow-hidden">
+                        <Image
+                          src={lecture.thumbnailUrl || "/placeholder.png"}
+                          alt="썸네일"
+                          width={320}
+                          height={180}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="text-base font-medium truncate">{lecture.title}</div>
+                      <div className="text-sm text-muted-foreground">{lecture.createdAt}</div>
+                      <div className="text-sm text-muted-foreground">{lecture.duration}</div>
+                    </CardContent>
+                  </Link>
+                </Card>
+              ))
             ) : (
-              <p className="text-muted-foreground text-center">요약한 동영상이 없습니다.</p>
+              <p className="text-muted-foreground text-center col-span-full">요약한 동영상이 없습니다.</p>
             )}
           </TabsContent>
         </Tabs>
