@@ -1,3 +1,6 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -6,6 +9,28 @@ import Link from "next/link"
 import Image from "next/image"
 
 export default function DashboardPage() {
+  const [lectures, setLectures] = useState([])
+
+  useEffect(() => {
+    async function fetchLectures() {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      const res = await fetch(`${baseUrl}/api/member-lectures/dashboard`, {
+        method: "GET",
+        credentials: "include",
+        cache: "no-store",
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        setLectures(data)
+      } else {
+        setLectures([])
+      }
+    }
+
+    fetchLectures()
+  }, [])
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-6xl mx-auto">
@@ -27,7 +52,7 @@ export default function DashboardPage() {
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <FileText className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold mb-1">0</h3>
+              <h3 className="text-2xl font-bold mb-1">{lectures.length}</h3>
               <p className="text-sm text-muted-foreground">요약한 동영상</p>
             </CardContent>
           </Card>
@@ -47,7 +72,10 @@ export default function DashboardPage() {
               <h3 className="text-lg font-medium mb-4">계정 정보</h3>
               <p className="text-muted-foreground">로그인된 사용자 정보가 여기에 표시됩니다.</p>
               <div className="mt-4 pt-4 border-t">
-                <Button variant="outline" size="sm" className="w-full">
+                <Button
+                  size="sm"
+                  className="w-full bg-background text-foreground border border-border hover:bg-muted"
+                >
                   계정 설정
                 </Button>
               </div>
@@ -61,10 +89,34 @@ export default function DashboardPage() {
             <TabsTrigger value="all">모든 요약</TabsTrigger>
           </TabsList>
           <TabsContent value="recent" className="mt-6">
-            <p className="text-muted-foreground text-center">최근 요약 데이터가 없습니다.</p>
+            {lectures.length > 0 ? (
+              <ul className="space-y-2">
+                {lectures.map((lecture: any) => (
+                  <li key={lecture.lectureId}>
+                    <Link href={`/summary/${lecture.lectureId}`} className="text-primary hover:underline">
+                      {lecture.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground text-center">요약한 동영상이 없습니다.</p>
+            )}
           </TabsContent>
           <TabsContent value="all" className="mt-6">
-            <p className="text-muted-foreground text-center">모든 요약 데이터를 불러올 수 없습니다.</p>
+            {lectures.length > 0 ? (
+              <ul className="space-y-2">
+                {lectures.map((lecture: any) => (
+                  <li key={lecture.lectureId}>
+                    <Link href={`/summary/${lecture.lectureId}`} className="text-primary hover:underline">
+                      {lecture.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground text-center">요약한 동영상이 없습니다.</p>
+            )}
           </TabsContent>
         </Tabs>
       </div>

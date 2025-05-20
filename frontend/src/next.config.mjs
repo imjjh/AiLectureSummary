@@ -27,6 +27,13 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
+  webpackDevMiddleware: config => {
+    config.watchOptions = {
+      poll: 1000,        // 1초마다 변경 감지
+      aggregateTimeout: 300,
+    }
+    return config
+  },
 }
 
 if (userConfig) {

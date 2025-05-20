@@ -9,17 +9,19 @@ import { UserMenu } from "@/components/user-menu"
 import { Menu, X } from "lucide-react"
 import { usePathname } from "next/navigation"
 import { useLanguage } from "@/hooks/use-language"
+import { useAuth } from "@/hooks/use-auth"
 import { motion } from "framer-motion"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
   const { t } = useLanguage()
+  const { user, isLoading } = useAuth()
 
   // 로그인 페이지와 회원가입 페이지에서는 헤더를 표시하지 않음
-  if (pathname === "/login" || pathname === "/register") {
+  {/*if (pathname === "/login" || pathname === "/register") {
     return null
-  }
+  }*/}
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-sm supports-backdrop-filter:bg-background/60 border-b border-border/40">
@@ -63,7 +65,13 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-2">
           <LanguageSelector />
           <ModeToggle />
-          <UserMenu />
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+            </div>
+          ) : (
+            <UserMenu />
+          )}
         </div>
 
         <div className="flex md:hidden items-center gap-2">
@@ -109,7 +117,13 @@ export default function Header() {
               {t("about")}
             </Link>
             <div className="flex flex-col gap-2 pt-2 border-t">
-              <UserMenu />
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+                </div>
+              ) : (
+                <UserMenu />
+              )}
             </div>
           </div>
         </motion.div>

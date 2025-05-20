@@ -21,3 +21,6 @@ spring:
 
 jwt:
   secret-key: ${JWT_SECRET_KEY}
+
+fastapi:
+  url: ${FASTAPI_URL}

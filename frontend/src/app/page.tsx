@@ -119,12 +119,12 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.6 }}
           >
             <h2 className="text-2xl font-bold mb-4">지금 바로 시작하세요</h2>
-            <p className="text-muted-foreground mb-6">
+            {/*<p className="text-muted-foreground mb-6">
               회원가입 없이도 서비스를 이용할 수 있습니다. 요약 기록을 저장하려면 로그인하세요.
-            </p>
+            </p>*/}
             <Link href="/register">
               <Button className="rounded-full px-8 py-6 text-lg bg-linear-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                무료로 시작하기
+                <span>무료로 시작하기</span>
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>

@@ -9,9 +9,9 @@ export default function Footer() {
   const { t } = useLanguage()
 
   // 로그인 페이지와 회원가입 페이지에서는 푸터를 표시하지 않음
-  if (pathname === "/login" || pathname === "/register") {
+  {/*if (pathname === "/login" || pathname === "/register") {
     return null
-  }
+  }*/}
 
   return (
     <footer className="border-t py-8 md:py-12 bg-linear-to-b from-white to-pink-50 dark:from-gray-950 dark:to-gray-900">

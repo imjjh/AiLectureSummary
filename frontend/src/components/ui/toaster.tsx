@@ -15,21 +15,21 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
-        return (
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+        {toasts.map(({ id, title, description, action, ...props }) => (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
+              {description && <ToastDescription>{description}</ToastDescription>}
             </div>
             {action}
             <ToastClose />
           </Toast>
-        )
-      })}
-      <ToastViewport />
+        ))}
+      </div>
+
+      {/* 🔽 뷰포트도 확실한 위치 지정 */}
+      <ToastViewport className="fixed top-4 right-4 z-50" />
     </ToastProvider>
   )
 }
