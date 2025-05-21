@@ -1,84 +1,80 @@
 package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.member.LoginResponse;
+import com.ktnu.AiLectureSummary.domain.Role;
+import com.ktnu.AiLectureSummary.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
+import com.ktnu.AiLectureSummary.dto.member.MemberLoginResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
-import com.ktnu.AiLectureSummary.dto.member.MemberResponse;
-import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
-import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
-import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
-import com.ktnu.AiLectureSummary.security.jwt.JwtTokenProvider;
+import com.ktnu.AiLectureSummary.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
-@RequiredArgsConstructor // final 필드만 포함한 생성자 자동 생성
-// 스프링이 생성자 주입 방식으로 의존성을 주입해줌.
-
-
-/**
- * 사용자가 /login, /register 요청 등을 보낼 때 동작
- * 사용자 직접 호출
- * 사용 목적: 로그인 처리 + 토큰 발급 , 회원가입 등
- */
+@RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder encoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
-    // 회원가입
-    @Transactional
-    public Member register(MemberRegisterRequest request) {
-        // 중복체크
-        if (memberRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new DuplicateLoginIdException("이미 존재하는 로그인 ID 입니다.");
+
+    /**
+     * 사용자가 입력한 정보로 회원가입 시도합니다.
+     * 이메일이 중복인 경우 실패 중복되지 않으면 성공합니다.
+     * 성공 이후 DB에 저장합니다.
+     * @param request
+     * @return
+     */
+    public void register(MemberRegisterRequest request) {
+        // 필요한 필드 꺼내기
+        String email = request.getEmail();
+        String password = request.getPassword();
+        String nickname = request.getUsername();
+
+        // 중복된 이메일 체크
+        if (memberRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다");
         }
-        // DTO → Entity 변환
-        Member member = new Member();
-        member.setEmail(request.getEmail());
-        member.setUsername(request.getUsername());
-        member.setPassword(encoder.encode(request.getPassword())); // 해싱 저장
+        // 멤버 생성
+        Member member = Member.builder()
+                .email(email)
+                .password(passwordEncoder.encode(password)) // encode()는 내부적으로 bcrypt 알고리즘을 사용한 단방향 해싱 함수
+                .username(nickname)
+                .role(Role.USER)
+                .build();
 
-        return memberRepository.save(member);
+        // DB 저장
+        memberRepository.save(member);
+
+        // 회원가입 완료 시 반환값 없음
     }
 
-    /**
-     * 로그인 (아이디 + 비밀번호 확인 + 토큰 생성)
-     * @param request 사용자의 로그인 요청 정보 (이메일, 비밀번호)
-     * @return 로그인에 성공한 사용자 정보와 JWT 토큰을 포함한 응답 객체
-     */
-     public LoginResponse login(MemberLoginRequest request){
-        // 이메일이 존재 여부 확인
-        Member member = memberRepository.findByEmail(request.getEmail())
-                .orElseThrow(()-> new MemberNotFoundException("존재하지 않는 이메일입니다."));
-        // 비밀 번호 확인 (해싱된 비밀번호와 입력값 비교)
-        if (!encoder.matches(request.getPassword(), member.getPassword()))
-            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
-
-        // JWT 토큰 생성
-        String token = jwtTokenProvider.createToken(member.getEmail());
-
-        // 토큰 + 유저정보 DTO로 감싸서 반환
-        return new LoginResponse(new MemberResponse(member), token);
-    }
-
-    // 로그아웃 (토큰 제거) -> Controller 에서 처리
-
-    // /me -> Controller 에서 처리
 
     /**
-     * id를 이용하여 DB에서  회원 조회, 존재 하지 않으면 MemberNotFoundException 발생
-     * @param id 조회할 회원의 고유 ID
-     * @return 해당 ID에 대응하는 Member 객체
-     * @throws MemberNotFoundException 존재하지 않는 ID일 경우 발생
+     * 사용자가 입력한 정보로 로그인을 시도합니다.
+     * 이메일이 존재하지 않거나 비밀번호가 일치하지 않으면 로그인에 실패합니다.
+     * 이메일이 존재하고 비밀번호가 일치하는 경우 JWT를 생성하여 반환합니다.
+     * @param request
+     * @return
      */
-    public Member findById(long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("해당 ID의 회원이 존재하지 않습니다."));
+    public MemberLoginResponse login(MemberLoginRequest request){
+        // 필요한 필드 꺼내기
+        String email = request.getEmail();
+        String password = request.getPassword();
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
+        if (!passwordEncoder.matches(password, member.getPassword())){
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // JWT 생성
+        String token=jwtProvider.createToken(member.getId());
+
+        return new MemberLoginResponse(token);
     }
 }

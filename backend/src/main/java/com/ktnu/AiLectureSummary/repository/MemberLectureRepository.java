@@ -20,4 +20,5 @@ public interface MemberLectureRepository extends JpaRepository<MemberLecture, Lo
     List<MemberLecture> findAllByMember_Id(Long memberId);
     boolean existsByMemberAndLecture(Member member, Lecture lecture);
 
+    boolean existsByMember_IdAndLecture(Long memberId, Lecture lecture);
 }

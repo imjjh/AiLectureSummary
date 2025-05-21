@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * AOP 클래스: 서비스 메서드 호출 전 로그를 출력함
+ * AOP 클래스: 로깅, 감사 등을 위한 클래스
  *
  */
 @Component
@@ -29,5 +29,13 @@ public class LoggingAspect {
         // 메서드 실행 전 로그 출력 (메서드명 + 인자 목록)
         log.info("{} 호출됨 - args: {}",joinPoint.getSignature(),joinPoint.getArgs());
 
+    }
+
+
+
+    // Controller 진입 시 로그
+    @Before("execution(* com.ktnu.AiLectureSummary.controller..*(..))")    public void logControllerStart(JoinPoint joinPoint) {
+        String method = joinPoint.getSignature().toShortString();
+        log.info(" [Controller] 요청: {}", method);
     }
 }

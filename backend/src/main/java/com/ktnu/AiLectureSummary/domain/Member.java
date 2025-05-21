@@ -1,8 +1,7 @@
 package com.ktnu.AiLectureSummary.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,7 +19,9 @@ import java.util.List;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Member {
     /**
      * 회원 고유 ID (Primary Key)
@@ -42,6 +43,7 @@ public class Member {
      * - null 불가
      */
     @Column(nullable = false)
+    @Setter(AccessLevel.PROTECTED) // 비밀번호 수정 가능
     private String password;
 
     /**
@@ -85,4 +87,12 @@ public class Member {
      */
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLecture> memberLectureList = new ArrayList<>();
+
+    // 값의 범위를 제한하고 명확하게 표현하기 위해 enum 사용
+    // USER, ADMIN 등의 값만 허용하며, 추후 VIP, MANAGER 등으로 확장 가능
+    // 불리언보다 확장성과 가독성이 뛰어남
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
 }

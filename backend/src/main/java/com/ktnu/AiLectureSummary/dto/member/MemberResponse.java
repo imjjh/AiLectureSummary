@@ -14,7 +14,6 @@ public class MemberResponse {
     }
 
     public  static  MemberResponse from(Member member){
-
         return new MemberResponse(member);
     }
 }
