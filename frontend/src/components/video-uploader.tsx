@@ -37,8 +37,8 @@ export default function VideoUploader() {
 
       setFiles(prevFiles => [
         ...prevFiles,
-        ...videoFiles.filter(newFile =>
-          !prevFiles.some(existing =>
+        ...videoFiles.filter(newFile => 
+          !prevFiles.some(existing => 
             existing.name === newFile.name && existing.size === newFile.size
           )
         )
@@ -48,9 +48,9 @@ export default function VideoUploader() {
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
-      const newFiles = Array.from(e.target.files).filter(file =>
-        file.type.startsWith("video/") &&
-        !files.some(existing =>
+      const newFiles = Array.from(e.target.files).filter(file => 
+        file.type.startsWith("video/") && 
+        !files.some(existing => 
           existing.name === file.name && existing.size === file.size
         )
       )
@@ -87,8 +87,8 @@ export default function VideoUploader() {
             }
           }
         }
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-        xhr.open('POST', `${baseUrl}/api/lecture/upload`)
+
+        xhr.open('POST', 'http://localhost:8080/api/lecture/upload')
         xhr.withCredentials = true
         xhr.send(formData)
       })
@@ -109,8 +109,9 @@ export default function VideoUploader() {
   return (
     <div className="w-full">
       <div
-        className={`border-2 border-dashed rounded-xl p-8 text-center ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/20"
-          } transition-colors`}
+        className={`border-2 border-dashed rounded-xl p-8 text-center ${
+          isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/20"
+        } transition-colors`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -126,17 +127,17 @@ export default function VideoUploader() {
             <p className="text-sm text-muted-foreground mt-1">{t("drag_drop")}</p>
           </div>
 
-          <input
-            type="file"
-            id="video-upload"
-            className="hidden"
-            accept="video/*"
+          <input 
+            type="file" 
+            id="video-upload" 
+            className="hidden" 
+            accept="video/*" 
             onChange={handleFileChange}
             multiple
           />
           <label htmlFor="video-upload">
-            <Button
-              variant="outline"
+            <Button 
+              variant="outline" 
               className="cursor-pointer rounded-full px-6 bg-background dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               asChild
             >

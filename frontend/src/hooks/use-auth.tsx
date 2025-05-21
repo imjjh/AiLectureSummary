@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   login: async () => false,
-  logout: async () => { },
+  logout: async () => {},
   register: async () => false,
 })
 
@@ -35,8 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-        const res = await fetch(`${baseUrl}/api/members/me`, {
+        const res = await fetch("http://localhost:8080/api/members/me", {
           credentials: "include",
         })
         if (res.ok) {
@@ -61,8 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      const res = await fetch(`${baseUrl}/api/members/login`, {
+      const res = await fetch("http://localhost:8080/api/members/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,8 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-      const res = await fetch(`${baseUrl}/api/members/register`, {
+      const res = await fetch("http://localhost:8080/api/members/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -133,9 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-
-      await fetch(`${baseUrl}/api/members/logout`, {
+      await fetch("http://localhost:8080/api/members/logout", {
         method: "POST",
         credentials: "include",
       })
