@@ -50,6 +50,9 @@ public class MemberLecture {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime enrolledAt;
 
+    @Column(nullable = false)
+    @Setter(AccessLevel.PROTECTED) // 사용자가 수정 가능
+    private String personalTitle;
 
     @Setter(AccessLevel.PUBLIC)
     @Column(nullable = true, columnDefinition = "TEXT") // 사용자 개별 메모 저장용 (TEXT 타입)

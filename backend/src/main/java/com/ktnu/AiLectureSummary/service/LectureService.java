@@ -53,7 +53,7 @@ public class LectureService {
         }
 
         // FastAPI 호출
-        LectureRegisterRequest registerRequest =sendToAi(file);
+        LectureRegisterRequest registerRequest = sendToAi(file);
 
         // DB에 강의 내용 저장
         return lectureRepository.save(Lecture.from(registerRequest, videoHash));

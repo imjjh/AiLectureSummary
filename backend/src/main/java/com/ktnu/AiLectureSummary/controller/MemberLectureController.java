@@ -2,10 +2,9 @@ package com.ktnu.AiLectureSummary.controller;
 
 
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureDetailResponse;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureListItemResponse;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
+import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.PersonalNoteRequest;
+import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListItemResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberLectureService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,9 +36,9 @@ public class MemberLectureController {
             summary = "내 강의 목록 조회",
             description = "로그인한 사용자가 등록한 강의들의 제목 및 간략 정보를 반환합니다."
     )
-    public ResponseEntity<ApiResponse<List<LectureListItemResponse>>> dashBoard(@AuthenticationPrincipal CustomUserDetails user){
+    public ResponseEntity<ApiResponse<List<MemberLectureListItemResponse>>> dashBoard(@AuthenticationPrincipal CustomUserDetails user){
         // 현재 로그인한 사용자의 강의 목록 조회
-        List<LectureListItemResponse> userLectureList = memberLectureService.getUserLectureList(user);
+        List<MemberLectureListItemResponse> userLectureList = memberLectureService.getUserLectureList(user);
         // 응답 상태코드 200 OK로 반환
         return ResponseEntity.ok(ApiResponse.success("내 강의 목록 조회 성공", userLectureList));
     }

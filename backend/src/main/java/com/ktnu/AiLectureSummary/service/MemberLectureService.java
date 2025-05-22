@@ -1,17 +1,16 @@
 package com.ktnu.AiLectureSummary.service;
 import com.ktnu.AiLectureSummary.domain.Member;
+import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListItemResponse;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.domain.MemberLecture;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureDetailResponse;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureListItemResponse;
+import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.exception.LectureNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +35,7 @@ public class MemberLectureService {
                     MemberLecture.builder()
                             .member(member)
                             .lecture(lecture)
+                            .personalTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
                             .build()
             );
         }
@@ -47,17 +47,12 @@ public class MemberLectureService {
      * LectureListItemResponse DTO 형태로 응답할 수 있도록 변환합니다.
      *
      * @param user 현재 로그인한 사용자 정보
-     * @return LectureListItemResponse 리스트 (강의 ID + 제목)
+     * @return MemberLectureListItemResponse 리스트 (강의 ID + personTitle)
      */
-    public List<LectureListItemResponse> getUserLectureList(CustomUserDetails user) {
+    public List<MemberLectureListItemResponse> getUserLectureList(CustomUserDetails user) {
 
         List<MemberLecture> memberLectures = memberLectureRepository.findAllByMember_Id(user.getId());
-
-        List<Lecture> lectures = memberLectures.stream()
-                .map(MemberLecture::getLecture) // MemberLecture -> Lecture
-                .toList();
-
-        return LectureListItemResponse.fromList(lectures);
+        return MemberLectureListItemResponse.fromList(memberLectures);
     }
 
     /**
@@ -73,10 +68,7 @@ public class MemberLectureService {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
 
-        return LectureDetailResponse.from(
-                memberLecture.getLecture(),
-                memberLecture.getPersonalNote()
-        );
+        return LectureDetailResponse.from(memberLecture);
 
     }
 
@@ -95,9 +87,7 @@ public class MemberLectureService {
 
         memberLecture.setPersonalNote(note);
 
-        return LectureDetailResponse.from(
-                memberLecture.getLecture(),
-                memberLecture.getPersonalNote()
-        );
+        return LectureDetailResponse.from(memberLecture);
+
     }
 }
