@@ -11,7 +11,8 @@ import Image from "next/image"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 
-// summaryData의 타입 명시
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 interface SummaryData {
   title?: string
   duration?: string
@@ -34,25 +35,29 @@ export default function Page() {
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [editedTitle, setEditedTitle] = useState(summaryData?.title || "")
 
-
   useEffect(() => {
     async function fetchSummary() {
       try {
-        const res = await fetch(`http://localhost:8080/api/member-lectures/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}`, {
           method: "GET",
           credentials: "include",
           cache: "no-store",
         })
 
-        if (!res.ok) throw new Error("요약 데이터를 가져오는 데 실패했습니다.")
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("요약 요청 실패:", res.status, errorText);
+          throw new Error("요약 데이터를 가져오는 데 실패했습니다.")
+        }
+
         const data = await res.json()
-        setSummaryData(data)
-        setNote(data.personalNote || "")
+        setSummaryData(data.data)
+        setNote(data.data.personalNote || "")
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err))
       }
     }
-    fetchSummary()
+    if (id) fetchSummary()
   }, [id])
 
   useEffect(() => {
@@ -61,10 +66,9 @@ export default function Page() {
     }
   }, [summaryData?.title])
 
-
   const handleNoteSave = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/member-lectures/${id}/my-note`, {
+      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/my-note`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -82,12 +86,12 @@ export default function Page() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/api/member-lectures/${id}/my-note`, {
+      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/my-note`, {
         method: "DELETE",
         credentials: "include",
       });
       if (!res.ok) throw new Error("메모 삭제 실패");
-      setNote(""); // 상태 초기화
+      setNote("");
       alert("메모가 삭제되었습니다.");
     } catch (err) {
       alert("메모 삭제 중 오류가 발생했습니다.");
@@ -96,11 +100,10 @@ export default function Page() {
 
   const handleTitleSave = async () => {
     setIsEditingTitle(false)
-
-    if (editedTitle === summaryData?.title) return // 변경사항 없을 때 무시
+    if (editedTitle === summaryData?.title) return
 
     try {
-      const res = await fetch(`http://localhost:8080/api/member-lectures/${id}/title`, {
+      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/title`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -152,8 +155,6 @@ export default function Page() {
               </div>
             </div>
           )}
-
-
 
           <p className="text-muted-foreground">
             동영상 길이: {summaryData.duration ?? "정보 없음"} • 업로드: {summaryData.uploadDate ?? "정보 없음"}
@@ -219,8 +220,13 @@ export default function Page() {
                   />
                   <div className="flex justify-end gap-2">
                     <Button variant="secondary" onClick={handleNoteSave}>메모 저장</Button>
-                    <Button variant="outline" className="text-destructive border-destructive hover:bg-destructive hover:text-white" 
-                    onClick={handleNoteDelete}>메모 삭제</Button>
+                    <Button
+                      variant="outline"
+                      className="text-destructive border-destructive hover:bg-destructive hover:text-white"
+                      onClick={handleNoteDelete}
+                    >
+                      메모 삭제
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -250,7 +256,6 @@ export default function Page() {
           </div>
         </div>
 
-        {/* 로그인하지 않은 경우에만 안내/로그인 섹션 표시 */}
         {!isLoading && !user && (
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">더 많은 강의를 요약해 보세요</h2>

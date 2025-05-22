@@ -7,36 +7,55 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Clock, FileText, Upload } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-
+import axios from "axios"
+axios.defaults.withCredentials = true;
 type Lecture = {
   lectureId: number;
   title: string;
   createdAt: string;
   duration: string;
   thumbnailUrl?: string;
+  email: string;
+  username: string;
+};
+
+type User = {
+  email: string;
+  username: string;
 };
 
 export default function DashboardPage() {
+  const [user, setUser] = useState<User | null>(null);
   const [lectures, setLectures] = useState<Lecture[]>([]);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     async function fetchLectures() {
-      const res = await fetch("http://localhost:8080/api/member-lectures/dashboard", {
-        method: "GET",
-        credentials: "include",
-        cache: "no-store",
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        setLectures(data)
-      } else {
-        setLectures([])
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/member-lectures/dashboard`, {
+          withCredentials: true,
+        });
+        setLectures(res.data.data);
+      } catch (error) {
+        console.error("강의 목록 불러오기 실패", error);
+        setLectures([]);
       }
     }
 
-    fetchLectures()
-  }, [])
+    async function fetchUserInfo() {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/api/members/me`, {
+          withCredentials: true,
+        });
+        setUser(res.data.data); // <- updated to access 'data' inside response
+      } catch (error) {
+        console.error("사용자 정보 불러오기 실패", error);
+      }
+    }
+
+    fetchUserInfo();
+    fetchLectures();
+  }, []);
 
   const handleDelete = (lectureId: number) => {
     const updated = lectures.filter((lecture) => lecture.lectureId !== lectureId);
@@ -109,7 +128,14 @@ export default function DashboardPage() {
           <Card className="md:col-span-2">
             <CardContent className="p-6">
               <h3 className="text-lg font-medium mb-4">계정 정보</h3>
-              <p className="text-muted-foreground">로그인된 사용자 정보가 여기에 표시됩니다.</p>
+              {user ? (
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p><strong>이메일:</strong> {user.email}</p>
+                  <p><strong>닉네임:</strong> {user.username}</p>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">로그인된 사용자 정보가 없습니다.</p>
+              )}
               <div className="mt-4 pt-4 border-t">
                 <Button
                   size="sm"
