@@ -21,7 +21,5 @@ public class MemberRegisterRequest {
     @Size(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하여야 합니다.")
     private String password;
 
-    @Schema(description = "사용자 이름", example = "테스트이름")
-    @NotBlank(message = "사용자 이름은 비어 있을 수 없습니다.")
     private String username;
 }

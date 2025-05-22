@@ -1,4 +1,6 @@
 package com.ktnu.AiLectureSummary.service;
+import com.ktnu.AiLectureSummary.domain.Member;
+import com.ktnu.AiLectureSummary.repository.MemberRepository;
 
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
@@ -7,7 +9,7 @@ import com.ktnu.AiLectureSummary.dto.lecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.LectureListItemResponse;
 import com.ktnu.AiLectureSummary.exception.LectureNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
-import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
+import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,23 +20,24 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MemberLectureService {
     private final MemberLectureRepository memberLectureRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * 사용자와 강의 간의 소유 관계를 저장합니다.
      * 이미 해당 관계가 존재하는 경우 중복 저장을 방지합니다.
      *
-     * @param user 현재 로그인한 사용자 정보     * @param lecture
      */
-    public void save(CustomUserDetails user, Lecture lecture) {
-        if (!memberLectureRepository.existsByMemberAndLecture(user.getMember(), lecture)) {
+    public void save(Long memberId, Lecture lecture) {
+        if (!memberLectureRepository.existsByMember_IdAndLecture(memberId, lecture)) {
+            Member member = memberRepository.findById(memberId)
+                    .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
             memberLectureRepository.save(
                     MemberLecture.builder()
-                            .member(user.getMember())
+                            .member(member)
                             .lecture(lecture)
                             .build()
             );
         }
-
     }
 
     /**

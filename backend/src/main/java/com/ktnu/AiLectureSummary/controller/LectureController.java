@@ -1,10 +1,10 @@
 package com.ktnu.AiLectureSummary.controller;
 
 
+import com.ktnu.AiLectureSummary.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
-import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
+import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.LectureApplicationService;
-import com.ktnu.AiLectureSummary.service.LectureService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +24,10 @@ public class LectureController {
 
     @PostMapping("/upload")
     @Operation(summary = "영상 업로드", description = "업로드 된 영상을 Ai를 사용해 요약합니다.")
-    public ResponseEntity<LectureResponse> uploadLecture(
+    public ResponseEntity<ApiResponse<LectureResponse>> uploadLecture(
             @AuthenticationPrincipal CustomUserDetails user,
             @RequestPart("file") MultipartFile file) {
-        LectureResponse response = lectureApplicationService.uploadLecture(user, file);
-        return ResponseEntity.ok(response);
+        LectureResponse data = lectureApplicationService.uploadLecture(user, file);
+        return ResponseEntity.ok(ApiResponse.success("요약 생성 성공", data));
     }
-
 }

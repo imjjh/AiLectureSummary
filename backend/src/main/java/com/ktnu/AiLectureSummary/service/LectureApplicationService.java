@@ -2,7 +2,7 @@ package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
-import com.ktnu.AiLectureSummary.security.principal.CustomUserDetails;
+import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class LectureApplicationService {
         Lecture lecture = lectureService.processLecture(file);
 
         // 2. 사용자와 강의 연결 저장
-        memberLectureService.save(user, lecture);
+        memberLectureService.save(user.getId(), lecture);
 
         // 3. 응답 반환
         return LectureResponse.from(lecture);

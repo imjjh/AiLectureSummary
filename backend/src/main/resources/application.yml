@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
@@ -20,4 +20,9 @@ spring:
       max-request-size: 500MB
 
 jwt:
-  secret-key: ${JWT_SECRET_KEY}
+  secret: ${JWT_SECRET}
+  expiration: 3600000
+#  expiration: ${JWT_EXPIRATION}
+
+fastapi:
+  url: ${FASTAPI_URL}
