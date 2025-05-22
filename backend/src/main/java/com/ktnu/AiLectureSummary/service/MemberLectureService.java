@@ -1,5 +1,6 @@
 package com.ktnu.AiLectureSummary.service;
 import com.ktnu.AiLectureSummary.domain.Member;
+import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 
 
@@ -30,7 +31,7 @@ public class MemberLectureService {
     public void save(Long memberId, Lecture lecture) {
         if (!memberLectureRepository.existsByMember_IdAndLecture(memberId, lecture)) {
             Member member = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+                    .orElseThrow(() -> new MemberNotFoundException("해당 사용자를 찾을 수 없습니다."));
             memberLectureRepository.save(
                     MemberLecture.builder()
                             .member(member)

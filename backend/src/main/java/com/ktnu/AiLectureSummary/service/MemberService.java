@@ -6,6 +6,9 @@ import com.ktnu.AiLectureSummary.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
+import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
+import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +40,9 @@ public class MemberService {
 
         // 중복된 이메일 체크
         if (memberRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다");
+            throw new DuplicateLoginIdException("이미 사용 중인 이메일입니다");
         }
+
         // 멤버 생성
         Member member = Member.builder()
                 .email(email)
@@ -67,9 +71,9 @@ public class MemberService {
         String password = request.getPassword();
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("이메일이 존재하지 않습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("이메일이 존재하지 않습니다."));
         if (!passwordEncoder.matches(password, member.getPassword())){
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }
 
         // JWT 생성
