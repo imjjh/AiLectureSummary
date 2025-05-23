@@ -9,6 +9,8 @@ import { Upload } from "lucide-react"
 import { useLanguage } from "@/hooks/use-language"
 import { motion } from "framer-motion"
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function VideoUploader() {
   const router = useRouter()
   const { t } = useLanguage()
@@ -87,7 +89,7 @@ export default function VideoUploader() {
           }
         }
 
-        xhr.open('POST', 'http://localhost:8080/api/lecture/upload')
+        xhr.open('POST', `${API_BASE_URL}/api/lecture/upload`)
         xhr.withCredentials = true
         xhr.send(formData)//
       })
