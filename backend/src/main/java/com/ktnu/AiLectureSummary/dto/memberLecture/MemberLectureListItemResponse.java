@@ -1,5 +1,6 @@
 package com.ktnu.AiLectureSummary.dto.memberLecture;
 
+import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.domain.MemberLecture;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +14,16 @@ import java.util.List;
 public class MemberLectureListItemResponse {
     Long lectureId;
     String title;
+    Long duration;
 
     public static List <MemberLectureListItemResponse> fromList(List<MemberLecture> memberLectures){
+
         return memberLectures.stream()
-                .map(memberLecture -> new MemberLectureListItemResponse(memberLecture.getLecture().getId(), memberLecture.getPersonalTitle()))
+                .map(memberLecture -> new MemberLectureListItemResponse(
+                    memberLecture.getLecture().getId(),
+                    memberLecture.getPersonalTitle(),
+                    memberLecture.getLecture().getDuration()
+                ))
                 .toList();
     }
 }

@@ -14,16 +14,18 @@ public class LectureUploadResponse {
     private String title;
     private String originalText;
     private String aiSummary;
+    private long duration;
 
 
 
     public static LectureUploadResponse from(Lecture lecture) {
 
-        return    LectureUploadResponse.builder()
-                    .id(lecture.getId())
-                    .title(lecture.getTitleByAi())
-                    .originalText(lecture.getOriginalText())
-                    .aiSummary(lecture.getAiSummary())
-                    .build();
+    return    LectureUploadResponse.builder()
+                .id(lecture.getId())
+                .title(lecture.getTitleByAi())
+                .originalText(lecture.getOriginalText())
+                .aiSummary(lecture.getAiSummary())
+                .duration(lecture.getDuration())
+                .build();
         }
 }

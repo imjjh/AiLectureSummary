@@ -1,6 +1,7 @@
 package com.ktnu.AiLectureSummary.service;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListItemResponse;
+import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 
@@ -44,15 +45,29 @@ public class MemberLectureService {
     /**
      * 사용자가 등록한 모든 강의 목록을 조회합니다.
      * 내부적으로 MemberLecture를 통해 강의 리스트를 추출하고
-     * LectureListItemResponse DTO 형태로 응답할 수 있도록 변환합니다.
+     * MemberLectureListResponse를 반환합니다.
      *
      * @param user 현재 로그인한 사용자 정보
-     * @return MemberLectureListItemResponse 리스트 (강의 ID + personTitle)
+     * @return MemberLectureListResponse ((강의 ID,  personTitle), totalDuration)
      */
-    public List<MemberLectureListItemResponse> getUserLectureList(CustomUserDetails user) {
+    public MemberLectureListResponse getUserLectureList(CustomUserDetails user) {
 
         List<MemberLecture> memberLectures = memberLectureRepository.findAllByMember_Id(user.getId());
-        return MemberLectureListItemResponse.fromList(memberLectures);
+        Long totalDuration=calculateTotalDuration(memberLectures); // 하나도 없는 경우 0?
+        return MemberLectureListResponse.from(memberLectures,totalDuration);
+    }
+
+    /**
+     * 사용자가 등록한 모든 강의 시간의 총 합
+     * @param memberLectures
+     * @return Long
+     */
+    private static long calculateTotalDuration(List<MemberLecture> memberLectures) {
+
+        return memberLectures.stream()
+                .map(memberLecture -> memberLecture.getLecture().getDuration())
+                .mapToLong(Long::longValue)
+                .sum(); // sum의 기본 리턴값은 0, list가 비어있어도 0을 반환
     }
 
     /**
