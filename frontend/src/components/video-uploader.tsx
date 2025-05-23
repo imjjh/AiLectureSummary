@@ -32,7 +32,6 @@ export default function VideoUploader() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
-
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFiles = Array.from(e.dataTransfer.files)
       const videoFiles = droppedFiles.filter(file => file.type.startsWith("video/"))
@@ -92,11 +91,11 @@ export default function VideoUploader() {
 
         xhr.open('POST', `${API_BASE_URL}/api/lecture/upload`)
         xhr.withCredentials = true
-        xhr.send(formData)
+        xhr.send(formData)//
       })
 
       // ✅ 성공 후 해당 ID 페이지로 이동
-      const lectureId = response.id
+      const lectureId = response.data.id
       router.push(`/summary/${lectureId}`)
 
     } catch (error: any) {
