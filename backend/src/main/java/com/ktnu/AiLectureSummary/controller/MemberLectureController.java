@@ -2,7 +2,7 @@ package com.ktnu.AiLectureSummary.controller;
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.dto.CustomTitleRequest;
 import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
-import com.ktnu.AiLectureSummary.dto.lecture.PersonalNoteRequest;
+import com.ktnu.AiLectureSummary.dto.memberLecture.MemoRequest;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberLectureService;
@@ -70,9 +70,9 @@ public class MemberLectureController {
     public ResponseEntity<ApiResponse<LectureDetailResponse>> saveMemo(
             @AuthenticationPrincipal CustomUserDetails user,
             @PathVariable Long lectureId,
-            @RequestBody @Valid PersonalNoteRequest request
+            @RequestBody @Valid MemoRequest request
     ) {
-        LectureDetailResponse lectureDetailResponse = memberLectureService.saveMemo(user, lectureId, request.getNote());
+        LectureDetailResponse lectureDetailResponse = memberLectureService.saveMemo(user, lectureId, request.getMemo());
         return ResponseEntity.ok(ApiResponse.success("개인 메모 저장 성공", lectureDetailResponse));
     }
 
