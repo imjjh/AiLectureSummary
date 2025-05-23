@@ -25,6 +25,14 @@ type User = {
   username: string;
 };
 
+const formatDuration = (duration: string): string => {
+  const seconds = parseInt(duration, 10);
+  if (isNaN(seconds)) return duration;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+};
+
 export default function DashboardPage() {
   // 로그인한 사용자 정보를 저장하는 상태
   const [user, setUser] = useState<User | null>(null);
@@ -188,9 +196,9 @@ export default function DashboardPage() {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="text-base font-medium truncate">{lecture.title}</div>
+                      <div className="text-base font-medium truncate">{lecture.customTitle}</div>
                       <div className="text-sm text-muted-foreground">{lecture.createdAt}</div>
-                      <div className="text-sm text-muted-foreground">{lecture.duration}</div>
+                      <div className="text-sm text-muted-foreground">{formatDuration(lecture.duration)}</div>
                     </CardContent>
                   </Link>
                 </Card>
@@ -224,9 +232,9 @@ export default function DashboardPage() {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="text-base font-medium truncate">{lecture.title}</div>
+                      <div className="text-base font-medium truncate">{lecture.customTitle}</div>
                       <div className="text-sm text-muted-foreground">{lecture.createdAt}</div>
-                      <div className="text-sm text-muted-foreground">{lecture.duration}</div>
+                      <div className="text-sm text-muted-foreground">{formatDuration(lecture.duration)}</div>
                     </CardContent>
                   </Link>
                 </Card>
