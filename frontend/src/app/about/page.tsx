@@ -6,9 +6,12 @@ import { ArrowRight, Brain, Clock, Layers } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function AboutPage() {
-  // Animation Variants
+  const { user } = useAuth()
+
+  // 애니메이션 컨테이너 설정
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -19,18 +22,21 @@ export default function AboutPage() {
     },
   }
 
+  // 애니메이션 아이템 설정
   const item = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 },
   }
 
   return (
+    // 페이지 전체 컨테이너 및 애니메이션 적용
     <motion.div
       initial="hidden"
       animate="show"
       variants={container}
       className="container mx-auto px-4 py-16"
     >
+      {/* 페이지 타이틀 및 소개 섹션 */}
       <motion.div variants={item} className="max-w-5xl mx-auto text-center mb-20"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,7 +50,7 @@ export default function AboutPage() {
         </p>
       </motion.div>
 
-      {/* How It Works */}
+      {/* 서비스 작동 방식 섹션 */}
       <motion.section variants={container} className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-24">
         {[
           {
@@ -72,6 +78,7 @@ export default function AboutPage() {
             desc: "회원 가입 후 로그인하면 요약 결과가 자동 저장되며, 마이 페이지에서 관리할 수 있습니다.",
           },
         ].map((itemData, index) => (
+          // 각 단계별 카드 컴포넌트
           <motion.div key={index} variants={item}>
             <Card className="shadow-md hover:shadow-xl transition-shadow">
               <CardContent className="p-6">
@@ -90,7 +97,7 @@ export default function AboutPage() {
         ))}
       </motion.section>
 
-      {/* Features */}
+      {/* 서비스가 제공하는 주요 가치 섹션 */}
       <motion.section variants={container} className="mb-24">
         <motion.h2 variants={item} className="text-3xl font-bold mb-10 text-center">
           우리가 제공하는 가치
@@ -113,6 +120,7 @@ export default function AboutPage() {
               desc: "1시간짜리 강의도 단 5분 만에 요약해 학습 효율을 높여줍니다.",
             },
           ].map((feature, idx) => (
+            // 각 가치별 카드 컴포넌트
             <motion.div key={idx} variants={item}>
               <Card className="shadow-xs">
                 <CardContent className="p-6 flex flex-col items-center text-center gap-4">
@@ -126,23 +134,31 @@ export default function AboutPage() {
         </div>
       </motion.section>
 
-      {/* CTA Section = call to action(웹사이트나 앱에서 사용자가 어떤 행돌을 하도록 유도하는 영역) */}
+      {/* Call To Action 섹션 */}
       <motion.section variants={item} className="bg-muted p-10 rounded-2xl text-center">
         <h2 className="text-2xl font-bold mb-4">지금 바로 시작하세요</h2>
         <p className="text-muted-foreground mb-6">
-          회원가입 없이도 요약 기능을 체험해 보세요. 기록을 저장하려면 로그인하면 됩니다.
+          강력한 요약 기능을 사용해 보세요. 요약하고 기록을 저장하려면 로그인하면 됩니다.
         </p>
         <div className="flex justify-center gap-4">
-          <Link href="/">
-            <Button className="gap-2">시작하기 <ArrowRight size={16} /></Button>
-          </Link>
-          <Link href="/login">
-            <Button
-              className="bg-background border border-border text-foreground hover:bg-muted"
-            >
-              로그인
-            </Button>
-          </Link>
+          {user ? (
+            <Link href="/">
+              <Button className="gap-2">시작하기 <ArrowRight size={16} /></Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button className="w-32 bg-primary text-white hover:bg-primary/90">
+                  로그인
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button className="w-32 bg-primary text-white hover:bg-primary/90">
+                  회원가입
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </motion.section>
     </motion.div>

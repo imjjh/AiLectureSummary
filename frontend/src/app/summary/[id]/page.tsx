@@ -24,17 +24,24 @@ interface SummaryData {
 }
 
 export default function Page() {
+  // URL 파라미터에서 id 추출
   const params = useParams()
   const { id } = params as { id: string }
 
+  // 사용자 인증 상태 가져오기
   const { user, isLoading } = useAuth()
+  // 요약 데이터 상태
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null)
+  // 에러 상태
   const [error, setError] = useState<string | null>(null)
+  // 개인 메모 상태
   const [note, setNote] = useState<string>("")
 
+  // 제목 편집 모드 상태 및 편집 중인 제목 상태
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [editedTitle, setEditedTitle] = useState(summaryData?.title || "")
 
+  // 요약 데이터 API 호출 및 초기 데이터 설정
   useEffect(() => {
     async function fetchSummary() {
       try {
@@ -52,7 +59,7 @@ export default function Page() {
 
         const data = await res.json()
         setSummaryData(data.data)
-        setNote(data.data.personalNote || "")
+        setNote(data.data.memo || "")
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err))
       }
@@ -60,12 +67,14 @@ export default function Page() {
     if (id) fetchSummary()
   }, [id])
 
+  // summaryData.title 변경 시 편집 중인 제목도 업데이트
   useEffect(() => {
     if (summaryData?.title) {
       setEditedTitle(summaryData.title)
     }
   }, [summaryData?.title])
 
+  // 메모 저장 함수
   const handleNoteSave = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/my-note`, {
@@ -81,6 +90,7 @@ export default function Page() {
     }
   }
 
+  // 메모 삭제 함수
   const handleNoteDelete = async () => {
     const confirmed = window.confirm("정말 메모를 삭제하시겠습니까?");
     if (!confirmed) return;
@@ -98,6 +108,7 @@ export default function Page() {
     }
   }
 
+  // 제목 저장 함수
   const handleTitleSave = async () => {
     setIsEditingTitle(false)
     if (editedTitle === summaryData?.title) return
@@ -119,17 +130,21 @@ export default function Page() {
     }
   }
 
+  // 에러 발생 시 에러 메시지 표시
   if (error) return <div className="container mx-auto px-4 py-12 text-red-500">{error}</div>
+  // 데이터 로딩 중일 때 표시
   if (!summaryData) return <div className="container mx-auto px-4 py-12">로딩 중...</div>
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto">
+        {/* 상단 네비게이션 및 제목 영역 */}
         <div className="mb-8">
           <Link href="/" className="text-primary hover:underline mb-4 inline-block">
             ← 홈으로 돌아가기
           </Link>
           <div className="flex items-center justify-between gap-4 mb-4">
+            {/* 제목 클릭 시 편집 모드 활성화 */}
             <h1
               className="text-3xl font-bold tracking-tight mb-2 cursor-pointer transition-colors hover:text-zinc-600"
               onClick={() => setIsEditingTitle(true)}
@@ -137,6 +152,7 @@ export default function Page() {
               {summaryData.title ?? "제목 없음"}
             </h1>
           </div>
+          {/* 제목 편집 모달 */}
           {isEditingTitle && (
             <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50">
               <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3x1 mx-4">
@@ -156,13 +172,16 @@ export default function Page() {
             </div>
           )}
 
+          {/* 동영상 길이 및 업로드 날짜 표시 */}
           <p className="text-muted-foreground">
             동영상 길이: {summaryData.duration ?? "정보 없음"} • 업로드: {summaryData.uploadDate ?? "정보 없음"}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {/* 왼쪽 주요 콘텐츠 영역 */}
           <div className="md:col-span-2">
+            {/* 썸네일 이미지 */}
             <Image
               src={summaryData.thumbnailUrl ?? "/placeholder.svg"}
               width={500}
@@ -171,6 +190,7 @@ export default function Page() {
               className="rounded-lg w-full object-cover aspect-video mb-4"
             />
 
+            {/* 탭 컴포넌트: AI 요약 / 원문 */}
             <Tabs defaultValue="key" className="mb-12">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="key">AI 요약</TabsTrigger>
@@ -208,6 +228,7 @@ export default function Page() {
               </TabsContent>
             </Tabs>
 
+            {/* 로그인된 사용자만 메모 작성 및 저장 가능 */}
             {user && (
               <Card className="mb-6">
                 <CardContent className="p-6">
@@ -233,6 +254,7 @@ export default function Page() {
             )}
           </div>
 
+          {/* 오른쪽 사이드바: 공유 기능 */}
           <div>
             <Card>
               <CardContent className="p-6">
@@ -256,6 +278,7 @@ export default function Page() {
           </div>
         </div>
 
+        {/* 비로그인 사용자에게 회원가입 및 로그인 유도 */}
         {!isLoading && !user && (
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">더 많은 강의를 요약해 보세요</h2>
