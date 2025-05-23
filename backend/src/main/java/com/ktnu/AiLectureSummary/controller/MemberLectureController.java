@@ -1,10 +1,8 @@
 package com.ktnu.AiLectureSummary.controller;
-
-
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
+import com.ktnu.AiLectureSummary.dto.CustomTitleRequest;
 import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.PersonalNoteRequest;
-import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListItemResponse;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberLectureService;
@@ -15,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,24 +56,61 @@ public class MemberLectureController {
 
 
     /**
-     * 로그인한 사용자가 등록한 특정 강의의 개인 메모를 작성합니다.
+     * 로그인한 사용자가 등록한 특정 강의의 개인 메모를 저장합니다.
+     * 기존 메모가 있을 경우 덮어씁니다.
      *
      * @param user 로그인한 사용자 정보
-     * @param lectureId
-     * @param request
-     * @return 사용자가 등록한 강의 상세 정보
+     * @param lectureId 강의 ID
+     * @param request 메모 요청 본문
+     * @return 수정된 강의 상세 정보
      */
-
-
     @Transactional
-    @PostMapping("/{lectureId}/my-note")
-    @Operation(summary = "내 특정 강의 개인 메모",description = "로그인한 사용자가 등록한 특정 강의의 개인 메모를 작성합니다.")
-    public ResponseEntity<ApiResponse<LectureDetailResponse>> writePersonalNote(
+    @PatchMapping("/{lectureId}/memo")
+    @Operation(summary = "내 특정 강의 메모 저장", description = "로그인한 사용자가 등록한 특정 강의의 메모를 저장합니다. 기존 메모가 있다면 수정합니다.")
+    public ResponseEntity<ApiResponse<LectureDetailResponse>> saveMemo(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long lectureId, @RequestBody @Valid PersonalNoteRequest request
-    ){
-        LectureDetailResponse lectureDetailResponse = memberLectureService.writePersonalNote(user, lectureId, request.getNote());
+            @PathVariable Long lectureId,
+            @RequestBody @Valid PersonalNoteRequest request
+    ) {
+        LectureDetailResponse lectureDetailResponse = memberLectureService.saveMemo(user, lectureId, request.getNote());
+        return ResponseEntity.ok(ApiResponse.success("개인 메모 저장 성공", lectureDetailResponse));
+    }
 
-        return ResponseEntity.ok(ApiResponse.success("개인 메모 작성 성공", lectureDetailResponse));
+
+    /**
+     * 로그인한 사용자가 등록한 특정 강의의 개인 메모를 삭제합니다.
+     *
+     * @param user 로그인한 사용자 정보
+     * @param lectureId 강의 ID
+     * @return 수정된 강의 상세 정보
+     */
+    @Transactional
+    @DeleteMapping("/{lectureId}/memo")
+    @Operation(summary = "내 특정 강의 메모 삭제", description = "로그인한 사용자가 등록한 특정 강의의 메모를 삭제합니다.")
+    public ResponseEntity<ApiResponse<LectureDetailResponse>> deleteMemo(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long lectureId
+    ) {
+        LectureDetailResponse lectureDetailResponse = memberLectureService.deleteMemo(user, lectureId);
+        return ResponseEntity.ok(ApiResponse.success("개인 메모 삭제 성공", lectureDetailResponse));
+    }
+
+    /**
+     * 강의 제목을 저장합니다.
+     *
+     * @param user 로그인한 사용자 정보
+     * @param lectureId 강의 Id
+     * @param requests 수정할 제목 DTO
+     * @return 수정된 강의 상세 정보
+     */
+    @Transactional
+    @PatchMapping("/{lectureId}/title")
+    @Operation(summary = "내 특정 강의 제목 수정", description = "로그인 한 사용자가 등록한 특정 강의의 제목을 수정합니다.")
+    public ResponseEntity<ApiResponse<LectureDetailResponse>> saveLectureTitle(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long lectureId, @RequestBody @Valid CustomTitleRequest requests){
+        LectureDetailResponse lectureDetailResponse = memberLectureService.updateCustomTitle(user,lectureId,requests.getTitle());
+
+        return ResponseEntity.ok(ApiResponse.success("강의 제목 수정 성공", lectureDetailResponse));
     }
 }
