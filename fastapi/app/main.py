@@ -52,7 +52,7 @@ class SummaryResponse(BaseModel):
     title: str
     aiSummary: str
     originalText: str
-    duration: str
+    duration: int
     filename: str
     timestamp: str
 
@@ -165,8 +165,7 @@ async def process_video(file: UploadFile = File(...)):
             logger.warning(f"유효하지 않은 동영상 길이: {duration_sec}, 0으로 설정")
             duration_sec = 0
 
-        duration = format_duration(duration_sec)
-        logger.info(f"최종 포맷된 동영상 길이: {duration}")
+        logger.info(f"최종 포맷된 동영상 길이(초): {duration_sec}")
 
         # GPT 요약 프롬프트
         title = "요약 제목 없음"
@@ -213,7 +212,7 @@ async def process_video(file: UploadFile = File(...)):
             "title": title,
             "aiSummary": ai_summary,
             "originalText": original_text,
-            "duration": duration,
+            "duration": int(duration_sec),
             "filename": file.filename,
             "timestamp": datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S")
         }

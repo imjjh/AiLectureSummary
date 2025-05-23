@@ -15,12 +15,14 @@ public class LectureDetailResponse {
     private String originalText;
     private String aiSummary;
     private String personalNote;
+    private long duration;
 
     public static LectureDetailResponse from(MemberLecture memberLecture) {
         Lecture lecture = memberLecture.getLecture();
 
         return LectureDetailResponse.builder()
                 .id(lecture.getId())
+                .duration(lecture.getDuration())
                 .title(memberLecture.getPersonalTitle())
                 .aiSummary(lecture.getAiSummary())
                 .originalText(lecture.getOriginalText())

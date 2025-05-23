@@ -32,10 +32,10 @@ export default function AboutPage() {
       className="container mx-auto px-4 py-16"
     >
       <motion.div variants={item} className="max-w-5xl mx-auto text-center mb-20"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      >  
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <h1 className="text-5xl font-extrabold tracking-tight mb-4 bg-linear-to-r from-pink-500 to-orange-500 text-transparent bg-clip-text">
           서비스 소개
         </h1>
@@ -126,7 +126,7 @@ export default function AboutPage() {
         </div>
       </motion.section>
 
-      {/* CTA Section */}
+      {/* CTA Section = call to action(웹사이트나 앱에서 사용자가 어떤 행돌을 하도록 유도하는 영역) */}
       <motion.section variants={item} className="bg-muted p-10 rounded-2xl text-center">
         <h2 className="text-2xl font-bold mb-4">지금 바로 시작하세요</h2>
         <p className="text-muted-foreground mb-6">

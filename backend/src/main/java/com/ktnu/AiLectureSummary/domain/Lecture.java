@@ -27,6 +27,8 @@ public class Lecture {
     @Column(nullable = false)
     private String titleByAi;
 
+    @Column(nullable = false)
+    private Long duration;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String originalText;
@@ -47,6 +49,7 @@ public class Lecture {
         lecture.setHash(hash);
         lecture.setAiSummary(request.getAiSummary());
         lecture.setOriginalText(request.getOriginalText());
+        lecture.setDuration(request.getDuration());
         return lecture;
     }
 }

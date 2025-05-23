@@ -5,6 +5,7 @@ import com.ktnu.AiLectureSummary.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.PersonalNoteRequest;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListItemResponse;
+import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberLectureService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,11 +37,11 @@ public class MemberLectureController {
             summary = "내 강의 목록 조회",
             description = "로그인한 사용자가 등록한 강의들의 제목 및 간략 정보를 반환합니다."
     )
-    public ResponseEntity<ApiResponse<List<MemberLectureListItemResponse>>> dashBoard(@AuthenticationPrincipal CustomUserDetails user){
+    public ResponseEntity<ApiResponse<MemberLectureListResponse>>dashBoard(@AuthenticationPrincipal CustomUserDetails user){
         // 현재 로그인한 사용자의 강의 목록 조회
-        List<MemberLectureListItemResponse> userLectureList = memberLectureService.getUserLectureList(user);
+        MemberLectureListResponse memberLectureListResponse = memberLectureService.getUserLectureList(user);
         // 응답 상태코드 200 OK로 반환
-        return ResponseEntity.ok(ApiResponse.success("내 강의 목록 조회 성공", userLectureList));
+        return ResponseEntity.ok(ApiResponse.success("내 강의 목록 조회 성공", memberLectureListResponse));
     }
 
     /**
@@ -66,6 +67,8 @@ public class MemberLectureController {
      * @param request
      * @return 사용자가 등록한 강의 상세 정보
      */
+
+
     @Transactional
     @PostMapping("/{lectureId}/my-note")
     @Operation(summary = "내 특정 강의 개인 메모",description = "로그인한 사용자가 등록한 특정 강의의 개인 메모를 작성합니다.")
