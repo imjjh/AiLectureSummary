@@ -5,7 +5,6 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
-import { useLanguage } from "@/hooks/use-language"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,9 +13,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Github, Loader2, Mail } from "lucide-react"
 import Link from "next/link"
 
+// 회원가입 페이지 컴포넌트
 export default function RegisterPage() {
   const { register } = useAuth()
-  const { t } = useLanguage()
   const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -26,15 +25,18 @@ export default function RegisterPage() {
   const [error, setError] = useState("")
   const [termsAccepted, setTermsAccepted] = useState(false)
 
+  // 폼 제출 처리 함수
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
 
+    // 비밀번호 일치 여부 확인
     if (password !== confirmPassword) {
       setError("비밀번호가 일치하지 않습니다.")
       return
     }
 
+    // 이용약관 동의 여부 확인
     if (!termsAccepted) {
       setError("이용약관에 동의해주세요.")
       return
@@ -43,9 +45,10 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
+      // 회원가입 시도
       const success = await register(name, email, password)
       if (success) {
-        router.push("/") // Redirect to root after registration
+        router.push("/") // 회원가입 성공 시 루트 페이지로 이동
       } else {
         setError("회원가입에 실패했습니다. 입력 정보를 확인해주세요.")
       }
@@ -57,19 +60,25 @@ export default function RegisterPage() {
   }
 
   return (
+    // 페이지 전체 배경 및 레이아웃 설정
     <div className="bg-gradient-to-b from-pink-50 to-white dark:from-gray-900 dark:to-gray-950 min-h-screen px-4 py-24">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px]">
+        {/* 헤더 섹션: 제목 및 설명 */}
         <div className="flex flex-col space-y-2 text-center">
-          <h1 className="text-3xl font-bold tracking-tight">{t("register")}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">회원가입</h1>
           <p className="text-sm text-muted-foreground">계정을 만들고 요약 기록을 저장하세요</p>
         </div>
+        {/* 카드 컴포넌트: 회원가입 폼 */}
         <Card className="border-0 shadow-lg">
           <form onSubmit={handleSubmit}>
+            {/* 카드 헤더: 제목 */}
             <CardHeader className="space-y-1">
               <CardTitle className="text-xl">새 계정 만들기</CardTitle>
               {/*<CardDescription>소셜 계정으로 가입하거나 이메일을 사용하세요</CardDescription>*/}
             </CardHeader>
+            {/* 카드 내용: 입력 필드 및 체크박스 */}
             <CardContent className="grid gap-4">
+              {/* 이름 입력 */}
               <div className="grid gap-2">
                 <Label htmlFor="name">이름</Label>
                 <Input
@@ -82,6 +91,7 @@ export default function RegisterPage() {
                   required
                 />
               </div>
+              {/* 이메일 입력 */}
               <div className="grid gap-2">
                 <Label htmlFor="email">이메일</Label>
                 <Input
@@ -94,6 +104,7 @@ export default function RegisterPage() {
                   required
                 />
               </div>
+              {/* 비밀번호 입력 및 유효성 검사 */}
               <div className="grid gap-2">
                 <Label htmlFor="password">비밀번호</Label>
                 <Input
@@ -108,6 +119,7 @@ export default function RegisterPage() {
                   <p className="text-sm text-red-500 mt-1">비밀번호는 8자 이상 20자 이하로 입력해주세요.</p>
                 )}
               </div>
+              {/* 비밀번호 확인 입력 및 일치 여부 확인 */}
               <div className="grid gap-2">
                 <Label htmlFor="confirm-password">비밀번호 확인</Label>
                 <Input
@@ -122,6 +134,7 @@ export default function RegisterPage() {
                   <p className="text-sm text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
                 )}
               </div>
+              {/* 이용약관 동의 체크박스 */}
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="terms"
@@ -140,8 +153,10 @@ export default function RegisterPage() {
                   </span>
                 </label>
               </div>
+              {/* 에러 메시지 출력 */}
               {error && <p className="text-sm text-red-500">{error}</p>}
             </CardContent>
+            {/* 카드 푸터: 제출 버튼 및 로그인 링크 */}
             <CardFooter className="flex flex-col">
               <Button
                 type="submit"
