@@ -30,20 +30,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
   // ✅ 로그인 유지용 - 컴포넌트 마운트 시 자동 호출
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/members/me", {
+        const res = await fetch(`${API_BASE_URL}/api/members/me`, {
           credentials: "include",
         })
         if (res.ok) {
           const data = await res.json()
           const loggedInUser: User = {
-            id: String(data.id),
-            name: data.username,
-            email: data.email,
+            id: String(data.data.id),
+            name: data.data.username,
+            email: data.data.email,
             joinDate: "", // 서버에 joinDate가 없으면 빈 값
           }
           setUser(loggedInUser)
@@ -60,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch("http://localhost:8080/api/members/login", {
+      const res = await fetch(`${API_BASE_URL}/api/members/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -70,19 +71,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
 
       if (res.ok) {
-        const data = await res.json()
-        const newUser: User = {
-          id: String(data.member.id),
-          name: data.member.username,
-          email: data.member.email,
-          joinDate: new Date().toISOString(),
-        }
+        const result = await res.json()
+        const token = result.data.accessToken
+        // 🔁 로그인 성공 후 사용자 정보 요청
+      const userRes = await fetch(`${API_BASE_URL}/api/members/me`, {
+        credentials: "include",
+      })
+      if (!userRes.ok) throw new Error("사용자 정보 불러오기 실패")
+
+      const userInfo = await userRes.json()
+      const newUser: User = {
+        id: String(userInfo.data.id),
+        name: userInfo.data.username,
+        email: userInfo.data.email,
+        joinDate: new Date().toISOString(),
+      }
+
         setUser(newUser)
         return true
       } else {
         const errorText = await res.text()
-        console.error("로그인 실패:", errorText)
-        alert("로그인 실패: " + errorText)
+        const message = errorText.trim() || "알 수 없는 오류가 발생했습니다."
+        console.error("로그인 실패:", message)
+        alert("로그인 실패: " + message)
         return false
       }
     } catch (error) {
@@ -94,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch("http://localhost:8080/api/members/register", {
+      const res = await fetch(`${API_BASE_URL}/api/members/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -130,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await fetch("http://localhost:8080/api/members/logout", {
+      await fetch(`${API_BASE_URL}/api/members/logout`, {
         method: "POST",
         credentials: "include",
       })
