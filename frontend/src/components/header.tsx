@@ -4,18 +4,15 @@ import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
-import { LanguageSelector } from "@/components/language-selector"
 import { UserMenu } from "@/components/user-menu"
 import { Menu, X } from "lucide-react"
 import { usePathname } from "next/navigation"
-import { useLanguage } from "@/hooks/use-language"
 import { useAuth } from "@/hooks/use-auth"
 import { motion } from "framer-motion"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
-  const { t } = useLanguage()
   const { user, isLoading } = useAuth()
 
   // 로그인 페이지와 회원가입 페이지에서는 헤더를 표시하지 않음
@@ -42,7 +39,7 @@ export default function Header() {
               pathname === "/" ? "text-primary" : ""
             }`}
           >
-            {t("home")}
+            홈
           </Link>
           <Link
             href="/about"
@@ -50,7 +47,7 @@ export default function Header() {
               pathname === "/about" ? "text-primary" : ""
             }`}
           >
-            {t("about")}
+            서비스 소개
           </Link>
           <Link
             href="/dashboard"
@@ -58,12 +55,11 @@ export default function Header() {
               pathname === "/dashboard" ? "text-primary" : ""
             }`}
           >
-            {t("Summary")}
+            요약
           </Link>
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          <LanguageSelector />
           <ModeToggle />
           {isLoading ? (
             <div className="flex items-center gap-2">
@@ -75,7 +71,6 @@ export default function Header() {
         </div>
 
         <div className="flex md:hidden items-center gap-2">
-          <LanguageSelector />
           <ModeToggle />
           <Button
             variant="ghost"
@@ -105,7 +100,7 @@ export default function Header() {
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
-              {t("home")}
+              홈
             </Link>
             <Link
               href="/about"
@@ -114,7 +109,7 @@ export default function Header() {
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
-              {t("about")}
+              서비스 소개
             </Link>
             <div className="flex flex-col gap-2 pt-2 border-t">
               {isLoading ? (

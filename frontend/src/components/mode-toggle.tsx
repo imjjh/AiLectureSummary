@@ -4,12 +4,10 @@ import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { useLanguage } from "@/hooks/use-language"
 import { useEffect, useState } from "react"
 
 export function ModeToggle() {
   const { setTheme, theme } = useTheme()
-  const { t } = useLanguage()
   const [mounted, setMounted] = useState(false)
 
   // Fix hydration issues

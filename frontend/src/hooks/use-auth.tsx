@@ -1,8 +1,9 @@
-"use client"
+"use client" // 클라이언트 컴포넌트임을 명시
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
 
+// 사용자 정보를 표현하는 타입 정의
 type User = {
   id: string
   name: string
@@ -10,6 +11,7 @@ type User = {
   joinDate: string
 }
 
+// 인증 컨텍스트가 제공하는 값들의 타입 정의
 type AuthContextType = {
   user: User | null
   isLoading: boolean
@@ -18,6 +20,7 @@ type AuthContextType = {
   register: (name: string, email: string, password: string) => Promise<boolean>
 }
 
+// 초기 컨텍스트 생성 (기본값은 비어 있음)
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
@@ -26,18 +29,19 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => false,
 })
 
+// 인증 관련 상태와 메서드를 제공하는 Provider 컴포넌트
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null) // 로그인한 사용자 정보
+  const [isLoading, setIsLoading] = useState(true)    // 사용자 정보 로딩 상태
   const router = useRouter()
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL // 환경변수로부터 API base URL 읽기
 
-  // ✅ 로그인 유지용 - 컴포넌트 마운트 시 자동 호출
+  // 컴포넌트 마운트 시 자동 로그인 여부 확인
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/members/me`, {
-          credentials: "include",
+          credentials: "include", // 쿠키 포함
         })
         if (res.ok) {
           const data = await res.json()
@@ -45,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: String(data.data.id),
             name: data.data.username,
             email: data.data.email,
-            joinDate: "", // 서버에 joinDate가 없으면 빈 값
+            joinDate: "",
           }
           setUser(loggedInUser)
         }
@@ -59,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser()
   }, [])
 
+  // 로그인 함수
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/members/login`, {
@@ -72,26 +77,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (res.ok) {
         const result = await res.json()
-        const token = result.data.accessToken
-        // 🔁 로그인 성공 후 사용자 정보 요청
-      const userRes = await fetch(`${API_BASE_URL}/api/members/me`, {
-        credentials: "include",
-      })
-      if (!userRes.ok) throw new Error("사용자 정보 불러오기 실패")
+        const token = result.data.accessToken // (필요시 활용 가능)
 
-      const userInfo = await userRes.json()
-      const newUser: User = {
-        id: String(userInfo.data.id),
-        name: userInfo.data.username,
-        email: userInfo.data.email,
-        joinDate: new Date().toISOString(),
-      }
+        // 로그인 성공 후 사용자 정보 가져오기
+        const userRes = await fetch(`${API_BASE_URL}/api/members/me`, {
+          credentials: "include",
+        })
+        if (!userRes.ok) throw new Error("사용자 정보 불러오기 실패")
+
+        const userInfo = await userRes.json()
+        const newUser: User = {
+          id: String(userInfo.data.id),
+          name: userInfo.data.username,
+          email: userInfo.data.email,
+          joinDate: new Date().toISOString(),
+        }
 
         setUser(newUser)
         return true
       } else {
-        const errorText = await res.text()
-        const message = errorText.trim() || "알 수 없는 오류가 발생했습니다."
+        // 실패한 경우 에러 메시지 추출
+        let message = "알 수 없는 오류가 발생했습니다."
+        try {
+          const errorJson = await res.json()
+          if (typeof errorJson?.message === "string") {
+            message = errorJson.message
+          }
+        } catch {
+          const fallback = await res.text()
+          if (fallback) message = fallback
+        }
         console.error("로그인 실패:", message)
         alert("로그인 실패: " + message)
         return false
@@ -103,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // 회원가입 함수
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/members/register`, {
@@ -139,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // 로그아웃 함수
   const logout = async () => {
     try {
       await fetch(`${API_BASE_URL}/api/members/logout`, {
@@ -148,11 +165,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("로그아웃 요청 중 오류 발생:", error)
     } finally {
-      setUser(null)
-      router.push("/")
+      setUser(null)        // 사용자 상태 초기화
+      router.push("/")     // 홈으로 리디렉션
     }
   }
 
+  // Context Provider로 로그인 상태 및 메서드 전달
   return (
     <AuthContext.Provider value={{ user, isLoading, login, logout, register }}>
       {children}
@@ -160,4 +178,5 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 }
 
+// 커스텀 훅으로 인증 컨텍스트 쉽게 사용하도록 함
 export const useAuth = () => useContext(AuthContext)

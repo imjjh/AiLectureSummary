@@ -5,11 +5,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Upload, PlayCircle, FileText, Info, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import VideoUploader from "@/components/video-uploader"
-import { useLanguage } from "@/hooks/use-language"
 import { motion } from "framer-motion"
 
 export default function Home() {
-  const { t } = useLanguage()
 
   const container = {
     hidden: { opacity: 0 },
@@ -37,15 +35,15 @@ export default function Home() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 bg-linear-to-r from-pink-500 to-orange-500 text-transparent bg-clip-text">
-              {t("service_title")}
+              AI 강의 요약 서비스
             </h1>
-            <p className="text-lg text-muted-foreground mb-8">{t("service_description")}</p>
+            <p className="text-lg text-muted-foreground mb-8">AI가 동영상을 분석하고 요약해주는 서비스입니다.</p>
 
             <div className="flex justify-center gap-4 mb-8">
               <Link href="/about">
                 <Button variant="outline" className="gap-2 rounded-full px-6 bg-background dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                   <Info size={18} />
-                  {t("about")}
+                  서비스 소개
                 </Button>
               </Link>
             </div>
@@ -75,7 +73,7 @@ export default function Home() {
                   <div className="w-16 h-16 rounded-full bg-linear-to-r from-pink-500 to-orange-500 flex items-center justify-center mb-4">
                     <Upload className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">{t("upload")}</h3>
+                  <h3 className="text-lg font-medium mb-2">동영상 업로드</h3>
                   <p className="text-sm text-muted-foreground">
                     강의 또는 다양한 동영상을 업로드하세요.
                   </p>
@@ -89,7 +87,7 @@ export default function Home() {
                   <div className="w-16 h-16 rounded-full bg-linear-to-r from-pink-500 to-orange-500 flex items-center justify-center mb-4">
                     <PlayCircle className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">{t("analyze")}</h3>
+                  <h3 className="text-lg font-medium mb-2">AI 분석</h3>
                   <p className="text-sm text-muted-foreground">
                     AI가 동영상 내용을 자동으로 분석합니다. 중요한 내용을 선별하고, 핵심 주제를 파악합니다.
                   </p>
@@ -103,7 +101,7 @@ export default function Home() {
                   <div className="w-16 h-16 rounded-full bg-linear-to-r from-pink-500 to-orange-500 flex items-center justify-center mb-4">
                     <FileText className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">{t("summary")}</h3>
+                  <h3 className="text-lg font-medium mb-2">요약 결과</h3>
                   <p className="text-sm text-muted-foreground">
                     핵심 요약과 전체 요약 두 가지 형태로 결과를 확인하세요.
                   </p>

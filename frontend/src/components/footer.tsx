@@ -2,11 +2,9 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useLanguage } from "@/hooks/use-language"
 
 export default function Footer() {
   const pathname = usePathname()
-  const { t } = useLanguage()
 
   // 로그인 페이지와 회원가입 페이지에서는 푸터를 표시하지 않음
   {/*if (pathname === "/login" || pathname === "/register") {

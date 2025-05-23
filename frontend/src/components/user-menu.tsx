@@ -1,7 +1,6 @@
 "use client"
 
 import { useAuth } from "@/hooks/use-auth"
-import { useLanguage } from "@/hooks/use-language"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,14 +17,13 @@ import Link from "next/link"
 
 export function UserMenu() {
   const { user, logout } = useAuth()
-  const { t } = useLanguage()
 
   if (!user) {
     return (
       <div className="flex items-center gap-2">
         <Link href="/login">
           <Button variant="ghost" size="sm" className="rounded-full px-4">
-            {t("login")}
+            로그인
           </Button>
         </Link>
         <Link href="/register">
@@ -33,7 +31,7 @@ export function UserMenu() {
             size="sm"
             className="rounded-full px-4 bg-linear-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0"
           >
-            {t("register")}
+            회원가입
           </Button>
         </Link>
       </div>
@@ -63,18 +61,18 @@ export function UserMenu() {
           <Link href="/dashboard">
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
-              <span>{t("my_page")}</span>
+              <span>내 정보</span>
             </DropdownMenuItem>
           </Link>
           <DropdownMenuItem>
             <Settings className="mr-2 h-4 w-4" />
-            <span>{t("settings")}</span>
+            <span>설정</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>{t("logout")}</span>
+          <span>로그아웃</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

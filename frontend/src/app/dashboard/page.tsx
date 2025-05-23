@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -25,10 +26,15 @@ type User = {
 };
 
 export default function DashboardPage() {
+  // 로그인한 사용자 정보를 저장하는 상태
   const [user, setUser] = useState<User | null>(null);
+  // 강의 목록을 저장하는 상태
   const [lectures, setLectures] = useState<Lecture[]>([]);
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  // 총 절약한 시간을 저장하는 상태
   const [totalDuration, setTotalDuration] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchLectures() {
@@ -50,9 +56,11 @@ export default function DashboardPage() {
         const res = await axios.get(`${API_BASE_URL}/api/members/me`, {
           withCredentials: true,
         });
-        setUser(res.data.data); // <- updated to access 'data' inside response
+        setUser(res.data.data); // 사용자 정보
       } catch (error) {
         console.error("사용자 정보 불러오기 실패", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -60,18 +68,36 @@ export default function DashboardPage() {
     fetchLectures();
   }, []);
 
+  // 강의 삭제 처리 함수
   const handleDelete = (lectureId: number) => {
     const updated = lectures.filter((lecture) => lecture.lectureId !== lectureId);
     setLectures(updated);
     // 서버에도 삭제 요청하고 싶다면 여기에 fetch 추가
   };
 
-  // Helper function to format totalDuration (seconds) as "X시간 Y분"
+  // 총 절약한 시간(초)을 "X시간 Y분" 형식으로 변환하는 헬퍼 함수
   const getTotalDurationText = () => {
     const hours = Math.floor(totalDuration / 3600);
     const minutes = Math.floor((totalDuration % 3600) / 60);
     return `${hours}시간 ${minutes}분`;
   };
+
+  //로딩중 흰배경 출력
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen bg-white" />
+    );
+  }
+
+  if (!user && !isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-12 text-center">
+        <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다</h1>
+        <p className="text-muted-foreground mb-6">로그인하고 모든 서비스를 이용해 보세요!</p>
+        <Button onClick={() => router.push("/login")}>로그인 하러가기</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-12">

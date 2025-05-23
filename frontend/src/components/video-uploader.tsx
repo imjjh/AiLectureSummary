@@ -6,14 +6,12 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Upload } from "lucide-react"
-import { useLanguage } from "@/hooks/use-language"
 import { motion } from "framer-motion"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function VideoUploader() {
   const router = useRouter()
-  const { t } = useLanguage()
   const [isDragging, setIsDragging] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
@@ -91,7 +89,7 @@ export default function VideoUploader() {
 
         xhr.open('POST', `${API_BASE_URL}/api/lecture/upload`)
         xhr.withCredentials = true
-        xhr.send(formData)//
+        xhr.send(formData)
       })
 
       // ✅ 성공 후 해당 ID 페이지로 이동
@@ -99,13 +97,13 @@ export default function VideoUploader() {
       router.push(`/summary/${lectureId}`)
 
     } catch (error: any) {
-      alert(t("upload_failed") + ": " + error.message)
+      alert("업로드 실패: " + error.message)
       console.error('Upload Error:', error)
     } finally {
       setUploading(false)
       setProgress(0)
     }
-  }, [files, router, t])
+  }, [files, router])
 
   return (
     <div className="w-full">
@@ -124,8 +122,8 @@ export default function VideoUploader() {
             </div>
           </motion.div>
           <div>
-            <h3 className="text-lg font-medium">{t("upload_video")}</h3>
-            <p className="text-sm text-muted-foreground mt-1">{t("drag_drop")}</p>
+            <h3 className="text-lg font-medium">동영상 업로드</h3>
+            <p className="text-sm text-muted-foreground mt-1">여기로 파일을 드래그하거나 클릭해서 선택하세요</p>
           </div>
 
           <input 
@@ -142,7 +140,7 @@ export default function VideoUploader() {
               className="cursor-pointer rounded-full px-6 bg-background dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               asChild
             >
-              <span>{t("select_file")}</span>
+              <span>파일 선택</span>
             </Button>
           </label>
         </div>
@@ -171,7 +169,7 @@ export default function VideoUploader() {
               onClick={handleUpload}
               className="w-full mt-2 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 text-white"
             >
-              {t("start_summary")}
+              요약 시작
             </Button>
           )}
         </div>
