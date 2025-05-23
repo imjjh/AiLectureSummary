@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function Home() {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8080/hello")
+    fetch(`${API_BASE_URL}/hello`)
       .then((res) => res.text())
       .then(setMsg)
       .catch(() => setMsg("연결 실패 😢"));

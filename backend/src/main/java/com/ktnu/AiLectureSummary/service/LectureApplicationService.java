@@ -1,7 +1,7 @@
 package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureResponse;
+import com.ktnu.AiLectureSummary.dto.lecture.LectureUploadResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class LectureApplicationService {
     private final LectureService lectureService;
     private final MemberLectureService memberLectureService;
 
-    public LectureResponse uploadLecture(CustomUserDetails user, MultipartFile file) {
+    public LectureUploadResponse uploadLecture(CustomUserDetails user, MultipartFile file) {
         // 1. 강의 처리 (파일 -> 강의 생성 -> 저장)
         Lecture lecture = lectureService.processLecture(file);
 
@@ -33,6 +33,6 @@ public class LectureApplicationService {
         memberLectureService.save(user.getId(), lecture);
 
         // 3. 응답 반환
-        return LectureResponse.from(lecture);
+        return LectureUploadResponse.from(lecture);
     }
 }

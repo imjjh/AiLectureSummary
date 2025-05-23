@@ -25,7 +25,7 @@ public class Lecture {
     private Long id;
 
     @Column(nullable = false)
-    private String title;
+    private String titleByAi;
 
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -43,7 +43,7 @@ public class Lecture {
 
     public static Lecture from(LectureRegisterRequest request, String hash) {
         Lecture lecture = new Lecture();
-        lecture.setTitle(request.getTitle());
+        lecture.setTitleByAi(request.getTitle()); // Ai 초기값 설정
         lecture.setHash(hash);
         lecture.setAiSummary(request.getAiSummary());
         lecture.setOriginalText(request.getOriginalText());

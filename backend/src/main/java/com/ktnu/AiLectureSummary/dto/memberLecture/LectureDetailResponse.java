@@ -1,6 +1,7 @@
-package com.ktnu.AiLectureSummary.dto.lecture;
+package com.ktnu.AiLectureSummary.dto.memberLecture;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
+import com.ktnu.AiLectureSummary.domain.MemberLecture;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,13 +16,15 @@ public class LectureDetailResponse {
     private String aiSummary;
     private String personalNote;
 
-    public static LectureDetailResponse from(Lecture lecture,String personalNote){
+    public static LectureDetailResponse from(MemberLecture memberLecture) {
+        Lecture lecture = memberLecture.getLecture();
+
         return LectureDetailResponse.builder()
                 .id(lecture.getId())
-                .title(lecture.getTitle())
+                .title(memberLecture.getPersonalTitle())
                 .aiSummary(lecture.getAiSummary())
                 .originalText(lecture.getOriginalText())
-                .personalNote(personalNote)
+                .personalNote(memberLecture.getPersonalNote())
                 .build();
     }
 }
