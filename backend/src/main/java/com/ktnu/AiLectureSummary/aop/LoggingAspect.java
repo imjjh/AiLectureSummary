@@ -24,7 +24,7 @@ public class LoggingAspect {
      *
      * @param joinPoint AOP에서 현재 실행되고 있는 메서드에 대한 정보를 담고 있는 객체
      */
-    @Before("execution(* com.ktnu.AiLectureSummary.service..*(..))")
+    @Before("execution(* com.ktnu.AiLectureSummary.service..*(..)) || execution(* com.ktnu.AiLectureSummary.controller..*(..))")
     public void logBeforeService(JoinPoint joinPoint){
         // 메서드 실행 전 로그 출력 (메서드명 + 인자 목록)
         log.info("{} 호출됨 - args: {}",joinPoint.getSignature(),joinPoint.getArgs());
