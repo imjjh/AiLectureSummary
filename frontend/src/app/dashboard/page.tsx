@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [lectures, setLectures] = useState<Lecture[]>([]);
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  const [totalDuration, setTotalDuration] = useState<number>(0);
 
   useEffect(() => {
     async function fetchLectures() {
@@ -35,10 +36,12 @@ export default function DashboardPage() {
         const res = await axios.get(`${API_BASE_URL}/api/member-lectures/dashboard`, {
           withCredentials: true,
         });
-        setLectures(res.data.data);
+        setLectures(res.data.data.items); // 강의 목록
+        setTotalDuration(res.data.data.totalDuration); // 총 절약한 시간
       } catch (error) {
         console.error("강의 목록 불러오기 실패", error);
         setLectures([]);
+        setTotalDuration(0);
       }
     }
 
@@ -63,29 +66,10 @@ export default function DashboardPage() {
     // 서버에도 삭제 요청하고 싶다면 여기에 fetch 추가
   };
 
-  const getTotalDurationText = (lectures: Lecture[]): string => {
-    let totalSeconds = 0;
-
-    lectures.forEach((lecture) => {
-      const duration = lecture.duration;
-
-      if (!duration || typeof duration !== "string") return;
-
-      const parts = duration.split(":").map((s) => parseInt(s, 10));
-
-      if (parts.length === 2) {
-        // "MM:SS"
-        const [minutes, seconds] = parts;
-        totalSeconds += (minutes * 60) + seconds;
-      } else if (parts.length === 1) {
-        // "MM"
-        totalSeconds += parts[0] * 60;
-      }
-    });
-
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-
+  // Helper function to format totalDuration (seconds) as "X시간 Y분"
+  const getTotalDurationText = () => {
+    const hours = Math.floor(totalDuration / 3600);
+    const minutes = Math.floor((totalDuration % 3600) / 60);
     return `${hours}시간 ${minutes}분`;
   };
 
@@ -120,7 +104,7 @@ export default function DashboardPage() {
               <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <Clock className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold mb-1">{getTotalDurationText(lectures)}</h3>
+              <h3 className="text-2xl font-bold mb-1">{getTotalDurationText()}</h3>
               <p className="text-sm text-muted-foreground">절약한 시간</p>
             </CardContent>
           </Card>
