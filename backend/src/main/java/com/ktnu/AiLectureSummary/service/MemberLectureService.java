@@ -1,6 +1,5 @@
 package com.ktnu.AiLectureSummary.service;
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListItemResponse;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
@@ -36,7 +35,7 @@ public class MemberLectureService {
                     MemberLecture.builder()
                             .member(member)
                             .lecture(lecture)
-                            .personalTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
+                            .customTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
                             .build()
             );
         }
@@ -100,7 +99,7 @@ public class MemberLectureService {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
 
-        memberLecture.setPersonalNote(note);
+        memberLecture.setMemo(note);
 
         return LectureDetailResponse.from(memberLecture);
 

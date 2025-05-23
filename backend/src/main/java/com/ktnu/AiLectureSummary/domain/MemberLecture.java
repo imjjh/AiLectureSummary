@@ -51,11 +51,11 @@ public class MemberLecture {
     private LocalDateTime enrolledAt;
 
     @Column(nullable = false)
-    @Setter(AccessLevel.PROTECTED) // 사용자가 수정 가능
-    private String personalTitle;
+    @Setter(AccessLevel.PUBLIC) // 사용자가 수정 가능
+    private String customTitle;
 
-    @Setter(AccessLevel.PUBLIC)
+    @Setter(AccessLevel.PUBLIC) // 사용자가 수정 가능
     @Column(nullable = true, columnDefinition = "TEXT") // 사용자 개별 메모 저장용 (TEXT 타입)
-    private String personalNote;
+    private String memo;
 
 }
