@@ -183,7 +183,7 @@ export default function Page() {
           <div className="md:col-span-2">
             {/* 썸네일 이미지 */}
             <Image
-              src={summaryData.thumbnailUrl ?? "/placeholder.svg"}
+              src={summaryData.thumbnailUrl ?? "/placeholder/1.png"}
               width={500}
               height={300}
               alt={summaryData.customTitle ?? "썸네일"}
