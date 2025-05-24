@@ -14,7 +14,7 @@ import { useAuth } from "@/hooks/use-auth"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SummaryData {
-  title?: string
+  customTitle?: string
   duration?: string
   uploadDate?: string
   thumbnailUrl?: string

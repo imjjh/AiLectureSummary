@@ -11,6 +11,7 @@ import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.exception.LectureNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -95,6 +96,7 @@ public class MemberLectureService {
      * @param note 사용자가 입력한 메모 내용
      * @return 수정된 강의 상세 정보
      */
+    @Transactional
     public LectureDetailResponse saveMemo(CustomUserDetails user, Long lectureId, String note) {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
@@ -108,6 +110,7 @@ public class MemberLectureService {
      * @param lectureId
      * @return  메모가 삭제된 강의 상세 정보
      */
+    @Transactional
     public LectureDetailResponse deleteMemo(CustomUserDetails user, Long lectureId) {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
@@ -128,6 +131,7 @@ public class MemberLectureService {
      * @param newTitle 새로운 제목
      * @return 수정된 강의 상세 정보
      */
+    @Transactional
     public LectureDetailResponse updateCustomTitle(CustomUserDetails user,Long lectureId, String newTitle){
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
