@@ -46,7 +46,7 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
                 <CardContent className="p-4">
                     <div className="aspect-video bg-muted rounded mb-3 overflow-hidden">
                         <Image
-                            src={lecture.thumbnailUrl || "/placeholder/1.png"}
+                            src={lecture.thumbnailUrl || "/images/1.png"}
                             alt="썸네일"
                             width={320}
                             height={180}
