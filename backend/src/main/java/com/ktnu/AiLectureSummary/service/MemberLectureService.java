@@ -1,6 +1,5 @@
 package com.ktnu.AiLectureSummary.service;
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListItemResponse;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
@@ -12,6 +11,7 @@ import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.exception.LectureNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ public class MemberLectureService {
                     MemberLecture.builder()
                             .member(member)
                             .lecture(lecture)
-                            .personalTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
+                            .customTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
                             .build()
             );
         }
@@ -88,21 +88,56 @@ public class MemberLectureService {
     }
 
     /**
-     * 강의에 대한 개인 메모를 작성합니다.
-     * member.id, lectureId로  사용자가 등록한 강의가 맞나 확인 하고, 개인 메모를 저장합니다.
+     * 강의에 대한 개인 메모를 저장합니다. 기존 메모가 있으면 덮어씁니다.
+     * member.id, lectureId로 사용자가 등록한 강의가 맞는지 확인 후 메모를 저장합니다.
      *
      * @param user 현재 로그인한 사용자 정보
-     * @param lectureId
-     * @param note 사용자가 입력한 요약 정보
-     * @return
+     * @param lectureId 강의 ID
+     * @param note 사용자가 입력한 메모 내용
+     * @return 수정된 강의 상세 정보
      */
-    public LectureDetailResponse writePersonalNote(CustomUserDetails user, Long lectureId, String note) {
+    @Transactional
+    public LectureDetailResponse saveMemo(CustomUserDetails user, Long lectureId, String note) {
+        MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
+                .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
+        memberLecture.setMemo(note);
+        return LectureDetailResponse.from(memberLecture);
+    }
+
+    /**
+     * 메모를 삭제합니다.
+     * @param user
+     * @param lectureId
+     * @return  메모가 삭제된 강의 상세 정보
+     */
+    @Transactional
+    public LectureDetailResponse deleteMemo(CustomUserDetails user, Long lectureId) {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
 
-        memberLecture.setPersonalNote(note);
+        memberLecture.setMemo(null);
 
         return LectureDetailResponse.from(memberLecture);
-
     }
+
+
+
+
+    /**
+     * 제목을 수정합니다(update), 초기값은 ai가 자동생성으로 클라이언트 요청없이 서버에서 처리하기에 (create)는 없습니다.
+     *
+     * @param user 현재 로그인한 사용자 정보
+     * @param lectureId 강의 Id
+     * @param newTitle 새로운 제목
+     * @return 수정된 강의 상세 정보
+     */
+    @Transactional
+    public LectureDetailResponse updateCustomTitle(CustomUserDetails user,Long lectureId, String newTitle){
+        MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
+                .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
+        memberLecture.setCustomTitle(newTitle);
+
+        return LectureDetailResponse.from(memberLecture);
+    }
+
 }

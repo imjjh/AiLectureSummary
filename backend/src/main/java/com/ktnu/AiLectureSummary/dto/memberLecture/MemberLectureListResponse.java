@@ -17,8 +17,6 @@ public class MemberLectureListResponse {
     private List<MemberLectureListItemResponse> items;
     private long totalDuration;
 
-
-
     public static MemberLectureListResponse from(List<MemberLecture> memberLectures, long totalDuration) {
         return MemberLectureListResponse.builder()
                 .items(MemberLectureListItemResponse.fromList(memberLectures))

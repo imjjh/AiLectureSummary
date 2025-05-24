@@ -14,13 +14,13 @@ import { useAuth } from "@/hooks/use-auth"
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SummaryData {
-  title?: string
+  customTitle?: string
   duration?: string
   uploadDate?: string
   thumbnailUrl?: string
   aiSummary?: string
   originalText?: string
-  personalNote?: string
+  memo?: string
 }
 
 export default function Page() {
@@ -35,11 +35,11 @@ export default function Page() {
   // 에러 상태
   const [error, setError] = useState<string | null>(null)
   // 개인 메모 상태
-  const [note, setNote] = useState<string>("")
+  const [memo, setMemo] = useState<string>("")
 
   // 제목 편집 모드 상태 및 편집 중인 제목 상태
   const [isEditingTitle, setIsEditingTitle] = useState(false)
-  const [editedTitle, setEditedTitle] = useState(summaryData?.title || "")
+  const [editedTitle, setEditedTitle] = useState(summaryData?.customTitle || "")
 
   // 요약 데이터 API 호출 및 초기 데이터 설정
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function Page() {
 
         const data = await res.json()
         setSummaryData(data.data)
-        setNote(data.data.memo || "")
+        setMemo(data.data.memo || "")
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err))
       }
@@ -67,21 +67,21 @@ export default function Page() {
     if (id) fetchSummary()
   }, [id])
 
-  // summaryData.title 변경 시 편집 중인 제목도 업데이트
+  // summaryData.customTitle 변경 시 편집 중인 제목도 업데이트
   useEffect(() => {
-    if (summaryData?.title) {
-      setEditedTitle(summaryData.title)
+    if (summaryData?.customTitle) {
+      setEditedTitle(summaryData.customTitle)
     }
-  }, [summaryData?.title])
+  }, [summaryData?.customTitle])
 
   // 메모 저장 함수
   const handleNoteSave = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/my-note`, {
-        method: "POST",
+      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/memo`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ note }),
+        body: JSON.stringify({ memo }),
       })
       if (!res.ok) throw new Error("메모 저장 실패")
       alert("메모가 저장되었습니다.")
@@ -96,12 +96,12 @@ export default function Page() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/my-note`, {
+      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/memo`, {
         method: "DELETE",
         credentials: "include",
       });
       if (!res.ok) throw new Error("메모 삭제 실패");
-      setNote("");
+      setMemo("");
       alert("메모가 삭제되었습니다.");
     } catch (err) {
       alert("메모 삭제 중 오류가 발생했습니다.");
@@ -111,7 +111,7 @@ export default function Page() {
   // 제목 저장 함수
   const handleTitleSave = async () => {
     setIsEditingTitle(false)
-    if (editedTitle === summaryData?.title) return
+    if (editedTitle === summaryData?.customTitle) return
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/title`, {
@@ -149,7 +149,7 @@ export default function Page() {
               className="text-3xl font-bold tracking-tight mb-2 cursor-pointer transition-colors hover:text-zinc-600"
               onClick={() => setIsEditingTitle(true)}
             >
-              {summaryData.title ?? "제목 없음"}
+              {summaryData.customTitle ?? "제목 없음"}
             </h1>
           </div>
           {/* 제목 편집 모달 */}
@@ -183,10 +183,10 @@ export default function Page() {
           <div className="md:col-span-2">
             {/* 썸네일 이미지 */}
             <Image
-              src={summaryData.thumbnailUrl ?? "/placeholder.svg"}
+              src={summaryData.thumbnailUrl ?? "/placeholder/1.png"}
               width={500}
               height={300}
-              alt={summaryData.title ?? "썸네일"}
+              alt={summaryData.customTitle ?? "썸네일"}
               className="rounded-lg w-full object-cover aspect-video mb-4"
             />
 
@@ -236,8 +236,8 @@ export default function Page() {
                   <Textarea
                     className="w-full min-h-[100px] mb-4"
                     placeholder="메모할 내용을 작성하세요."
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
+                    value={memo}
+                    onChange={(e) => setMemo(e.target.value)}
                   />
                   <div className="flex justify-end gap-2">
                     <Button variant="secondary" onClick={handleNoteSave}>메모 저장</Button>

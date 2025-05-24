@@ -9,6 +9,7 @@ import { Clock, FileText, Upload } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import axios from "axios"
+import LectureCard from "@/components/lecture-card";
 axios.defaults.withCredentials = true;
 type Lecture = {
   lectureId: number;
@@ -23,6 +24,14 @@ type Lecture = {
 type User = {
   email: string;
   username: string;
+};
+
+const formatDuration = (duration: string): string => {
+  const seconds = parseInt(duration, 10);
+  if (isNaN(seconds)) return duration;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
 export default function DashboardPage() {
@@ -69,10 +78,26 @@ export default function DashboardPage() {
   }, []);
 
   // 강의 삭제 처리 함수
-  const handleDelete = (lectureId: number) => {
-    const updated = lectures.filter((lecture) => lecture.lectureId !== lectureId);
-    setLectures(updated);
-    // 서버에도 삭제 요청하고 싶다면 여기에 fetch 추가
+  const handleDelete = async (lectureId: number) => {
+    const confirmed = window.confirm("정말 강의를 삭제하시겠습니까?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${lectureId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("삭제 실패");
+      }
+
+      // UI에서 해당 강의 제거
+      setLectures((prev) => prev.filter((lecture) => lecture.lectureId !== lectureId));
+    } catch (err) {
+      alert("삭제 중 오류가 발생했습니다.");
+      console.error(err);
+    }
   };
 
   // 총 절약한 시간(초)을 "X시간 Y분" 형식으로 변환하는 헬퍼 함수
@@ -168,32 +193,11 @@ export default function DashboardPage() {
           <TabsContent value="recent" className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {lectures.length > 0 ? (
               lectures.slice(0, 2).map((lecture: any) => (
-                <Card key={lecture.lectureId} className="relative hover:shadow-lg transition-shadow">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-2 right-2 text-xs text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(lecture.lectureId)}
-                  >
-                    X
-                  </Button>
-                  <Link href={`/summary/${lecture.lectureId}`}>
-                    <CardContent className="p-4">
-                      <div className="aspect-video bg-muted rounded mb-3 overflow-hidden">
-                        <Image
-                          src={lecture.thumbnailUrl || "/images/1.png"}
-                          alt="썸네일"
-                          width={320}
-                          height={180}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="text-base font-medium truncate">{lecture.title}</div>
-                      <div className="text-sm text-muted-foreground">{lecture.createdAt}</div>
-                      <div className="text-sm text-muted-foreground">{lecture.duration}</div>
-                    </CardContent>
-                  </Link>
-                </Card>
+                <LectureCard
+                  key={lecture.lectureId}
+                  lecture={lecture}
+                  onDelete={() => handleDelete(lecture.lectureId)}
+                />
               ))
             ) : (
               <p className="text-muted-foreground text-center col-span-full">요약한 동영상이 없습니다.</p>
@@ -204,32 +208,11 @@ export default function DashboardPage() {
           <TabsContent value="all" className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {lectures.length > 0 ? (
               lectures.map((lecture: any) => (
-                <Card key={lecture.lectureId} className="relative hover:shadow-lg transition-shadow">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-2 right-2 text-xs text-muted-foreground hover:text-destructive"
-                    onClick={() => handleDelete(lecture.lectureId)}
-                  >
-                    X
-                  </Button>
-                  <Link href={`/summary/${lecture.lectureId}`}>
-                    <CardContent className="p-4">
-                      <div className="aspect-video bg-muted rounded mb-3 overflow-hidden">
-                        <Image
-                          src={lecture.thumbnailUrl || "/placeholder.png"}
-                          alt="썸네일"
-                          width={320}
-                          height={180}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="text-base font-medium truncate">{lecture.title}</div>
-                      <div className="text-sm text-muted-foreground">{lecture.createdAt}</div>
-                      <div className="text-sm text-muted-foreground">{lecture.duration}</div>
-                    </CardContent>
-                  </Link>
-                </Card>
+                <LectureCard
+                  key={lecture.lectureId}
+                  lecture={lecture}
+                  onDelete={() => handleDelete(lecture.lectureId)}
+                />
               ))
             ) : (
               <p className="text-muted-foreground text-center col-span-full">요약한 동영상이 없습니다.</p>

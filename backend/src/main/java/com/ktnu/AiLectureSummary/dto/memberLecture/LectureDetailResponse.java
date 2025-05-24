@@ -11,10 +11,10 @@ import lombok.Getter;
 @Builder
 public class LectureDetailResponse {
     private Long id;
-    private String title;
+    private String customTitle;
     private String originalText;
     private String aiSummary;
-    private String personalNote;
+    private String memo;
     private long duration;
 
     public static LectureDetailResponse from(MemberLecture memberLecture) {
@@ -23,10 +23,10 @@ public class LectureDetailResponse {
         return LectureDetailResponse.builder()
                 .id(lecture.getId())
                 .duration(lecture.getDuration())
-                .title(memberLecture.getPersonalTitle())
+                .customTitle(memberLecture.getCustomTitle())
                 .aiSummary(lecture.getAiSummary())
                 .originalText(lecture.getOriginalText())
-                .personalNote(memberLecture.getPersonalNote())
+                .memo(memberLecture.getMemo())
                 .build();
     }
 }
