@@ -123,12 +123,26 @@ export default function Page() {
 
       if (!res.ok) throw new Error("제목 저장 실패")
 
-      setSummaryData((prev) => prev ? { ...prev, title: editedTitle } : prev)
+      setSummaryData((prev) => prev ? { ...prev, customTitle: editedTitle } : prev)
       alert("제목이 저장되었습니다.")
     } catch (err) {
       alert("제목 저장 중 오류가 발생했습니다.")
     }
   }
+
+  const formatDuration = (durationInSeconds: number): string => {
+    const hours = Math.floor(durationInSeconds / 3600);
+    const minutes = Math.floor((durationInSeconds % 3600) / 60);
+    const seconds = durationInSeconds % 60;
+
+    if (hours > 0) {
+      return `${hours}시간 ${minutes}분 ${seconds}초`;
+    } else if (minutes > 0) {
+      return `${minutes}분 ${seconds}초`;
+    } else {
+      return `${seconds}초`;
+    }
+  };
 
   // 에러 발생 시 에러 메시지 표시
   if (error) return <div className="container mx-auto px-4 py-12 text-red-500">{error}</div>
@@ -174,7 +188,10 @@ export default function Page() {
 
           {/* 동영상 길이 및 업로드 날짜 표시 */}
           <p className="text-muted-foreground">
-            동영상 길이: {summaryData.duration ?? "정보 없음"} • 업로드: {summaryData.uploadDate ?? "정보 없음"}
+            동영상 길이: {" "} 
+            {typeof summaryData.duration === "number" 
+            ? formatDuration(summaryData.duration) : "정보 없음"}{" "}
+            • 업로드: {summaryData.uploadDate ?? "정보 없음"}
           </p>
         </div>
 
