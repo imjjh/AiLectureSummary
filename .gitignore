@@ -61,6 +61,7 @@ ai-server/__pycache__/
 
 # MySQL Docker volume data
 mysql-data/
+mysql-prod-data/
 
 
 # === Python (FastAPI/AI 서버) ===

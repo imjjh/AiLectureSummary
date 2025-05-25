@@ -8,9 +8,10 @@ services:
     container_name: ai_lecture_frontend
     ports:
       - "3000:3000"
-    volumes: [] # 배포
     working_dir: /app
-
+    env_file:
+      - ./.env.frontend
+    restart: always
 
   backend:
     build:
@@ -19,32 +20,39 @@ services:
     container_name: ai_lecture_backend
     ports:
       - "8080:8080"
-    volumes: [] # 배포
     stdin_open: true
     tty: true
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-
     depends_on:
       - mysql
     env_file:
-        - .env
+      - ./.env.backend
+    # restart: always
+
   mysql:
     image: mysql:8.0
     container_name: mysql
     ports:
       - "${MYSQL_PORT}:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      # MYSQL_USER: ${MYSQL_USER}
-      # MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
-    # mysql-data 없으면 자동 생성
-      - ./mysql-data:/var/lib/mysql
+      - ./mysql-prod-data:/var/lib/mysql
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     env_file:
-          - .env
+      - ./.env.db
+    # restart: always
+
+  fastapi:
+    build:
+      context: ./fastapi
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    depends_on:
+      - backend
+    # restart: always
+    env_file:
+      - ./.env.fastapi
+
+volumes:
+  mysql-prod-data:
