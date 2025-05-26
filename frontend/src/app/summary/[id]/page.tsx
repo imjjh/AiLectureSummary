@@ -260,7 +260,7 @@ export default function Page() {
                     <Button variant="secondary" onClick={handleNoteSave}>메모 저장</Button>
                     <Button
                       variant="outline"
-                      className="text-destructive border-destructive hover:bg-destructive hover:text-white"
+                      className="bg-muted text-white dark:bg-zinc-800 hover:bg-destructive hover:text-white dark:hover:bg-destructive"
                       onClick={handleNoteDelete}
                     >
                       메모 삭제
@@ -277,15 +277,18 @@ export default function Page() {
               <CardContent className="p-6">
                 <h3 className="text-lg font-medium mb-4">요약 공유하기</h3>
                 <div className="space-y-3">
-                  <Button variant="outline" className="w-full gap-2">
+                  <Button 
+                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
                     <Download size={16} />
                     PDF로 저장
                   </Button>
-                  <Button variant="outline" className="w-full gap-2">
+                  <Button 
+                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
                     <Share2 size={16} />
                     링크 공유
                   </Button>
-                  <Button variant="outline" className="w-full gap-2">
+                  <Button 
+                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
                     <Bookmark size={16} />
                     북마크 추가
                   </Button>

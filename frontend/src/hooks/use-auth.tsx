@@ -144,14 +144,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const fallback = await res.text()
           if (fallback) message = fallback
         }
-        alert(`❌ 회원가입 실패: ${message}`)
-        console.error("회원가입 실패:", message)
-        return false
+        throw new Error(message)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("API 오류:", error)
-      alert("서버 오류가 발생했습니다.")
-      return false
+      throw new Error(error?.message || "서버 오류가 발생했습니다.")
     }
   }
 

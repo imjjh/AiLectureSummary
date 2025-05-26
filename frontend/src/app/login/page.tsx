@@ -2,15 +2,18 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Github, Loader2, Mail } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
+
+import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
 
 export default function LoginPage() {
   // 인증 관련 훅에서 로그인 함수 가져오기
@@ -94,7 +97,7 @@ export default function LoginPage() {
                     비밀번호 찾기
                   </Link>
                 </div>
-                <Input
+                <PasswordInputWithCapsWarning
                   id="password"
                   type="password"
                   value={password}

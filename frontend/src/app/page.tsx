@@ -10,7 +10,6 @@ import { useRef } from "react"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
 
-
 export default function Home() {
 
   const container = {
@@ -59,7 +58,6 @@ export default function Home() {
               AI 강의 요약 서비스
             </h1>
             <p className="text-lg text-muted-foreground mb-8">AI가 동영상을 분석하고 요약해주는 서비스입니다.</p>
-
             <div className="flex justify-center gap-4 mb-8">
               <Link href="/about">
                 <Button variant="outline" className="gap-2 rounded-full px-6 bg-background dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">

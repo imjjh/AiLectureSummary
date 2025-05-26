@@ -6,12 +6,15 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Github, Loader2, Mail } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { toast } from "@/hooks/use-toast"
+
+import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
 
 // 회원가입 페이지 컴포넌트
 export default function RegisterPage() {
@@ -48,10 +51,16 @@ export default function RegisterPage() {
       // 회원가입 시도
       const success = await register(name, email, password)
       if (success) {
-        router.push("/") // 회원가입 성공 시 루트 페이지로 이동
-      } else {
-        setError("회원가입에 실패했습니다. 입력 정보를 확인해주세요.")
-      }
+        toast({
+          title: "회원가입 완료🎉",
+          description: "환영합니다! 잠시 후 로그인 페이지로 이동합니다.",
+          duration: 1500,
+        })
+
+        setTimeout(() => {
+          router.push("/login")
+        }, 1500)
+      } 
     } catch (err: any) {
       setError(err?.message || "회원가입 중 오류가 발생했습니다. 다시 시도해주세요.")
     } finally {
@@ -107,7 +116,7 @@ export default function RegisterPage() {
               {/* 비밀번호 입력 및 유효성 검사 */}
               <div className="grid gap-2">
                 <Label htmlFor="password">비밀번호</Label>
-                <Input
+                <PasswordInputWithCapsWarning
                   id="password"
                   type="password"
                   value={password}
@@ -122,7 +131,7 @@ export default function RegisterPage() {
               {/* 비밀번호 확인 입력 및 일치 여부 확인 */}
               <div className="grid gap-2">
                 <Label htmlFor="confirm-password">비밀번호 확인</Label>
-                <Input
+                <PasswordInputWithCapsWarning
                   id="confirm-password"
                   type="password"
                   value={confirmPassword}
