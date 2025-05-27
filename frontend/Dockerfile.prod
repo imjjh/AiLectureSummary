@@ -5,11 +5,10 @@ WORKDIR /app
 
 COPY . .
 
-# 환경변수 하드코딩
-ENV NEXT_PUBLIC_API_URL=http://localhost:8080
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
-# 개발용: 에러 무시 후 빌드 추후 수정 필요
-RUN npm install && npm run build --ignore-build-errors  
+RUN npm install && npm run build
 
 # --- 운영 스테이지 ---
 FROM node:18-alpine
