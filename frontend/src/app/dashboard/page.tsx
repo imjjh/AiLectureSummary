@@ -51,8 +51,15 @@ export default function DashboardPage() {
         const res = await axios.get(`${API_BASE_URL}/api/member-lectures/dashboard`, {
           withCredentials: true,
         });
-        setLectures(res.data.data.items); // 강의 목록
-        setTotalDuration(res.data.data.totalDuration); // 총 절약한 시간
+
+        const fetchedData = res.data.data;
+        const sortedLectures = fetchedData.items.sort(
+          (a: Lecture, b: Lecture) => b.lectureId - a.lectureId
+        );
+        
+        setLectures(sortedLectures);
+        setTotalDuration(fetchedData.totalDuration);
+
       } catch (error) {
         console.error("강의 목록 불러오기 실패", error);
         setLectures([]);
@@ -104,6 +111,9 @@ export default function DashboardPage() {
   const getTotalDurationText = () => {
     const hours = Math.floor(totalDuration / 3600);
     const minutes = Math.floor((totalDuration % 3600) / 60);
+    if (hours === 0 && minutes === 0) return "0분";
+    if (hours === 0) return `${minutes}분`;
+    if (minutes === 0) return `${hours}시간`;
     return `${hours}시간 ${minutes}분`;
   };
 
@@ -172,12 +182,14 @@ export default function DashboardPage() {
                 <p className="text-muted-foreground">로그인된 사용자 정보가 없습니다.</p>
               )}
               <div className="mt-4 pt-4 border-t">
-                <Button
-                  size="sm"
-                  className="w-full bg-background text-foreground border border-border hover:bg-muted"
-                >
-                  계정 설정
-                </Button>
+                <Link href = "/accountedit">
+                  <Button
+                    size="sm"
+                    className="w-full bg-background text-foreground border border-border hover:bg-muted"
+                  >
+                    계정 설정
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

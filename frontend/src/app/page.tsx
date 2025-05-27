@@ -6,6 +6,10 @@ import { Upload, PlayCircle, FileText, Info, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import VideoUploader from "@/components/video-uploader"
 import { motion } from "framer-motion"
+import { useRef } from "react"
+import { useAuth } from "@/hooks/use-auth"
+import { useRouter } from "next/navigation"
+
 
 export default function Home() {
 
@@ -24,11 +28,28 @@ export default function Home() {
     show: { opacity: 1, y: 0 },
   }
 
+  const uploadRef = useRef<HTMLDivElement | null>(null)
+  const { user, isLoading } = useAuth()
+  const router = useRouter()
+
+  const handleStartClick = () => {
+    if (isLoading) return
+
+    if (user) {
+      // 로그인된 경우: 업로드 영역으로 스크롤
+      uploadRef.current?.scrollIntoView({ behavior: "smooth" })
+    } else {
+      // 로그인 안된 경우: 회원가입 페이지로 이동
+      router.push("/register")
+    }
+  }
+
   return (
     <div className="bg-linear-to-b from-pink-50 to-white dark:from-gray-900 dark:to-gray-950">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <motion.div
+            ref = {uploadRef}
             className="text-center mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -120,12 +141,11 @@ export default function Home() {
             {/*<p className="text-muted-foreground mb-6">
               회원가입 없이도 서비스를 이용할 수 있습니다. 요약 기록을 저장하려면 로그인하세요.
             </p>*/}
-            <Link href="/register">
-              <Button className="rounded-full px-8 py-6 text-lg bg-linear-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                <span>무료로 시작하기</span>
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <Button 
+            onClick={handleStartClick} className="rounded-full px-8 py-6 text-lg bg-linear-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <span>무료로 시작하기</span>
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
           </motion.div>
         </div>
       </div>
