@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 
+import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
+
 export default function AccountEditPage() {
   const router = useRouter()
   const { user } = useAuth()
@@ -100,7 +102,7 @@ export default function AccountEditPage() {
 
                 <div className="grid gap-2">
                     <Label htmlFor="password">비밀번호</Label>
-                    <Input
+                    <PasswordInputWithCapsWarning
                     id="password"
                     type="password"
                     value={password}
@@ -116,7 +118,7 @@ export default function AccountEditPage() {
                 {/* 비밀번호 확인 입력 및 일치 여부 확인 */}
                 <div className="grid gap-2">
                     <Label htmlFor="confirm-password">비밀번호 확인</Label>
-                    <Input
+                    <PasswordInputWithCapsWarning
                         id="confirm-password"
                         type="password"
                         value={confirmPassword}

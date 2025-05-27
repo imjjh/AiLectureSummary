@@ -15,7 +15,7 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+      {/*<div className="fixed top-[80px] left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-2">*/}
         {toasts.map(({ id, title, description, action, ...props }) => (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
@@ -26,10 +26,10 @@ export function Toaster() {
             <ToastClose />
           </Toast>
         ))}
-      </div>
+      {/*</div>*/}
 
       {/* 🔽 뷰포트도 확실한 위치 지정 */}
-      <ToastViewport className="fixed top-4 right-4 z-50" />
+      <ToastViewport className="!fixed !top-[80px] !left-1/2 !-translate-x-1/2 !z-[9999] w-full max-w-sm" />
     </ToastProvider>
   )
 }
