@@ -32,10 +32,10 @@ public class Member {
     private Long id;
     /**
      * 로그인 ID
-     * - null 불가, 중복 불가
+     * - null 불가, 중복 불가, 수정 불가
      * - 로그인 시 사용자 식별자로 사용
      */
-    @Column(nullable = false, unique = true) // 수정 불가
+    @Column(nullable = false, unique = true)
     private String email;
 
     /**
@@ -43,7 +43,7 @@ public class Member {
      * - null 불가
      */
     @Column(nullable = false)
-    @Setter(AccessLevel.PROTECTED) // 비밀번호 수정 가능
+    @Setter(AccessLevel.PUBLIC) // 비밀번호 수정 가능
     private String password;
 
     /**
@@ -51,14 +51,13 @@ public class Member {
      * - null 불가
      */
     @Column(nullable = false)
-    @Setter(AccessLevel.PROTECTED) // 수정 가능
+    @Setter(AccessLevel.PUBLIC)
     private String username;
 
 
     /**
      * 활성 상태 여부 (탈퇴한 계정 관리용)
      */
-    @Setter(AccessLevel.PROTECTED)
     @Column(nullable = false)
     private boolean active = true;
 

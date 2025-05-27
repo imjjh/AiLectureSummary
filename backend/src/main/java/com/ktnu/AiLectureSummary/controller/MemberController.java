@@ -2,10 +2,7 @@ package com.ktnu.AiLectureSummary.controller;
 
 
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
-import com.ktnu.AiLectureSummary.dto.member.MemberLoginResponse;
-import com.ktnu.AiLectureSummary.dto.member.MemberMeResponse;
-import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.dto.member.*;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -84,4 +81,29 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.success("현재 사용자 정보", MemberMeResponse.from(userDetails)));
     }
 
+
+
+    @PatchMapping("/edit")
+    @Operation(summary = "계정 정보 변경", description = "사용자 입력으로 이름, 비밀번호를 수정합니다. 아이디는 수정할 수 없습니다.")
+    public ResponseEntity<ApiResponse<MemberEditResponse>> editProfile(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody MemberEditRequest request) {
+        MemberEditResponse memberEditResponse = memberService.editProfile(userDetails, request);
+
+        // 비밀번호 변경으로 토큰 재발급한 경우
+        if (memberEditResponse.getToken() != null) {
+            ResponseCookie cookie = ResponseCookie.from("token", memberEditResponse.getToken())
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .sameSite("Lax")
+                    .maxAge(3600)
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header("Set-Cookie", cookie.toString())
+                    .body(ApiResponse.success("수정된 사용자 정보", memberEditResponse));
+        }
+
+        // 비밀번호 등 민감한 정보를 변경하지 않은 경우
+        return ResponseEntity.ok(ApiResponse.success("수정된 사용자 정보", memberEditResponse));
+    }
 }
