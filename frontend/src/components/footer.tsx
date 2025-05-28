@@ -28,7 +28,7 @@ export default function Footer() {
         <div className="text-sm text-muted-foreground text-right leading-6">
           <p><strong>KTNU 팀원</strong></p>
           <p><a href="https://github.com/ddoyo" target="_blank" rel="noopener noreferrer">김서연</a></p>
-          <p><a href="https://github.com/jangjunho2" target="_blank" rel="noopener noreferrer">장준호</a></p>
+          <p><a href="https://github.com/imjjh" target="_blank" rel="noopener noreferrer">장준호</a></p>
           <p><a href="https://github.com/light-castle" target="_blank" rel="noopener noreferrer">조희성</a></p>
           <p><a href="https://github.com/minwoChoi" target="_blank" rel="noopener noreferrer">최민우</a></p>
         </div>
