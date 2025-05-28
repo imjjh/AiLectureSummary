@@ -5,12 +5,10 @@ WORKDIR /app
 
 COPY . .
 
-# 개발용: 에러 무시 후 빌드
-RUN npm install && npm run build --ignore-build-errors  
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
-# 배포용: 타입 검사 포함
-# RUN npm install && npm run build
-
+RUN npm install && npm run build
 
 # --- 운영 스테이지 ---
 FROM node:18-alpine
