@@ -32,7 +32,7 @@ public class Member {
     private Long id;
     /**
      * 로그인 ID
-     * - null 불가, 중복 불가
+     * - null 불가, 중복 불가, 수정 불가
      * - 로그인 시 사용자 식별자로 사용
      */
     @Column(nullable = false, unique = true)
@@ -43,7 +43,7 @@ public class Member {
      * - null 불가
      */
     @Column(nullable = false)
-    @Setter(AccessLevel.PROTECTED) // 비밀번호 수정 가능
+    @Setter(AccessLevel.PUBLIC) // 비밀번호 수정 가능
     private String password;
 
     /**
@@ -51,6 +51,7 @@ public class Member {
      * - null 불가
      */
     @Column(nullable = false)
+    @Setter(AccessLevel.PUBLIC)
     private String username;
 
 

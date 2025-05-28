@@ -2,7 +2,8 @@ package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.domain.Role;
-import com.ktnu.AiLectureSummary.dto.ApiResponse;
+import com.ktnu.AiLectureSummary.dto.member.MemberEditResponse;
+import com.ktnu.AiLectureSummary.dto.member.MemberEditRequest;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
@@ -10,7 +11,9 @@ import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
 import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
+import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +35,7 @@ public class MemberService {
      * @param request
      * @return
      */
+    @Transactional
     public void register(MemberRegisterRequest request) {
         // 필요한 필드 꺼내기
         String email = request.getEmail();
@@ -80,5 +84,39 @@ public class MemberService {
         String token=jwtProvider.createToken(member.getId());
 
         return new MemberLoginResponse(token);
+    }
+
+    /**
+     * 사용자 정보를 수정합니다. (수정 가능한 정보: 이름, 비밀번호)
+     *
+     * @param user 현재 로그인한 사용자 정보
+     * @param request 수정할 정보(이름,비밀번호)를 담은 DTO
+     * @return 수정된 사용자 정보
+     */
+    @Transactional
+    public MemberEditResponse editProfile(CustomUserDetails user, MemberEditRequest request){
+        // 필요한 필드 꺼내기
+        String newPassword=request.getPassword();
+        String newUsername = request.getUsername();
+
+        // 로그인한 사용자의 정보 찾기
+        Member member = memberRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new MemberNotFoundException("이메일이 존재하지 않습니다."));
+
+        // null 또는 현재 정보와 다를경우만 정보를 수정
+        String token=null;
+        if (newUsername != null && !newUsername.equals(member.getUsername())) {
+            member.setUsername(newUsername);
+        }
+        if (newPassword != null && !passwordEncoder.matches(newPassword, member.getPassword())) {
+            member.setPassword(passwordEncoder.encode(newPassword));
+            token = jwtProvider.createToken(member.getId());
+        }
+
+        return MemberEditResponse.builder()
+                .username(member.getUsername())
+                .email(member.getEmail())
+                .token(token)
+                .build();
     }
 }
