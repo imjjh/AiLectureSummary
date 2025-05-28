@@ -62,6 +62,7 @@ public class MemberController {
         // 즉시 만료되는 JWT를 생성
         ResponseCookie expiredCookie = ResponseCookie.from("token", "")
                 .httpOnly(true)
+                .secure(true) // https 환경 대응
                 .path("/")
                 .maxAge(0) // 즉시 만료
                 .sameSite("Lax")
