@@ -36,7 +36,7 @@ public class MemberController {
 
         // 발급된 JWT를 Httponly 쿠키에 담아 응답 헤더에 추가
         ResponseCookie cookie = ResponseCookie.from("token", result.getAccessToken())
-                .httpOnly(false) // Swagger 테스트 용도 (개발용)  // TODO 배포 전 true 필수
+                .httpOnly(true) // Swagger 테스트 용도 (개발용)  // TODO 배포 전 true 필수
                 .path("/")
                 .sameSite("Lax") // 느슨한 보안 (안전한 요청만 처리, delete같은 위험한 요청은 처리 X)
                 .secure(true) // https 에서만 전송 현재 http //TODO http->https 변경 이후 수정
