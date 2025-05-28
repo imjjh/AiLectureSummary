@@ -12,7 +12,7 @@ build/
 out/
 target/
 .gradle/
-*.class
+*.classㅈ
 *.jar
 *.war
 *.ear
