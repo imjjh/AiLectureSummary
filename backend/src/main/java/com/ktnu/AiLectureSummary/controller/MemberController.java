@@ -38,7 +38,7 @@ public class MemberController {
         ResponseCookie cookie = ResponseCookie.from("token", result.getAccessToken())
                 .httpOnly(true) // Swagger 테스트 용도 (개발용)  // TODO 배포 전 true 필수
                 .path("/")
-                .sameSite("Lax") // 느슨한 보안 (안전한 요청만 처리, delete같은 위험한 요청은 처리 X)
+                .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
                 .secure(true) // https 에서만 전송 현재 http //TODO http->https 변경 이후 수정
                 .maxAge(3600) // JWT 만료 시간과 일치시킬 것 (쿠키 만료시 자동 삭제)
                 .build();
@@ -65,7 +65,7 @@ public class MemberController {
                 .secure(true) // https 환경 대응
                 .path("/")
                 .maxAge(0) // 즉시 만료
-                .sameSite("Lax")
+                .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
                 .build();
 
         // TODO (refreshtoken 또는 blacklist 추가 예정)
@@ -95,7 +95,7 @@ public class MemberController {
                     .httpOnly(true)
                     .secure(true)
                     .path("/")
-                    .sameSite("Lax")
+                    .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
                     .maxAge(3600)
                     .build();
 
