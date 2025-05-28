@@ -3,9 +3,9 @@ spring:
     name: AiLectureSummary
 
   datasource:
-    url: jdbc:mysql://mysql:3306/ai_lecture_summary
+    url: ${SPRING_DATASOURCE_URL}    
     username: root
-    password: ${MYSQL_ROOT_PASSWORD}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
