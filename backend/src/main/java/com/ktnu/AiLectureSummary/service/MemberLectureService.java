@@ -1,7 +1,9 @@
 package com.ktnu.AiLectureSummary.service;
+
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
+import com.ktnu.AiLectureSummary.repository.LectureRepository;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 
 
@@ -22,24 +24,29 @@ import java.util.List;
 public class MemberLectureService {
     private final MemberLectureRepository memberLectureRepository;
     private final MemberRepository memberRepository;
+    private final LectureRepository lectureRepository;
 
     /**
      * 사용자와 강의 간의 소유 관계를 저장합니다.
      * 이미 해당 관계가 존재하는 경우 중복 저장을 방지합니다.
-     *
      */
+    @Transactional
     public void save(Long memberId, Lecture lecture) {
-        if (!memberLectureRepository.existsByMember_IdAndLecture(memberId, lecture)) {
-            Member member = memberRepository.findById(memberId)
-                    .orElseThrow(() -> new MemberNotFoundException("해당 사용자를 찾을 수 없습니다."));
-            memberLectureRepository.save(
-                    MemberLecture.builder()
-                            .member(member)
-                            .lecture(lecture)
-                            .customTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
-                            .build()
-            );
-        }
+
+        boolean alreadyExists = memberLectureRepository.existsByMember_IdAndLecture(memberId, lecture);
+        if (alreadyExists) return;
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("해당 사용자를 찾을 수 없습니다."));
+
+        MemberLecture memberLecture = MemberLecture.builder()
+                .member(member)
+                .lecture(lecture)
+                .customTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
+                .build();
+
+        memberLectureRepository.save(memberLecture);
+
     }
 
     /**
@@ -53,12 +60,13 @@ public class MemberLectureService {
     public MemberLectureListResponse getUserLectureList(CustomUserDetails user) {
 
         List<MemberLecture> memberLectures = memberLectureRepository.findAllByMember_Id(user.getId());
-        Long totalDuration=calculateTotalDuration(memberLectures); // 하나도 없는 경우 0?
-        return MemberLectureListResponse.from(memberLectures,totalDuration);
+        Long totalDuration = calculateTotalDuration(memberLectures); // 하나도 없는 경우 0?
+        return MemberLectureListResponse.from(memberLectures, totalDuration);
     }
 
     /**
      * 사용자가 등록한 모든 강의 시간의 총 합
+     *
      * @param memberLectures
      * @return Long
      */
@@ -74,7 +82,7 @@ public class MemberLectureService {
      * 강의 상세 요약 정보를 가져옵니다.
      * member.id, lectureId로  사용자가 등록한 강의가 맞나 확인 하고 강의 상세 요약 정보를 반환합니다.
      *
-     * @param user 현재 로그인한 사용자 정보
+     * @param user      현재 로그인한 사용자 정보
      * @param lectureId
      * @return
      */
@@ -91,9 +99,9 @@ public class MemberLectureService {
      * 강의에 대한 개인 메모를 저장합니다. 기존 메모가 있으면 덮어씁니다.
      * member.id, lectureId로 사용자가 등록한 강의가 맞는지 확인 후 메모를 저장합니다.
      *
-     * @param user 현재 로그인한 사용자 정보
+     * @param user      현재 로그인한 사용자 정보
      * @param lectureId 강의 ID
-     * @param note 사용자가 입력한 메모 내용
+     * @param note      사용자가 입력한 메모 내용
      * @return 수정된 강의 상세 정보
      */
     @Transactional
@@ -106,9 +114,10 @@ public class MemberLectureService {
 
     /**
      * 메모를 삭제합니다.
+     *
      * @param user
      * @param lectureId
-     * @return  메모가 삭제된 강의 상세 정보
+     * @return 메모가 삭제된 강의 상세 정보
      */
     @Transactional
     public LectureDetailResponse deleteMemo(CustomUserDetails user, Long lectureId) {
@@ -121,18 +130,16 @@ public class MemberLectureService {
     }
 
 
-
-
     /**
      * 제목을 수정합니다(update), 초기값은 ai가 자동생성으로 클라이언트 요청없이 서버에서 처리하기에 (create)는 없습니다.
      *
-     * @param user 현재 로그인한 사용자 정보
+     * @param user      현재 로그인한 사용자 정보
      * @param lectureId 강의 Id
-     * @param newTitle 새로운 제목
+     * @param newTitle  새로운 제목
      * @return 수정된 강의 상세 정보
      */
     @Transactional
-    public LectureDetailResponse updateCustomTitle(CustomUserDetails user,Long lectureId, String newTitle){
+    public LectureDetailResponse updateCustomTitle(CustomUserDetails user, Long lectureId, String newTitle) {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
         memberLecture.setCustomTitle(newTitle);
@@ -140,4 +147,27 @@ public class MemberLectureService {
         return LectureDetailResponse.from(memberLecture);
     }
 
+
+    /**
+     * 사용자의 강의 등록 정보를 삭제하고,
+     * 더 이상 아무도 해당 강의를 참조하지 않으면 Lecture 엔티티도 함께 삭제합니다.
+     * @param user
+     * @param lectureId
+     */
+    @Transactional
+    public void deleteLecture(CustomUserDetails user, Long lectureId) {
+        MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
+                .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다"));
+
+        // 강의 정보
+        Lecture lecture = memberLecture.getLecture();
+
+        // 강의와 사용자의 연관 관계 제거
+        memberLectureRepository.delete(memberLecture);
+
+        // 더 이상 어떤 회원에게도 해당 강의가 등록되어 있지 않으면 강의 자체를 삭제합니다.
+        if (!memberLectureRepository.existsByLecture(lecture)) {
+            lectureRepository.delete(lecture);
+        }
+    }
 }
