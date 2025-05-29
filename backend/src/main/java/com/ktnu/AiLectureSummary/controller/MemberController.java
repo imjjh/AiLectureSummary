@@ -40,7 +40,7 @@ public class MemberController {
         ResponseCookie cookie = ResponseCookie.from("token", result.getAccessToken())
                 .httpOnly(cookieProperties.isHttpOnly())
                 .path("/")
-                .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
+                .sameSite(cookieProperties.getSameSite()) // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
                 .secure(cookieProperties.isSecure()) // https 에서만 전송 // 개발 환경 false
                 .maxAge(3600) // JWT 만료 시간과 일치시킬 것 (쿠키 만료시 자동 삭제)
                 .build();
@@ -67,7 +67,7 @@ public class MemberController {
                 .secure(cookieProperties.isSecure()) // https 환경 대응
                 .path("/")
                 .maxAge(0) // 즉시 만료
-                .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
+                .sameSite(cookieProperties.getSameSite()) // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
                 .build();
 
         // TODO (refreshtoken 또는 blacklist 추가 예정)
@@ -97,7 +97,7 @@ public class MemberController {
                     .httpOnly(cookieProperties.isHttpOnly())
                     .secure(cookieProperties.isSecure())
                     .path("/")
-                    .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
+                    .sameSite(cookieProperties.getSameSite()) // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
                     .maxAge(3600)
                     .build();
 
