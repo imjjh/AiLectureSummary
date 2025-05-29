@@ -1,6 +1,7 @@
 package com.ktnu.AiLectureSummary.controller;
 
 
+import com.ktnu.AiLectureSummary.config.CookieProperties;
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.dto.member.*;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
-
+    private final CookieProperties cookieProperties;
+    
     @PostMapping("/register")
     @Operation(summary = "회원가입", description = "사용자 정보를 입력받아 이메일 중복 체크후 회원가입")
     public ResponseEntity<ApiResponse<Void>> register(@Valid @RequestBody MemberRegisterRequest request){
@@ -36,10 +38,10 @@ public class MemberController {
 
         // 발급된 JWT를 Httponly 쿠키에 담아 응답 헤더에 추가
         ResponseCookie cookie = ResponseCookie.from("token", result.getAccessToken())
-                .httpOnly(true) // Swagger 테스트 용도 (개발용)  // TODO 배포 전 true 필수
+                .httpOnly(cookieProperties.isHttpOnly())
                 .path("/")
                 .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
-                .secure(true) // https 에서만 전송 현재 http //TODO http->https 변경 이후 수정
+                .secure(cookieProperties.isSecure()) // https 에서만 전송 // 개발 환경 false
                 .maxAge(3600) // JWT 만료 시간과 일치시킬 것 (쿠키 만료시 자동 삭제)
                 .build();
 
@@ -61,8 +63,8 @@ public class MemberController {
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletResponse response) {
         // 즉시 만료되는 JWT를 생성
         ResponseCookie expiredCookie = ResponseCookie.from("token", "")
-                .httpOnly(true)
-                .secure(true) // https 환경 대응
+                .httpOnly(cookieProperties.isHttpOnly())
+                .secure(cookieProperties.isSecure()) // https 환경 대응
                 .path("/")
                 .maxAge(0) // 즉시 만료
                 .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
@@ -92,8 +94,8 @@ public class MemberController {
         // 비밀번호 변경으로 토큰 재발급한 경우
         if (memberEditResponse.getToken() != null) {
             ResponseCookie cookie = ResponseCookie.from("token", memberEditResponse.getToken())
-                    .httpOnly(true)
-                    .secure(true)
+                    .httpOnly(cookieProperties.isHttpOnly())
+                    .secure(cookieProperties.isSecure())
                     .path("/")
                     .sameSite("None") // SameSite=None: 다른 도메인에서도 쿠키 전송 허용 (HTTPS 필요)
                     .maxAge(3600)

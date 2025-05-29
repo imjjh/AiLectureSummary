@@ -16,8 +16,12 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 500MB
-      max-request-size: 500MB
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+  cookie:
+    http-only: ${COOKIE_HTTP_ONLY}
+    secure: ${COOKIE_SECURE}
 
 jwt:
   secret: ${JWT_SECRET}
