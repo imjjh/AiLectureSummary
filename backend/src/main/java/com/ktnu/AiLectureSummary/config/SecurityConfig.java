@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // API 서버는 보통 CSRF 비활성화
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // httponly 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/members/login", "/api/members/register",
+                        .requestMatchers("/api/members/login", "/api/members/register", "/health",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll() // 로그인, 회원가입, 스웨거 인증없이 접근 허용
