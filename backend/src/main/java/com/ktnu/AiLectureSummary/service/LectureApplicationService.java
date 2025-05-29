@@ -8,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@RequiredArgsConstructor
-@Service
-@Transactional
+
 
 /**
  * 사용자의 강의 업로드 요청을 처리하는 애플리케이션 서비스
@@ -21,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
  * 내부적으로 LectureService와 MemberLectureService를 조합하여
  * 하나의 유스케이스 단위 로직을 처리합니다.
  */
+@RequiredArgsConstructor
+@Service
+@Transactional
 public class LectureApplicationService {
     private final LectureService lectureService;
     private final MemberLectureService memberLectureService;

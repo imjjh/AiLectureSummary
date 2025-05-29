@@ -14,6 +14,6 @@ public class MemberEditRequest {
     private String password;
 
     @Pattern(regexp = "^(?!.*\\s{2,}).{1,30}$", message = "사용자 이름에는 연속된 공백을 포함할 수 없으며, 최대 30자까지 가능합니다.")
-    @Schema(description = "사용자 이름", example = "testUser")
+    @Schema(description = "사용자 이름", example = "testUser1")
     private String username;
 }
