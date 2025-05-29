@@ -275,22 +275,13 @@ export default function Page() {
           <div>
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-medium mb-4">요약 공유하기</h3>
-                <div className="space-y-3">
-                  <Button 
-                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
+                <h3 className="text-lg font-medium mb-4">요약 저장하기</h3>
+                <div className="mt-4 flex justify-center">
+                  <Button
+                    className="w-full max-w-xs gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white"
+                  >
                     <Download size={16} />
                     PDF로 저장
-                  </Button>
-                  <Button 
-                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
-                    <Share2 size={16} />
-                    링크 공유
-                  </Button>
-                  <Button 
-                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
-                    <Bookmark size={16} />
-                    북마크 추가
                   </Button>
                 </div>
               </CardContent>

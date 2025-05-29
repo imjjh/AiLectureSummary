@@ -1,3 +1,4 @@
+// frontend/src/components/video-uploader.tsx
 "use client"
 
 import type React from "react"
@@ -9,6 +10,7 @@ import { Upload } from "lucide-react"
 import { motion } from "framer-motion"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 export default function VideoUploader() {
   const router = useRouter()
@@ -33,11 +35,15 @@ export default function VideoUploader() {
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFiles = Array.from(e.dataTransfer.files)
       const videoFiles = droppedFiles.filter(file => file.type.startsWith("video/"))
-
+      const validFiles = videoFiles.filter(f => f.size <= MAX_FILE_SIZE)
+      const oversized = videoFiles.filter(f => f.size > MAX_FILE_SIZE)
+      if (oversized.length) {
+        alert(`${oversized.map(f => f.name).join(', ')} 파일 크기는 최대 25MB까지 업로드 가능합니다.`)
+      }
       setFiles(prevFiles => [
         ...prevFiles,
-        ...videoFiles.filter(newFile => 
-          !prevFiles.some(existing => 
+        ...validFiles.filter(newFile =>
+          !prevFiles.some(existing =>
             existing.name === newFile.name && existing.size === newFile.size
           )
         )
@@ -47,9 +53,15 @@ export default function VideoUploader() {
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
-      const newFiles = Array.from(e.target.files).filter(file => 
-        file.type.startsWith("video/") && 
-        !files.some(existing => 
+      const selected = Array.from(e.target.files)
+      const videoFiles = selected.filter(file => file.type.startsWith("video/"))
+      const validFiles = videoFiles.filter(f => f.size <= MAX_FILE_SIZE)
+      const oversized = videoFiles.filter(f => f.size > MAX_FILE_SIZE)
+      if (oversized.length) {
+        alert(`${oversized.map(f => f.name).join(', ')} 파일 크기는 최대 25MB까지 업로드 가능합니다.`)
+      }
+      const newFiles = validFiles.filter(file =>
+        !files.some(existing =>
           existing.name === file.name && existing.size === file.size
         )
       )
@@ -71,7 +83,7 @@ export default function VideoUploader() {
       const response = await new Promise<any>((resolve, reject) => {
         const xhr = new XMLHttpRequest()
 
-        xhr.upload.addEventListener('progress', (event) => {
+        xhr.upload.addEventListener('progress', event => {
           if (event.lengthComputable) {
             setProgress(Math.round((event.loaded / event.total) * 100))
           }
@@ -92,10 +104,8 @@ export default function VideoUploader() {
         xhr.send(formData)
       })
 
-      // ✅ 성공 후 해당 ID 페이지로 이동
       const lectureId = response.data.id
       router.push(`/summary/${lectureId}`)
-
     } catch (error: any) {
       alert("업로드 실패: " + error.message)
       console.error('Upload Error:', error)
@@ -145,6 +155,10 @@ export default function VideoUploader() {
           </label>
         </div>
       </div>
+
+      <p className="text-sm text-gray-500 mt-2">
+        ※ 파일 크기는 최대 25MB 이하만 업로드 가능합니다.
+      </p>
 
       {files.length > 0 && (
         <div className="mt-4">
