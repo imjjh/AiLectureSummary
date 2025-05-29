@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 @Builder
@@ -16,6 +18,7 @@ public class LectureDetailResponse {
     private String aiSummary;
     private String memo;
     private long duration;
+    private LocalDateTime enrolledAt;
 
     public static LectureDetailResponse from(MemberLecture memberLecture) {
         Lecture lecture = memberLecture.getLecture();
@@ -27,6 +30,7 @@ public class LectureDetailResponse {
                 .aiSummary(lecture.getAiSummary())
                 .originalText(lecture.getOriginalText())
                 .memo(memberLecture.getMemo())
+                .enrolledAt(memberLecture.getEnrolledAt())
                 .build();
     }
 }

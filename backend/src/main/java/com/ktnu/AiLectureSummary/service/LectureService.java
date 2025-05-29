@@ -1,6 +1,7 @@
 package com.ktnu.AiLectureSummary.service;
 
 
+import com.ktnu.AiLectureSummary.config.FastApiProperties;
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.dto.lecture.LectureRegisterRequest;
 import com.ktnu.AiLectureSummary.exception.ExternalApiException;
@@ -9,6 +10,7 @@ import com.ktnu.AiLectureSummary.exception.InvalidVideoFileException;
 import com.ktnu.AiLectureSummary.repository.LectureRepository;
 import com.ktnu.AiLectureSummary.util.MultipartFileResource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,6 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LectureService {
     private final LectureRepository lectureRepository;
+    private final FastApiProperties fastApiProperties;
 
     /**
      * 업로드된 비디오 파일을 해싱하여 중복 여부를 검사하고,
@@ -69,8 +71,6 @@ public class LectureService {
      * @return 요약 정보가 담긴 요청 객체
      * @throws ExternalApiException FastAPI 요청 중 오류가 발생한 경우
      */
-    @Value("${fastapi.url}")
-    private String fastapiUrl;
 
     private LectureRegisterRequest sendToAi(MultipartFile file) {
         // Spring에서 외부 HTTP 요청을 보낼 수 있는 기본 클라이언트
@@ -99,7 +99,7 @@ public class LectureService {
         // 동기식 처리로 fastAPI에서 요청을 계속 기다림
         try {
             ResponseEntity<LectureRegisterRequest> response = restTemplate.exchange(
-                    fastapiUrl + "/api/summary",  // FastAPI 엔드포인트
+                    fastApiProperties.getUrl() + "/api/summary",  // FastAPI 엔드포인트
                     HttpMethod.POST,
                     requestEntity,
                     LectureRegisterRequest.class // 받은 json 응답을 역직렬화
