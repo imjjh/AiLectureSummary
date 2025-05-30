@@ -60,5 +60,12 @@ services:
     env_file:
       - ./.env.fastapi
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    # restart: always
+
 volumes:
   mysql-data:
