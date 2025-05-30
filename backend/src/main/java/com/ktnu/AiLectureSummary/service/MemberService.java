@@ -109,7 +109,8 @@ public class MemberService {
             member.setUsername(newUsername);
         }
         if (newPassword != null && !passwordEncoder.matches(newPassword, member.getPassword())) {
-            member.setPassword(passwordEncoder.encode(newPassword));
+            String encoded = passwordEncoder.encode(newPassword);
+            member.changePassword(encoded);
             token = jwtProvider.createToken(member.getId());
         }
 

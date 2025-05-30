@@ -47,6 +47,14 @@ public class Member {
     private String password;
 
     /**
+     * 비밀번호를 변경하는 도메인 메서드
+     * 호출 전 반드시 암호화된 비밀번호를 넘겨야함!
+     */
+    public void changePassword(String password) {
+        this.setPassword(password);
+    }
+
+    /**
      * 사용자 이름
      * - null 불가
      */
@@ -95,5 +103,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+
 
 }
