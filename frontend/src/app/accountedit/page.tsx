@@ -32,6 +32,14 @@ export default function AccountEditPage() {
     setIsLoading(true)
     setError("")
 
+    // 변경사항 없음 체크
+    if (username === user?.name && password.trim() === "") {
+      alert("변경할 내용을 입력해주세요.")
+      setIsLoading(false)
+      return
+    }
+
+
     if (password && (password.length < 8 || password.length > 20)) {
       setError("비밀번호는 8자 이상 20자 이하로 입력해주세요.")
       setIsLoading(false)
@@ -124,7 +132,7 @@ export default function AccountEditPage() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         className="rounded-full"
-                        required
+                        required={!!password}
                     />
                     {confirmPassword && confirmPassword !== password && (
                         <p className="text-sm text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
