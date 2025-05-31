@@ -15,6 +15,7 @@ type User = {
 type AuthContextType = {
   user: User | null
   isLoading: boolean
+  token: string | null
   login: (email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   register: (name: string, email: string, password: string) => Promise<boolean>
@@ -24,6 +25,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
+  token: null,
   login: async () => false,
   logout: async () => {},
   register: async () => false,
@@ -33,16 +35,26 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null) // 로그인한 사용자 정보
   const [isLoading, setIsLoading] = useState(true)    // 사용자 정보 로딩 상태
+  const [token, setToken] = useState<string | null>(null)
   const router = useRouter()
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL // 환경변수로부터 API base URL 읽기
 
   // 컴포넌트 마운트 시 자동 로그인 여부 확인
   useEffect(() => {
-    const fetchUser = async () => {
+      const storedToken = localStorage.getItem("access_token")
+        if (storedToken) {
+          setToken(storedToken)
+          fetchUserWithToken(storedToken)
+        } else {
+          setIsLoading(false)
+        }
+    async function fetchUserWithToken(token: string) {
       try {
         const res = await fetch(`${API_BASE_URL}/api/members/me`, {
           credentials: "include", // 쿠키 포함
+          headers: { Authorization: `Bearer ${token}` }
         })
+
         if (res.ok) {
           const data = await res.json()
           const loggedInUser: User = {
@@ -54,13 +66,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(loggedInUser)
         }
       } catch (err) {
-        console.error("자동 로그인 확인 실패:", err)
+        console.error("자동 로그인 실패:", err)
       } finally {
         setIsLoading(false)
       }
     }
-
-    fetchUser()
   }, [])
 
   // 로그인 함수
@@ -77,11 +87,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (res.ok) {
         const result = await res.json()
-        const token = result.data.accessToken // (필요시 활용 가능)
+        const token = result.data.token // (필요시 활용 가능)
+
+        setToken(token)
+        localStorage.setItem("access_token", token)
 
         // 로그인 성공 후 사용자 정보 가져오기
         const userRes = await fetch(`${API_BASE_URL}/api/members/me`, {
           credentials: "include",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
         })
         if (!userRes.ok) throw new Error("사용자 정보 불러오기 실패")
 
@@ -162,14 +178,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("로그아웃 요청 중 오류 발생:", error)
     } finally {
-      setUser(null)        // 사용자 상태 초기화
+      setUser(null) 
+      setToken(null)       // 사용자 상태 초기화
       router.push("/")     // 홈으로 리디렉션
     }
   }
 
   // Context Provider로 로그인 상태 및 메서드 전달
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, register }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, register, token }}>
       {children}
     </AuthContext.Provider>
   )

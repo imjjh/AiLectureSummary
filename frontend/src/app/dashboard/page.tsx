@@ -10,12 +10,13 @@ import Link from "next/link"
 import Image from "next/image"
 import axios from "axios"
 import LectureCard from "@/components/lecture-card";
+
 axios.defaults.withCredentials = true;
 type Lecture = {
   lectureId: number;
   title: string;
   createdAt: string;
-  duration: string;
+  duration: number;
   thumbnailUrl?: string;
   email: string;
   username: string;
@@ -26,11 +27,9 @@ type User = {
   username: string;
 };
 
-const formatDuration = (duration: string): string => {
-  const seconds = parseInt(duration, 10);
-  if (isNaN(seconds)) return duration;
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+const formatDuration = (duration: number): string => {
+  const mins = Math.floor(duration / 60);
+  const secs = duration % 60;
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 };
 
@@ -85,12 +84,12 @@ export default function DashboardPage() {
   }, []);
 
   // 강의 삭제 처리 함수
-  const handleDelete = async (lectureId: number) => {
+  const handleDelete = async (lecture: Lecture) => {
     const confirmed = window.confirm("정말 강의를 삭제하시겠습니까?");
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${lectureId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${lecture.lectureId}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -100,7 +99,11 @@ export default function DashboardPage() {
       }
 
       // UI에서 해당 강의 제거
-      setLectures((prev) => prev.filter((lecture) => lecture.lectureId !== lectureId));
+      setLectures((prevLectures) =>
+      prevLectures.filter((l) => l.lectureId !== lecture.lectureId)
+    );
+    setTotalDuration((prev) => Math.max(0, prev - (lecture.duration ?? 0)));
+
     } catch (err) {
       alert("삭제 중 오류가 발생했습니다.");
       console.error(err);
@@ -208,7 +211,7 @@ export default function DashboardPage() {
                 <LectureCard
                   key={lecture.lectureId}
                   lecture={lecture}
-                  onDelete={() => handleDelete(lecture.lectureId)}
+                  onDelete={() => handleDelete(lecture)}
                 />
               ))
             ) : (
@@ -223,7 +226,7 @@ export default function DashboardPage() {
                 <LectureCard
                   key={lecture.lectureId}
                   lecture={lecture}
-                  onDelete={() => handleDelete(lecture.lectureId)}
+                  onDelete={() => handleDelete(lecture)}
                 />
               ))
             ) : (

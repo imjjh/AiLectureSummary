@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Upload } from "lucide-react"
 import { motion } from "framer-motion"
+import { useAuth } from "@/hooks/use-auth"
+import { toast } from "@/hooks/use-toast"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 export default function VideoUploader() {
   const router = useRouter()
+  const { user } = useAuth()
   const [isDragging, setIsDragging] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
@@ -70,6 +73,13 @@ export default function VideoUploader() {
   }, [files])
 
   const handleUpload = useCallback(async () => {
+    if(!user){
+      toast({
+        title: "로그인이 필요합니다.",
+        description: "동영상을 업로드하려면 먼저 로그인해주세요."
+      })
+      return
+    }
     if (!files.length) return
 
     setUploading(true)
@@ -113,7 +123,7 @@ export default function VideoUploader() {
       setUploading(false)
       setProgress(0)
     }
-  }, [files, router])
+  }, [files, router, user])
 
   return (
     <div className="w-full">
@@ -126,7 +136,8 @@ export default function VideoUploader() {
         onDrop={handleDrop}
       >
         <div className="flex flex-col items-center justify-center gap-4">
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+          onClick={() => document.getElementById("video-upload")?.click()}>
             <div className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 flex items-center justify-center">
               <Upload className="h-10 w-10 text-white" />
             </div>

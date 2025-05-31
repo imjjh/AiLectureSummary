@@ -144,7 +144,7 @@ export default function RegisterPage() {
                 )}
               </div>
               {/* 이용약관 동의 체크박스 */}
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <Checkbox
                   id="terms"
                   checked={termsAccepted}
@@ -161,7 +161,7 @@ export default function RegisterPage() {
                     에 동의합니다
                   </span>
                 </label>
-              </div>
+              </div> */}
               {/* 에러 메시지 출력 */}
               {error && <p className="text-sm text-red-500">{error}</p>}
             </CardContent>
