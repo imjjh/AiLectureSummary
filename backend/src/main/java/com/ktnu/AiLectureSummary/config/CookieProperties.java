@@ -1,5 +1,6 @@
 package com.ktnu.AiLectureSummary.config;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,5 +13,7 @@ import org.springframework.stereotype.Component;
 public class CookieProperties {
     private boolean httpOnly;
     private boolean secure;
+
+    @Pattern(regexp = "^(None|Lax|Strict)$", message = "SameSite must be None, Lax, or Strict")
     private String sameSite;
 }

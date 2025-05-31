@@ -1,9 +1,11 @@
 package com.ktnu.AiLectureSummary.dto.member;
 
 import com.ktnu.AiLectureSummary.domain.Member;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class MemberResponse {
     private String email;
     private String username;

@@ -1,6 +1,6 @@
 package com.ktnu.AiLectureSummary.controller;
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.CustomTitleRequest;
+import com.ktnu.AiLectureSummary.dto.memberLecture.CustomTitleRequest;
 import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemoRequest;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;

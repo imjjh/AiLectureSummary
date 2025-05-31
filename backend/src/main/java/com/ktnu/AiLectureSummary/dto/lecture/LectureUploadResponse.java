@@ -1,6 +1,7 @@
 package com.ktnu.AiLectureSummary.dto.lecture;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,6 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
+@AllArgsConstructor
 public class LectureUploadResponse {
     private long id;
     private String title;

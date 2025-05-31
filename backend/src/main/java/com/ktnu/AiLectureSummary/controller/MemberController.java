@@ -132,6 +132,7 @@ public class MemberController {
      * @param request
      * @return
      */
+    // TODO @RateLimiter(name="..") 요청 제한 추가 (무차별 대입 방어)
     @PostMapping("/reset-password")
     @Operation(summary = "비밀번호 재설정 요청(비밀번호 입력)",
             description = "사용자의 비밀번호를 재설정 합니다. 비밀번호 찾기 요청에서 발급 받은 임시토큰을 커스텀헤더" +
