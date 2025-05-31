@@ -13,7 +13,7 @@ import java.io.IOException;
 
 // 인증 실패시 동작하는 핸들러
 @Component
-public class CustomAuthenicationEntryPoint implements AuthenticationEntryPoint{
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint{
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // 401

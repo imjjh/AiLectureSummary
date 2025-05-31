@@ -26,13 +26,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateLoginIdException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateLoginIdException(DuplicateLoginIdException e,  HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                ErrorResponse.builder()
-                        .error("DUPLICATE_LOGIN_ID")
-                        .message(e.getMessage())
-                        .status(HttpStatus.CONFLICT.value())
-                        .path(request.getRequestURI())
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ErrorResponse.of("DUPLICATE_LOGIN_ID", e.getMessage(), HttpStatus.CONFLICT.value(), request.getRequestURI())
         );
     }
 
@@ -45,15 +39,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MemberNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleMemberNotFoundException(MemberNotFoundException e, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    ErrorResponse.builder()
-                            .error("MEMBER_NOT_FOUND")
-                            .message(e.getMessage())
-                            .status(HttpStatus.UNAUTHORIZED.value())
-                            .path(request.getRequestURI())
-                            .timestamp(LocalDateTime.now())
-                            .build()
-            );
-        }
+                ErrorResponse.of("MEMBER_NOT_FOUND", e.getMessage(), HttpStatus.UNAUTHORIZED.value(), request.getRequestURI())
+        );
+    }
 
 
     /**
@@ -65,13 +53,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidPasswordException.class)
     public ResponseEntity<ErrorResponse> handleInvalidPasswordException(InvalidPasswordException e, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                ErrorResponse.builder()
-                        .error("INVALID_PASSWORD")
-                        .message(e.getMessage())
-                        .status(HttpStatus.UNAUTHORIZED.value())
-                        .path(request.getRequestURI())
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ErrorResponse.of("INVALID_PASSWORD", e.getMessage(), HttpStatus.UNAUTHORIZED.value(), request.getRequestURI())
         );
     }
 
@@ -84,13 +66,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FileProcessingException.class)
     public ResponseEntity<ErrorResponse> handleFileProcessingException(FileProcessingException e, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                ErrorResponse.builder()
-                        .error("FILE_PROCESSING_ERROR")
-                        .message(e.getMessage())
-                        .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                        .path(request.getRequestURI())
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ErrorResponse.of("FILE_PROCESSING_ERROR", e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), request.getRequestURI())
         );
     }
 
@@ -104,13 +80,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalApiException.class)
     public ResponseEntity<ErrorResponse> handleExternalApiException(ExternalApiException e, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
-                ErrorResponse.builder()
-                        .error("EXTERNAL_API_ERROR")
-                        .message(e.getMessage())
-                        .status(HttpStatus.BAD_GATEWAY.value())
-                        .path(request.getRequestURI())
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ErrorResponse.of("EXTERNAL_API_ERROR", e.getMessage(), HttpStatus.BAD_GATEWAY.value(), request.getRequestURI())
         );
     }
 
@@ -123,13 +93,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidVideoFileException.class)
     public ResponseEntity<ErrorResponse> handleInvalidVideoFileException(InvalidVideoFileException e, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ErrorResponse.builder()
-                        .error("INVALID_VIDEO")
-                        .message(e.getMessage())
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .path(request.getRequestURI())
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ErrorResponse.of("INVALID_VIDEO", e.getMessage(), HttpStatus.BAD_REQUEST.value(), request.getRequestURI())
         );
     }
 
@@ -143,13 +107,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleSqlException(SQLIntegrityConstraintViolationException e, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                ErrorResponse.builder()
-                        .error("SQL_CONSTRAINT_VIOLATION")
-                        .message(e.getMessage())
-                        .status(HttpStatus.BAD_REQUEST.value())
-                        .path(request.getRequestURI())
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ErrorResponse.of("SQL_CONSTRAINT_VIOLATION", e.getMessage(), HttpStatus.BAD_REQUEST.value(), request.getRequestURI())
         );
     }
 
@@ -162,13 +120,34 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LectureNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleLectureNotFoundException(LectureNotFoundException e, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                ErrorResponse.builder()
-                        .error("LECTURE_NOT_FOUND")
-                        .message(e.getMessage())
-                        .status(HttpStatus.NOT_FOUND.value())
-                        .path(request.getRequestURI())
-                        .timestamp(LocalDateTime.now())
-                        .build()
+                ErrorResponse.of("LECTURE_NOT_FOUND", e.getMessage(), HttpStatus.NOT_FOUND.value(), request.getRequestURI())
         );
+    }
+
+    /**
+     * 비밀번호 수정을 위해 발급된 토큰이 유효하지 않아 발생한 예외 처리 핸들러
+     *
+     * @param e 비밀번호 수정을 위해 발급된 토큰이 유효하지 않아 발생한 예외 객체
+     * @param request request 요청 객체 (요청 URI 포함)
+     * @return 401, 에러 응답
+     */
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(InvalidTokenException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ErrorResponse.of("INVALID_TOKEN", e.getMessage(), HttpStatus.UNAUTHORIZED.value(), request.getRequestURI())
+        );
+    }
+
+
+    /**
+     * 프로필 수정 요청을 받았지만 수정할 정보가 없어 발생한 예외 처리 핸들러
+     * @param e 프로필 수정 요청을 받았지만 수정할 정보가 없어 발생한 예외 객체
+     * @param request request 요청 객체 (요청 URI 포함)
+     * @return 400, 에러 응답
+     */
+    @ExceptionHandler(NoProfileChangesException.class)
+    public ResponseEntity<ErrorResponse> handleNoProfileChangesException(NoProfileChangesException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of("NO_PROFILE_CHANGES", e.getMessage(), HttpStatus.BAD_REQUEST.value(), request.getRequestURI()));
     }
 }

@@ -3,9 +3,13 @@ package com.ktnu.AiLectureSummary.dto.member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberFindPasswordRequest {
 
     @NotBlank(message = "이름은 필수 입력값입니다.")
