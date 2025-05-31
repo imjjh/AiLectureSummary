@@ -22,7 +22,7 @@ public class CustomAuthenicationEntryPoint implements AuthenticationEntryPoint{
 
         String message = authException instanceof UsernameNotFoundException
                 ? "존재 하지 않는 계정입니다"
-                : "인증이 필요합니다.";
+                : "로그인 이후 이용 가능합니다.";
 
         response.getWriter().write("{\"message\": \"" + message + "\"}");    }
 }

@@ -29,7 +29,7 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member,Long> {
     Optional <Member> findByEmail(String email);
-    Optional <Member> findByUsername(String username);
+    Optional<Member> findByUsernameAndEmail(String username, String email);// 비밀번호 찾기 시 사용
     Boolean existsByEmail(String email); // 회원가입 중복 체크
 
 }

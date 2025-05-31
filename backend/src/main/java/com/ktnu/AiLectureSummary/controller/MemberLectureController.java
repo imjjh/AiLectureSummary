@@ -7,6 +7,7 @@ import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberLectureService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,9 @@ public class MemberLectureController {
      */
     @GetMapping("/{lectureId}")
     @Operation(summary = "내 특정 강의 상세 조희",description = "로그인한 사용자가 등록한 특정 강의의 전체 요약 내용을 조회합니다. (제목, 원문, AI 요약, 사용자 메모 포함)")
-    public ResponseEntity<ApiResponse<LectureDetailResponse>> getLectureDetail(@AuthenticationPrincipal CustomUserDetails user,@PathVariable Long lectureId){
+    public ResponseEntity<ApiResponse<LectureDetailResponse>> getLectureDetail(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @Parameter(description = "강의 ID", example = "1") @PathVariable Long lectureId){
         LectureDetailResponse lectureDetailResponse = memberLectureService.getLectureDetail(user, lectureId);
         return ResponseEntity.ok(ApiResponse.success("강의 상세 조회 성공", lectureDetailResponse));
     }
@@ -67,7 +70,7 @@ public class MemberLectureController {
     @Operation(summary = "내 특정 강의 메모 저장", description = "로그인한 사용자가 등록한 특정 강의의 메모를 저장합니다. 기존 메모가 있다면 수정합니다.")
     public ResponseEntity<ApiResponse<LectureDetailResponse>> saveMemo(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long lectureId,
+            @Parameter(description = "강의 ID", example = "1") @PathVariable Long lectureId,
             @RequestBody @Valid MemoRequest request
     ) {
         LectureDetailResponse lectureDetailResponse = memberLectureService.saveMemo(user, lectureId, request.getMemo());
@@ -86,7 +89,7 @@ public class MemberLectureController {
     @Operation(summary = "내 특정 강의 메모 삭제", description = "로그인한 사용자가 등록한 특정 강의의 메모를 삭제합니다.")
     public ResponseEntity<ApiResponse<LectureDetailResponse>> deleteMemo(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long lectureId
+            @Parameter(description = "강의 ID", example = "1") @PathVariable Long lectureId
     ) {
         LectureDetailResponse lectureDetailResponse = memberLectureService.deleteMemo(user, lectureId);
         return ResponseEntity.ok(ApiResponse.success("개인 메모 삭제 성공", lectureDetailResponse));
@@ -104,7 +107,8 @@ public class MemberLectureController {
     @Operation(summary = "내 특정 강의 제목 수정", description = "로그인 한 사용자가 등록한 특정 강의의 제목을 수정합니다.")
     public ResponseEntity<ApiResponse<LectureDetailResponse>> saveLectureTitle(
             @AuthenticationPrincipal CustomUserDetails user,
-            @PathVariable Long lectureId, @RequestBody @Valid CustomTitleRequest requests){
+            @Parameter(description = "강의 ID", example = "1") @PathVariable Long lectureId,
+            @RequestBody @Valid CustomTitleRequest requests){
         LectureDetailResponse lectureDetailResponse = memberLectureService.updateCustomTitle(user,lectureId,requests.getTitle());
 
         return ResponseEntity.ok(ApiResponse.success("강의 제목 수정 성공", lectureDetailResponse));

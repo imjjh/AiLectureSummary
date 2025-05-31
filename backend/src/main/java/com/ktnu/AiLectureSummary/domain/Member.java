@@ -43,8 +43,16 @@ public class Member {
      * - null 불가
      */
     @Column(nullable = false)
-    @Setter(AccessLevel.PUBLIC) // 비밀번호 수정 가능
+    @Setter(AccessLevel.PRIVATE) // 비밀번호 수정 가능
     private String password;
+
+    /**
+     * 비밀번호를 변경하는 도메인 메서드
+     * 호출 전 반드시 암호화된 비밀번호를 넘겨야함!
+     */
+    public void changePassword(String encodedPassword) {
+        this.setPassword(encodedPassword);
+    }
 
     /**
      * 사용자 이름
@@ -58,6 +66,7 @@ public class Member {
     /**
      * 활성 상태 여부 (탈퇴한 계정 관리용)
      */
+    @Builder.Default
     @Column(nullable = false)
     private boolean active = true;
 
@@ -95,5 +104,7 @@ public class Member {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+
 
 }
