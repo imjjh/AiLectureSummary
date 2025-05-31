@@ -91,7 +91,6 @@ public class MemberController {
     @Operation(summary = "계정 정보 변경", description = "사용자 입력으로 이름, 비밀번호를 수정합니다. 아이디는 수정할 수 없습니다.")
     public ResponseEntity<ApiResponse<MemberEditResponse>> editProfile(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody MemberEditRequest request) {
         MemberEditResponse memberEditResponse = memberService.editProfile(userDetails, request);
-        // TODO 둘다 NULL이면? 커스텀 예외 처리
         // 비밀번호 변경으로 토큰 재발급한 경우
         if (memberEditResponse.getToken() != null) {
             ResponseCookie cookie = ResponseCookie.from("token", memberEditResponse.getToken())

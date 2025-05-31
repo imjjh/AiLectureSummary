@@ -3,9 +3,7 @@ package com.ktnu.AiLectureSummary.service;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.domain.Role;
 import com.ktnu.AiLectureSummary.dto.member.*;
-import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
-import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
-import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
+import com.ktnu.AiLectureSummary.exception.*;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
@@ -28,10 +26,12 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final StringRedisTemplate stringRedisTemplate;
+
     /**
      * 사용자가 입력한 정보로 회원가입 시도합니다.
      * 이메일이 중복인 경우 실패 중복되지 않으면 성공합니다.
      * 성공 이후 DB에 저장합니다.
+     *
      * @param request
      * @return
      */
@@ -66,22 +66,23 @@ public class MemberService {
      * 사용자가 입력한 정보로 로그인을 시도합니다.
      * 이메일이 존재하지 않거나 비밀번호가 일치하지 않으면 로그인에 실패합니다.
      * 이메일이 존재하고 비밀번호가 일치하는 경우 JWT를 생성하여 반환합니다.
+     *
      * @param request
      * @return
      */
-    public MemberLoginResponse login(MemberLoginRequest request){
+    public MemberLoginResponse login(MemberLoginRequest request) {
         // 필요한 필드 꺼내기
         String email = request.getEmail();
         String password = request.getPassword();
 
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("이메일이 존재하지 않습니다."));
-        if (!passwordEncoder.matches(password, member.getPassword())){
+        if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }
 
         // JWT 생성
-        String token=jwtProvider.createToken(member.getId());
+        String token = jwtProvider.createToken(member.getId());
 
         return new MemberLoginResponse(token);
     }
@@ -89,26 +90,34 @@ public class MemberService {
     /**
      * 사용자 정보를 수정합니다. (수정 가능한 정보: 이름, 비밀번호)
      *
-     * @param user 현재 로그인한 사용자 정보
+     * @param user    현재 로그인한 사용자 정보
      * @param request 수정할 정보(이름,비밀번호)를 담은 DTO
      * @return 수정된 사용자 정보
      */
     @Transactional
-    public MemberEditResponse editProfile(CustomUserDetails user, MemberEditRequest request){
+    public MemberEditResponse editProfile(CustomUserDetails user, MemberEditRequest request) {
         // 필요한 필드 꺼내기
-        String newPassword=request.getPassword();
+        String newPassword = request.getPassword();
         String newUsername = request.getUsername();
 
         // 로그인한 사용자의 정보 찾기
         Member member = memberRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new MemberNotFoundException("이메일이 존재하지 않습니다."));
 
-        // null 또는 현재 정보와 다를경우만 정보를 수정
-        String token=null;
-        if (newUsername != null && !newUsername.equals(member.getUsername())) {
+        boolean usernameUnchanged = newUsername == null || newUsername.equals(member.getUsername());
+        boolean passwordUnchanged = newPassword == null || passwordEncoder.matches(newPassword, member.getPassword());
+
+        // 수정된 정보가 없는 경우
+        if (usernameUnchanged && passwordUnchanged) {
+            throw new NoProfileChangesException("변경된 정보가 없습니다.");
+        }
+
+        // 새로운 정보로 업데이트가 필요한 경우
+        String token = null;
+        if (!usernameUnchanged) {
             member.setUsername(newUsername);
         }
-        if (newPassword != null && !passwordEncoder.matches(newPassword, member.getPassword())) {
+        if (!passwordUnchanged) {
             String encoded = passwordEncoder.encode(newPassword);
             member.changePassword(encoded);
             token = jwtProvider.createToken(member.getId());
@@ -123,6 +132,7 @@ public class MemberService {
 
     /**
      * 비밀번호 찾기: 비밀번호 수정을 위한 임시 토큰 발급(15분 유효)
+     *
      * @param request
      * @return
      */
@@ -145,6 +155,7 @@ public class MemberService {
 
     /**
      * 비밀번호 찾기: 임시 토큰을 가진 사용자가 비밀 번호를 수정합니다. 수정 후 토큰은 삭제됩니다.
+     *
      * @param token
      * @param request
      */
@@ -156,13 +167,12 @@ public class MemberService {
 
         // 토큰 유효성 확인
         if (email == null) {
-            // TODO InvalidTokenException
-            throw new InvalidPasswordException("유효하지 않거나 만료된 토큰입니다.");
+            throw new InvalidTokenException("유효하지 않거나 만료된 토큰입니다.");
         }
 
         // 이메일로 사용자 조회
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(()->new MemberNotFoundException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("사용자를 찾을 수 없습니다."));
 
         // 새 비밀번호로 변경
         String encodedPassword = passwordEncoder.encode(request.getNewPassword());
