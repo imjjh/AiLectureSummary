@@ -81,9 +81,9 @@ public class MemberController {
 
     @GetMapping("/me")
     @Operation(summary = "사용자 정보", description = "로그인된 사용자의 정보를 반환")
-    public ResponseEntity<ApiResponse<MemberMeResponse>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<ApiResponse<MemberProfileResponse>> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        return ResponseEntity.ok(ApiResponse.success("현재 사용자 정보", MemberMeResponse.from(userDetails)));
+        return ResponseEntity.ok(ApiResponse.success("현재 사용자 정보", MemberProfileResponse.from(userDetails)));
     }
 
 
@@ -118,11 +118,11 @@ public class MemberController {
      * @param request
      * @return
      */
-    @PostMapping("/find-password")
+    @PostMapping("/verify")
     @Operation(summary = "비밀번호 찾기 요청(이메일 이름 입력)", description = "사용자 이름과 이메일을 입력받아 일치하면 비밀번호를 변경할 수 있는 임시 토큰을 발급합니다.\n" +
             "        발급 받은 임시 토큰은 비밀번호 재설정 요청에서 헤더에 붙여서 전달해 주어야 비밀번호 변경이 가능합니다.")
-    public ResponseEntity<ApiResponse<MemberPasswordResetTokenResponse>> findPassword(@Valid @RequestBody MemberFindPasswordRequest request) {        // 실제 이메일 인증 등을 통하지 않아서 위험한 방식
-        MemberPasswordResetTokenResponse response = memberService.findPassword(request);
+    public ResponseEntity<ApiResponse<MemberPasswordResetTokenResponse>> verify(@Valid @RequestBody MemberVerifyRequest request) {        // 실제 이메일 인증 등을 통하지 않아서 위험한 방식
+        MemberPasswordResetTokenResponse response = memberService.verify(request);
         return ResponseEntity.ok(ApiResponse.success("사용자의 이름과 이메일 일치, 임시 토큰 발급(15분 유효)", response));
     }
 

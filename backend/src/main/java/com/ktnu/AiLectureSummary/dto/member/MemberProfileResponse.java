@@ -9,13 +9,13 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class MemberMeResponse {
+public class MemberProfileResponse {
     private Long id;
     private String email;
     private String username;
 
-    public static MemberMeResponse from(CustomUserDetails user) {
-        return MemberMeResponse.builder()
+    public static MemberProfileResponse from(CustomUserDetails user) {
+        return MemberProfileResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .username(user.getNickname()) // 화면에 표시될 이름

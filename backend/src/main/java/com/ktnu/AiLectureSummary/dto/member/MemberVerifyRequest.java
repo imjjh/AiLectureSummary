@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberFindPasswordRequest {
+public class MemberVerifyRequest {
 
     @NotBlank(message = "이름은 필수 입력값입니다.")
     @Schema(description = "사용자 이름", example = "testUser")
-    private String name;
+    private String username;
 
     @NotBlank(message = "이메일은 필수 입력값입니다.")
     @Email(message = "이메일 형식이 올바르지 않습니다.")
