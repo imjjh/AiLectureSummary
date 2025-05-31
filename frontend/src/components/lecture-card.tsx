@@ -10,6 +10,7 @@ interface Lecture {
     customTitle: string;
     duration: string;
     thumbnailUrl?: string;
+    enrolledAt: string;
 }
 
 interface LectureCardProps {
@@ -25,6 +26,16 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
         const secs = seconds % 60;
         return `${mins}:${secs.toString().padStart(2, "0")}`;
     };
+
+    const formatDate = (isoString: string): string => {
+        const date = new Date(isoString);
+        return date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        });
+    };
+
 
     return (
         <Link href={`/summary/${lecture.lectureId}`}>
@@ -54,7 +65,10 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
                         />
                     </div>
                     <div className="text-base font-medium truncate">{lecture.customTitle}</div>
-                    <div className="text-sm text-muted-foreground">{formatDuration(lecture.duration)}</div>
+                    <div className="flex justify-between text-sm text-muted-foreground">
+                        <span>{formatDuration(lecture.duration)}</span>
+                        <span>{formatDate(lecture.enrolledAt)}</span>
+                    </div>
                 </CardContent>
             </Card>
         </Link>

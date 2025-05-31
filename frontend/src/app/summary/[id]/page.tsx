@@ -16,11 +16,11 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 interface SummaryData {
   customTitle?: string
   duration?: string
-  uploadDate?: string
   thumbnailUrl?: string
   aiSummary?: string
   originalText?: string
   memo?: string
+  enrolledAt?: string
 }
 
 export default function Page() {
@@ -40,6 +40,16 @@ export default function Page() {
   // 제목 편집 모드 상태 및 편집 중인 제목 상태
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [editedTitle, setEditedTitle] = useState(summaryData?.customTitle || "")
+
+  const formatDate = (isoString: string): string => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
 
   // 요약 데이터 API 호출 및 초기 데이터 설정
   useEffect(() => {
@@ -76,6 +86,11 @@ export default function Page() {
 
   // 메모 저장 함수
   const handleNoteSave = async () => {
+    if (!memo.trim()){
+      alert("메모 내용을 작성해주세요.");
+      return;
+    }
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/memo`, {
         method: "PATCH",
@@ -87,8 +102,8 @@ export default function Page() {
       alert("메모가 저장되었습니다.")
     } catch (err) {
       alert("메모 저장 중 오류가 발생했습니다.")
+      }
     }
-  }
 
   // 메모 삭제 함수
   const handleNoteDelete = async () => {
@@ -169,11 +184,11 @@ export default function Page() {
           {/* 제목 편집 모달 */}
           {isEditingTitle && (
             <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-3x1 mx-4">
+              <div className="bg-white dark:bg-zinc-800 text-black dark:text-white rounded-lg shadow-lg p-6 w-full max-w-3xl mx-4">
                 <h2 className="text-lg font-bold mb-4">제목 수정</h2>
                 <input
                   type="text"
-                  className="w-full border rounded px-3 py-2 mb-6"
+                  className="w-full border border-gray-300 dark:border-zinc-700 rounded px-3 py-2 mb-6 bg-white dark:bg-zinc-800 text-black dark:text-white"
                   value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
                   autoFocus
@@ -191,7 +206,7 @@ export default function Page() {
             동영상 길이: {" "} 
             {typeof summaryData.duration === "number" 
             ? formatDuration(summaryData.duration) : "정보 없음"}{" "}
-            • 업로드: {summaryData.uploadDate ?? "정보 없음"}
+            • 업로드: {summaryData.enrolledAt ? formatDate(summaryData.enrolledAt) : "정보 없음"}
           </p>
         </div>
 
@@ -257,15 +272,17 @@ export default function Page() {
                     onChange={(e) => setMemo(e.target.value)}
                   />
                   <div className="flex justify-end gap-2">
-                    <Button variant="secondary" onClick={handleNoteSave}>메모 저장</Button>
+                    <Button variant="secondary"
+                            className="dark:hover:bg-zinc-600 hover:bg-zinc-300"
+                            onClick={handleNoteSave}>메모 저장</Button>
                     <Button
-                      variant="outline"
-                      className="bg-muted text-white dark:bg-zinc-800 hover:bg-destructive hover:text-white dark:hover:bg-destructive"
+                      variant="secondary"
+                      className="hover:bg-destructive hover:text-white dark:hover:bg-destructive"
                       onClick={handleNoteDelete}
                     >
                       메모 삭제
                     </Button>
-                  </div>
+            </div>
                 </CardContent>
               </Card>
             )}
@@ -275,22 +292,13 @@ export default function Page() {
           <div>
             <Card>
               <CardContent className="p-6">
-                <h3 className="text-lg font-medium mb-4">요약 공유하기</h3>
-                <div className="space-y-3">
-                  <Button 
-                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
+                <h3 className="text-lg font-medium mb-4">요약 저장하기</h3>
+                <div className="mt-4 flex justify-center">
+                  <Button
+                    className="w-full max-w-xs gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white"
+                  >
                     <Download size={16} />
                     PDF로 저장
-                  </Button>
-                  <Button 
-                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
-                    <Share2 size={16} />
-                    링크 공유
-                  </Button>
-                  <Button 
-                    className="w-full gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white">
-                    <Bookmark size={16} />
-                    북마크 추가
                   </Button>
                 </div>
               </CardContent>
@@ -300,13 +308,13 @@ export default function Page() {
 
         {/* 비로그인 사용자에게 회원가입 및 로그인 유도 */}
         {!isLoading && !user && (
-          <div className="text-center">
+        <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">더 많은 강의를 요약해 보세요</h2>
             <p className="text-muted-foreground mb-6">회원가입하고 모든 요약 기록을 저장하세요</p>
-            <div className="flex justify-center gap-4">
-              <Link href="/">
-                <Button>새 동영상 요약하기</Button>
-              </Link>
+          <div className="flex justify-center gap-4">
+            <Link href="/">
+              <Button>새 동영상 요약하기</Button>
+            </Link>
               <Link href="/login">
                 <Button variant="outline">로그인</Button>
               </Link>

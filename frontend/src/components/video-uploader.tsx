@@ -1,3 +1,4 @@
+// frontend/src/components/video-uploader.tsx
 "use client"
 
 import type React from "react"
@@ -7,11 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Upload } from "lucide-react"
 import { motion } from "framer-motion"
+import { useAuth } from "@/hooks/use-auth"
+import { toast } from "@/hooks/use-toast"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 export default function VideoUploader() {
   const router = useRouter()
+  const { user } = useAuth()
   const [isDragging, setIsDragging] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
@@ -33,11 +38,15 @@ export default function VideoUploader() {
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const droppedFiles = Array.from(e.dataTransfer.files)
       const videoFiles = droppedFiles.filter(file => file.type.startsWith("video/"))
-
+      const validFiles = videoFiles.filter(f => f.size <= MAX_FILE_SIZE)
+      const oversized = videoFiles.filter(f => f.size > MAX_FILE_SIZE)
+      if (oversized.length) {
+        alert(`${oversized.map(f => f.name).join(', ')} 파일 크기는 최대 25MB까지 업로드 가능합니다.`)
+      }
       setFiles(prevFiles => [
         ...prevFiles,
-        ...videoFiles.filter(newFile => 
-          !prevFiles.some(existing => 
+        ...validFiles.filter(newFile =>
+          !prevFiles.some(existing =>
             existing.name === newFile.name && existing.size === newFile.size
           )
         )
@@ -47,9 +56,15 @@ export default function VideoUploader() {
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
-      const newFiles = Array.from(e.target.files).filter(file => 
-        file.type.startsWith("video/") && 
-        !files.some(existing => 
+      const selected = Array.from(e.target.files)
+      const videoFiles = selected.filter(file => file.type.startsWith("video/"))
+      const validFiles = videoFiles.filter(f => f.size <= MAX_FILE_SIZE)
+      const oversized = videoFiles.filter(f => f.size > MAX_FILE_SIZE)
+      if (oversized.length) {
+        alert(`${oversized.map(f => f.name).join(', ')} 파일 크기는 최대 25MB까지 업로드 가능합니다.`)
+      }
+      const newFiles = validFiles.filter(file =>
+        !files.some(existing =>
           existing.name === file.name && existing.size === file.size
         )
       )
@@ -58,6 +73,13 @@ export default function VideoUploader() {
   }, [files])
 
   const handleUpload = useCallback(async () => {
+    if(!user){
+      toast({
+        title: "로그인이 필요합니다.",
+        description: "동영상을 업로드하려면 먼저 로그인해주세요."
+      })
+      return
+    }
     if (!files.length) return
 
     setUploading(true)
@@ -71,7 +93,7 @@ export default function VideoUploader() {
       const response = await new Promise<any>((resolve, reject) => {
         const xhr = new XMLHttpRequest()
 
-        xhr.upload.addEventListener('progress', (event) => {
+        xhr.upload.addEventListener('progress', event => {
           if (event.lengthComputable) {
             setProgress(Math.round((event.loaded / event.total) * 100))
           }
@@ -92,10 +114,8 @@ export default function VideoUploader() {
         xhr.send(formData)
       })
 
-      // ✅ 성공 후 해당 ID 페이지로 이동
       const lectureId = response.data.id
       router.push(`/summary/${lectureId}`)
-
     } catch (error: any) {
       alert("업로드 실패: " + error.message)
       console.error('Upload Error:', error)
@@ -103,7 +123,7 @@ export default function VideoUploader() {
       setUploading(false)
       setProgress(0)
     }
-  }, [files, router])
+  }, [files, router, user])
 
   return (
     <div className="w-full">
@@ -116,7 +136,8 @@ export default function VideoUploader() {
         onDrop={handleDrop}
       >
         <div className="flex flex-col items-center justify-center gap-4">
-          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+          onClick={() => document.getElementById("video-upload")?.click()}>
             <div className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 flex items-center justify-center">
               <Upload className="h-10 w-10 text-white" />
             </div>
@@ -145,6 +166,10 @@ export default function VideoUploader() {
           </label>
         </div>
       </div>
+
+      <p className="text-sm text-gray-500 mt-2">
+        ※ 파일 크기는 최대 25MB 이하만 업로드 가능합니다.
+      </p>
 
       {files.length > 0 && (
         <div className="mt-4">
