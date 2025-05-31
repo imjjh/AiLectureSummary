@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "@/hooks/use-toast"
@@ -26,7 +25,6 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
-  const [termsAccepted, setTermsAccepted] = useState(false)
 
   // 폼 제출 처리 함수
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,11 +37,6 @@ export default function RegisterPage() {
       return
     }
 
-    // 이용약관 동의 여부 확인
-    if (!termsAccepted) {
-      setError("이용약관에 동의해주세요.")
-      return
-    }
 
     setIsLoading(true)
 
@@ -143,25 +136,6 @@ export default function RegisterPage() {
                   <p className="text-sm text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
                 )}
               </div>
-              {/* 이용약관 동의 체크박스 */}
-              {/* <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={termsAccepted}
-                  onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                />
-                <label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  <span>
-                    <Link href="#" className="text-primary hover:underline">
-                      이용약관
-                    </Link>
-                    에 동의합니다
-                  </span>
-                </label>
-              </div> */}
               {/* 에러 메시지 출력 */}
               {error && <p className="text-sm text-red-500">{error}</p>}
             </CardContent>
