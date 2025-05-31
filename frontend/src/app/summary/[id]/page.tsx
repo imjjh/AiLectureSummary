@@ -34,6 +34,7 @@ export default function Page() {
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null)
   // 에러 상태
   const [error, setError] = useState<string | null>(null)
+  const [imgSrc, setImgSrc] = useState<string>("/images/1.png")
   // 개인 메모 상태
   const [memo, setMemo] = useState<string>("")
 
@@ -83,6 +84,14 @@ export default function Page() {
       setEditedTitle(summaryData.customTitle)
     }
   }, [summaryData?.customTitle])
+
+  useEffect(() => {
+    if (summaryData?.thumbnailUrl) {
+      setImgSrc(summaryData.thumbnailUrl)
+    } else {
+      setImgSrc("/images/1.png")
+    }
+  }, [summaryData?.thumbnailUrl])
 
   // 메모 저장 함수
   const handleNoteSave = async () => {
@@ -215,11 +224,12 @@ export default function Page() {
           <div className="md:col-span-2">
             {/* 썸네일 이미지 */}
             <Image
-              src={summaryData.thumbnailUrl ?? "/placeholder/1.png"}
+              src={imgSrc}
               width={500}
               height={300}
               alt={summaryData.customTitle ?? "썸네일"}
               className="rounded-lg w-full object-cover aspect-video mb-4"
+              onError={() => setImgSrc("/images/1.png")}
             />
 
             {/* 탭 컴포넌트: AI 요약 / 원문 */}

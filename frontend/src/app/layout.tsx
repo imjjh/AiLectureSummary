@@ -6,6 +6,7 @@ import { AuthProvider } from "@/hooks/use-auth"
 import Header from "@/components/header"
 import Footer from "@/components/footer"
 import { Toaster } from "@/components/ui/toaster"
+import ServerWakeup from "@/components/ServerWakeup"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <AuthProvider>
+            <ServerWakeup />
             <div className="flex min-h-screen flex-col">
               <Header />
               <main className="flex-1">{children}</main>
