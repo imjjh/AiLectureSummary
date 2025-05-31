@@ -13,7 +13,7 @@ import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
 
 export default function AccountEditPage() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, token } = useAuth()
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -55,9 +55,11 @@ export default function AccountEditPage() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/members/me`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         credentials: "include",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username,
+          ...(password ? { password } : {})
+        }),
       })
 
       if (!res.ok) throw new Error("수정 실패")
