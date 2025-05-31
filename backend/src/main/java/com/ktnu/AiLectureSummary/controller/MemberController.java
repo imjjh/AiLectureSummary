@@ -87,7 +87,7 @@ public class MemberController {
     }
 
 
-    @PatchMapping("/edit")
+    @PatchMapping("/me")
     @Operation(summary = "계정 정보 변경", description = "사용자 입력으로 이름, 비밀번호를 수정합니다. 아이디는 수정할 수 없습니다.")
     public ResponseEntity<ApiResponse<MemberEditResponse>> editProfile(@AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody MemberEditRequest request) {
         MemberEditResponse memberEditResponse = memberService.editProfile(userDetails, request);
