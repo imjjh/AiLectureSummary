@@ -1,6 +1,8 @@
 package com.ktnu.AiLectureSummary.config;
 
 import com.ktnu.AiLectureSummary.security.JwtAuthenticationFilter;
+import com.ktnu.AiLectureSummary.security.handler.CustomAccessDeniedHandler;
+import com.ktnu.AiLectureSummary.security.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +22,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    // Jwt 인증 필터를 주입받아 Security FilterChain에 등록
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,7 +40,11 @@ public class SecurityConfig {
 //                        .requestMatchers(HttpMethod.GET, "/api/Lecture/**").permitAll()
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
-                .addFilterBefore(jwtAuthenticationFilter,  // filter 작동전 Jwt필터 추가
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
+                .addFilterBefore(jwtAuthenticationFilter,  // filter 작동전 Jwt필터 추가 (JWT 필터를 실행하여 토큰 인증 선처리)
                         UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 전에 JWT 필터를 실행하여 토큰 인증 선처리 //Spring Security에 인증된 사용자임을 알려주기 위한 객체
                 .build();
     }

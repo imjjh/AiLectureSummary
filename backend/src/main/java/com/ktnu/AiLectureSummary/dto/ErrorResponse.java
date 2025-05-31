@@ -17,7 +17,6 @@ public class ErrorResponse {
     private final String path;
     private final LocalDateTime timestamp;
 
-
     // 헬퍼 메서드
     public static ErrorResponse of(String error, String message, int status, String path) {
         return ErrorResponse.builder()
@@ -27,4 +26,5 @@ public class ErrorResponse {
                 .path(path)
                 .timestamp(LocalDateTime.now())
                 .build();
-    }}
+    }
+}
