@@ -4,7 +4,6 @@ import com.ktnu.AiLectureSummary.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -32,9 +31,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // httponly 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/members/login", "/api/members/register", "/health",
-                                "/v3/api-docs/**",
+                                "/v3/api-docs/**","/api/members/find-password","/api/members/reset-password",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html").permitAll() // 로그인, 회원가입, 스웨거 인증없이 접근 허용
+                                "/swagger-ui.html").permitAll() // 로그인, 회원가입, 스웨거, 헬스체크, 비밀번호 변경 인증없이 접근 허용
 //                        .requestMatchers(HttpMethod.GET, "/api/Lecture/**").permitAll()
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
