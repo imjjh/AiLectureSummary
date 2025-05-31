@@ -8,7 +8,6 @@ import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -136,8 +135,8 @@ public class MemberService {
      * @param request
      * @return
      */
-    public MemberPasswordResetTokenResponse findPassword(MemberFindPasswordRequest request) {
-        String name = request.getName();
+    public MemberPasswordResetTokenResponse verify(MemberVerifyRequest request) {
+        String name = request.getUsername();
         String email = request.getEmail();
 
         Member member = memberRepository.findByUsernameAndEmail(name, email)

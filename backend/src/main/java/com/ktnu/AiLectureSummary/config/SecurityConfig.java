@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // httponly 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/members/login", "/api/members/register", "/health",
-                                "/v3/api-docs/**","/api/members/find-password","/api/members/reset-password",
+                                "/v3/api-docs/**","/api/members/verify","/api/members/reset-password",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll() // 로그인, 회원가입, 스웨거, 헬스체크, 비밀번호 변경 인증없이 접근 허용
 //                        .requestMatchers(HttpMethod.GET, "/api/Lecture/**").permitAll()

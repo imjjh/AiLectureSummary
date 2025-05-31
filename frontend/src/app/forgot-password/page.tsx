@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const [token, setToken] = useState("")
 
   const [step, setStep] = useState<1 | 2>(1)
   const [name, setName] = useState("")
@@ -37,6 +39,8 @@ export default function ForgotPasswordPage() {
       })
 
       if (!res.ok) throw new Error("입력한 정보가 일치하지 않습니다.")
+      const result = await res.json()
+      setToken(result.data.token)
       setStep(2)
     } catch (err: any) {
       setError(err.message || "확인 중 오류가 발생했습니다.")
@@ -49,6 +53,12 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setError("")
     setIsLoading(true)
+
+    if (!token) {
+      setError("비밀번호 재설정 토큰이 없습니다.")
+      setIsLoading(false)
+      return
+    }
 
     if (password.length < 8 || password.length > 20) {
       setError("비밀번호는 8자 이상 20자 이하로 입력해주세요.")
@@ -65,9 +75,11 @@ export default function ForgotPasswordPage() {
     try {
       const res = await fetch(`${API_BASE_URL}/api/members/reset-password`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
+        headers: {
+          "Content-Type": "application/json",
+          "Reset-Token": token,
+        },
+        body: JSON.stringify({ newPassword: password }),
       })
 
       if (!res.ok) throw new Error("비밀번호 변경 실패")
