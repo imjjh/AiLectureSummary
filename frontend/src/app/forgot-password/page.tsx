@@ -50,6 +50,12 @@ export default function ForgotPasswordPage() {
     setError("")
     setIsLoading(true)
 
+    if (password.length < 8 || password.length > 20) {
+      setError("비밀번호는 8자 이상 20자 이하로 입력해주세요.")
+      setIsLoading(false)
+      return
+    }
+
     if (password !== confirmPassword) {
       setError("비밀번호가 일치하지 않습니다.")
       setIsLoading(false)
@@ -128,6 +134,9 @@ export default function ForgotPasswordPage() {
                       className="rounded-full"
                       required
                     />
+                    {password && (password.length < 8 || password.length > 20) && (
+                      <p className="text-sm text-red-500 mt-1">비밀번호는 8자 이상 20자 이하로 입력해주세요.</p>
+                    )}
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="confirm-password">비밀번호 확인</Label>
