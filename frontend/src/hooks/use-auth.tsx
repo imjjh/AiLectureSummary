@@ -27,7 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   token: null,
   login: async () => false,
-  logout: async () => {},
+  logout: async () => { },
   register: async () => false,
 })
 
@@ -41,13 +41,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 컴포넌트 마운트 시 자동 로그인 여부 확인
   useEffect(() => {
-      const storedToken = localStorage.getItem("access_token")
-        if (storedToken) {
-          setToken(storedToken)
-          fetchUserWithToken(storedToken)
-        } else {
-          setIsLoading(false)
-        }
+    const storedToken = localStorage.getItem("access_token")
+    if (storedToken) {
+      setToken(storedToken)
+      fetchUserWithToken(storedToken)
+    } else {
+      setIsLoading(false)
+    }
     async function fetchUserWithToken(token: string) {
       try {
         const res = await fetch(`${API_BASE_URL}/api/members/me`, {
@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 로그인 함수
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/members/login`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -137,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 회원가입 함수
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/members/register`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -171,14 +171,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 로그아웃 함수
   const logout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/members/logout`, {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       })
     } catch (error) {
       console.error("로그아웃 요청 중 오류 발생:", error)
     } finally {
-      setUser(null) 
+      setUser(null)
       setToken(null)       // 사용자 상태 초기화
       router.push("/")     // 홈으로 리디렉션
     }

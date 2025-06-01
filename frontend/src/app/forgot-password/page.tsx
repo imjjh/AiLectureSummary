@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true)
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/members/verify`, {
+      const res = await fetch(`${API_BASE_URL}/api/password/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/members/reset-password`, {
+      const res = await fetch(`${API_BASE_URL}/api/password/reset`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
