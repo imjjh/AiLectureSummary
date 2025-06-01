@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 class MemberAuthServiceTest {
 
-
     private MemberRepository memberRepository;
     private PasswordEncoder passwordEncoder;
     private JwtProvider jwtProvider;
@@ -97,13 +96,6 @@ class MemberAuthServiceTest {
     void 로그인_실패_아이디불일치() {
         // given
         MemberLoginRequest request = new MemberLoginRequest("test@example.com", "password123");
-
-        Member mockMember = Member.builder()
-                .id(1L) // ID를 명시적으로 설정
-                .email("test1@example.com")
-                .password("encoded_password") // 인코딩된 비밀번호
-                .username("TestUser")
-                .build();
 
         String email = request.getEmail();
         when(memberRepository.findByEmail(email))
