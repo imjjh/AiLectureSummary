@@ -52,8 +52,6 @@ public class MemberAuthService {
 
         // DB 저장
         memberRepository.save(member);
-
-        // 회원가입 완료 시 반환값 없음=
     }
 
 
