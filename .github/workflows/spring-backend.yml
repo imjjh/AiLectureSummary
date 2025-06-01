@@ -1,11 +1,15 @@
 name: Build and Push Spring Docker Image
 
 on:
+  workflow_run:
+    workflows: ["Spring Unit Test"] # spring-test.yml의 name과 일치해야 함
+    types:
+      - completed
   push:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:

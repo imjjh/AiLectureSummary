@@ -110,7 +110,7 @@ class MemberAuthServiceTest {
     }
 
     @Test
-    void 로그인_성공_비밀번호불일치() {
+    void 로그인_실패_비밀번호불일치() {
         // given
         MemberLoginRequest request = new MemberLoginRequest("test@example.com", "password123");
 
