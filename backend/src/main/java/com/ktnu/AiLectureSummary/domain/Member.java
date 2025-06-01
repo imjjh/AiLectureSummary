@@ -95,6 +95,7 @@ public class Member {
      * - List<MemberLecture> -> 다대다 중간 테이블인 MemberLecture를 담는 리스트
      * - new ArrayList<>() -> null 방지를 위해 초기화
      */
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLecture> memberLectureList = new ArrayList<>();
 

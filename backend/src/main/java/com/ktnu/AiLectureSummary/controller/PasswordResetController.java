@@ -18,7 +18,6 @@ public class PasswordResetController {
 
     private final PasswordResetService passwordResetService;
 
-
     /**
      * 비밀번호 변경을 위해 사용자 이름과 이메일을 입력받아 일치하면 비밀번호를 변경할 수 있는 임시 토큰을 발급합니다.
      * 발급 받은 임시 토큰은 비밀번호 재설정 요청에서 헤더에 붙여서 전달해 주어야 비밀번호 변경이 가능합니다.
