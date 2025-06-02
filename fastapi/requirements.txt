@@ -6,3 +6,4 @@ openai>=1.0.0
 moviepy>=1.0.0
 pillow>=9.0.0
 requests
+yt-dlp>=2024.4.9
