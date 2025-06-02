@@ -5,7 +5,7 @@ on:
     workflows: ["Spring Unit Test"] # spring-test.yml의 name과 일치해야 함
     types:
       - completed
-  push:
+  push: # push 또는 PR 머지된 경우 실행 
     branches: [ "main" ]
 
 jobs:
