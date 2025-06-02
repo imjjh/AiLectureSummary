@@ -37,6 +37,5 @@ jwt:
 #  expiration: ${JWT_EXPIRATION}
 
 
-
 fastapi:
   url: ${FASTAPI_URL}

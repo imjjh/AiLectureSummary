@@ -42,7 +42,7 @@ public class MemberLectureController {
     }
 
     /**
-     * 로그인한 사용자가 등록한 특정 강의의 전체 요약 내용을 조회합니다. (제목, 원문, AI 요약, 사용자 메모 포함)
+     * 로그인한 사용자가 등록한 특정 강의의 전체 요약 내용을 조회합니다. (제목, 원문, AI 요약, 사용자 메모, 썸네일 이미지 포함)
      *
      * @param user      로그인한 사용자 정보
      * @param lectureId
