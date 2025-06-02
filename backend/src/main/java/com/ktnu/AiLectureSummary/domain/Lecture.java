@@ -1,9 +1,11 @@
 package com.ktnu.AiLectureSummary.domain;
 
-import com.ktnu.AiLectureSummary.dto.lecture.LectureRegisterRequest;
+import com.ktnu.AiLectureSummary.dto.lecture.LectureSummaryResponse;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,9 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Lecture {
 
 
@@ -36,8 +40,11 @@ public class Lecture {
     @Column(nullable = false, columnDefinition = "TEXT")
     private  String aiSummary;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = true,unique = true)
     private String hash; // 영상 내용 기반 해시 // 중복 저장 방지
+
+    @Column(nullable = true,unique = true)
+    private String youtubeUrl; // 요약한 영상의 링크 // 중복 저장 방지
 
     @Lob
     @Column(columnDefinition = "LONGBLOB") // null 가능
@@ -46,15 +53,25 @@ public class Lecture {
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLecture> memberLectures = new ArrayList<>();
 
-    public static Lecture from(LectureRegisterRequest request, String hash, byte[] thumbnailBytes) {
-        Lecture lecture = new Lecture();
-        lecture.setTitleByAi(request.getTitle()); // Ai 초기값 설정
-        lecture.setHash(hash);
-        lecture.setAiSummary(request.getAiSummary());
-        lecture.setOriginalText(request.getOriginalText());
-        lecture.setDuration(request.getDuration());
-        lecture.setThumbnail(thumbnailBytes);
-        return lecture;
+    public static Lecture fromUploadedVideo(LectureSummaryResponse request, String hash, byte[] thumbnailBytes) {
+        return Lecture.builder()
+                .titleByAi(request.getTitle())
+                .hash(hash)
+                .aiSummary(request.getAiSummary())
+                .originalText(request.getOriginalText())
+                .duration(request.getDuration())
+                .thumbnail(thumbnailBytes)
+                .build();
     }
 
+
+    public static Lecture fromYoutubeUrl(LectureSummaryResponse request, String youtubeUrl) {
+        return Lecture.builder()
+                .titleByAi(request.getTitle())
+                .aiSummary(request.getAiSummary())
+                .originalText(request.getOriginalText())
+                .duration(request.getDuration())
+                .youtubeUrl(youtubeUrl)
+                .build();
+    }
 }

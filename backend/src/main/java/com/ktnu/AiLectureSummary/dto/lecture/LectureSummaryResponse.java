@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LectureRegisterRequest {
+public class LectureSummaryResponse {
     private String title;
     private String originalText;
     private String aiSummary;

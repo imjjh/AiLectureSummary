@@ -4,6 +4,7 @@ import com.ktnu.AiLectureSummary.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -149,5 +150,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNoProfileChangesException(NoProfileChangesException e, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of("NO_PROFILE_CHANGES", e.getMessage(), HttpStatus.BAD_REQUEST.value(), request.getRequestURI()));
+    }
+
+
+    /**
+     * 유효성 검사 @Valid 실패시 발생한 예외 처리 핸들러
+     * @param e
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        String errorMessage = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of("VALIDATION_ERROR", errorMessage, HttpStatus.BAD_REQUEST.value(), request.getRequestURI()));
     }
 }
