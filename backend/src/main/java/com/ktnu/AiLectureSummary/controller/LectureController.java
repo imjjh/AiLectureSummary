@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/lecture")
 public class LectureController {
+
     private final LectureApplicationService lectureApplicationService;
 
 

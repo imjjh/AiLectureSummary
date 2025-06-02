@@ -1,6 +1,7 @@
 package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Member;
+import com.ktnu.AiLectureSummary.exception.PdfGenerateFailException;
 import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.LectureRepository;
@@ -13,10 +14,15 @@ import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
 import com.ktnu.AiLectureSummary.exception.LectureNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 @Service
@@ -170,4 +176,7 @@ public class MemberLectureService {
             lectureRepository.delete(lecture);
         }
     }
+
+
+
 }
