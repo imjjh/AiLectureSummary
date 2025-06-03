@@ -21,8 +21,10 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -37,7 +39,6 @@ public class LectureService {
     /**
      * 업로드된 비디오 파일을 해싱하여 중복 여부를 검사하고,
      * FastAPI 서버에 전송하여 요약 정보를 받은 후, 이를 DB에 저장한다.
-     *
      *
      * @param file 사용자가 업로드한 비디오 파일
      * @return lecture 객체
@@ -57,10 +58,14 @@ public class LectureService {
         // FastAPI 호출
         LectureRegisterRequest registerRequest = sendToAi(file);
 
-        // DB에 강의 내용 저장
-        return lectureRepository.save(Lecture.from(registerRequest, videoHash));
-    }
+        // 썸네일 이미지는 DB에 저장되며, 프론트 전달 시 Base64로 인코딩되어 전송됨
+        // 썸네일 Base64 디코딩
+        byte[] thumbnailBytes = Base64.getDecoder().decode(registerRequest.getThumbnail());
 
+        // DB에 강의 내용 저장
+        return lectureRepository.save(Lecture.from(registerRequest, videoHash,thumbnailBytes));
+
+    }
 
     /**
      * 업로드된 비디오 파일을 FastAPI 서버로 전송하고,
@@ -173,7 +178,7 @@ public class LectureService {
     }
 
 
-    // 비디오 삭제?
+// 비디오 삭제?
 
 
 }

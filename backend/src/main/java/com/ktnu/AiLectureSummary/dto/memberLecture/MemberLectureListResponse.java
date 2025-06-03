@@ -21,6 +21,5 @@ public class MemberLectureListResponse {
                 .items(MemberLectureListItemResponse.fromList(memberLectures))
                 .totalDuration(totalDuration)
                 .build();
-
     }
 }

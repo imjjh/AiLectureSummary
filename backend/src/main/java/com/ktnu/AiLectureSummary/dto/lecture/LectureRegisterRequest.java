@@ -15,6 +15,5 @@ public class LectureRegisterRequest {
     private String originalText;
     private String aiSummary;
     private long duration;
-//    private String filename;
-//    private String timestamp;
+    private String thumbnail; // base64로 인코딩된 이미지 데이터
 }

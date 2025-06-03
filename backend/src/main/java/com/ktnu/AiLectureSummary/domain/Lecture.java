@@ -39,17 +39,22 @@ public class Lecture {
     @Column(nullable = false,unique = true)
     private String hash; // 영상 내용 기반 해시 // 중복 저장 방지
 
+    @Lob
+    @Column(columnDefinition = "LONGBLOB") // null 가능
+    private byte[] thumbnail; // 썸네일 DB에 저장
 
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberLecture> memberLectures = new ArrayList<>();
 
-    public static Lecture from(LectureRegisterRequest request, String hash) {
+    public static Lecture from(LectureRegisterRequest request, String hash, byte[] thumbnailBytes) {
         Lecture lecture = new Lecture();
         lecture.setTitleByAi(request.getTitle()); // Ai 초기값 설정
         lecture.setHash(hash);
         lecture.setAiSummary(request.getAiSummary());
         lecture.setOriginalText(request.getOriginalText());
         lecture.setDuration(request.getDuration());
+        lecture.setThumbnail(thumbnailBytes);
         return lecture;
     }
+
 }
