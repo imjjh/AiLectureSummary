@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         // 쿠키에서 JWT 추출
-        String token = CookieUtil.getCookieValue(request, "token").orElse(null);
+        String token = CookieUtil.getCookieValue(request, "access_token").orElse(null);
         // 토큰이 존재하고, 유효한 경우
         if (token != null) {
             if (jwtProvider.validateAccessToken(token)) {

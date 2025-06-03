@@ -39,7 +39,7 @@ public class ProfileController {
         MemberEditResponse memberEditResponse = memberProfileService.editProfile(userDetails, request);
         // 비밀번호 변경으로 토큰 재발급한 경우
         if (memberEditResponse.getToken() != null) {
-            ResponseCookie cookie = ResponseCookie.from("token", memberEditResponse.getToken())
+            ResponseCookie cookie = ResponseCookie.from("access_token", memberEditResponse.getToken())
                     .httpOnly(cookieProperties.isHttpOnly())
                     .secure(cookieProperties.isSecure())
                     .path("/")
