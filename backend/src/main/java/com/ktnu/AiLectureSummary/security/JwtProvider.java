@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.Jwts;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -19,13 +20,16 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
+
+    private final StringRedisTemplate stringRedisTemplate;
     private final JwtProperties jwtProperties;
     private final Key key;
 
-    // key 가공이 필요해 생성자 주입 직접 정의
-    public JwtProvider(JwtProperties jwtProperties){
+    // key 가공이 필요해 생성자 주입 직접 정의 // 생성자 1개로 @Autowired 생략
+    public JwtProvider(JwtProperties jwtProperties,StringRedisTemplate stringRedisTemplate){
         this.jwtProperties = jwtProperties;
         this.key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     /**
@@ -61,6 +65,11 @@ public class JwtProvider {
                 .compact();
     }
 
+    public boolean isBlacklisted(String accessToken) {
+        String key = "blacklist:" + accessToken;
+        return stringRedisTemplate.hasKey(key);
+    }
+
 
     /**
      * accessToken 유효성을 검사합니다.
@@ -70,6 +79,7 @@ public class JwtProvider {
      * @return true | false (예외 발생시)
      */
     public boolean validateAccessToken(String accessToken){
+        // 유효성 검사
         try{
             Jwts.parser()
                     .verifyWith((SecretKey) key)

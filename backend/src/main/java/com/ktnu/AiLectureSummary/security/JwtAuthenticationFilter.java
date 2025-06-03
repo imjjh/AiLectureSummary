@@ -11,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -21,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
     private final CustomUserDetailsService userDetailsService;
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -30,8 +33,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 쿠키에서 JWT 추출
         String token = CookieUtil.getCookieValue(request, "access_token").orElse(null);
-        // 토큰이 존재하고, 유효한 경우
+
         if (token != null) {
+            // 블랙리스트 확인
+            if (jwtProvider.isBlacklisted(token)) {
+                log.warn("차단된 access_token 요청: {}", token); // 로그 기록
+                filterChain.doFilter(request, response); // 인증 없이 넘김 (Security 설정에 따라 인증 정보가 없어 403, 401 응답)
+                return;
+            }
+            // 유효성 검사
             if (jwtProvider.validateAccessToken(token)) {
                 // 토큰에서 사용자 ID 추출
                 Long userId = jwtProvider.getUserIdFromAccessToken(token);
