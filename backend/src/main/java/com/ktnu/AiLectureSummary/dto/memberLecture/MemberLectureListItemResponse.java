@@ -8,6 +8,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 @AllArgsConstructor
 @Getter
@@ -27,9 +28,12 @@ public class MemberLectureListItemResponse {
                         memberLecture.getCustomTitle(),
                         memberLecture.getLecture().getDuration(),
                         memberLecture.getEnrolledAt(),
-                        Base64.getEncoder().encodeToString(memberLecture.getLecture().getThumbnail())
-
+                        encodeThumbnailSafe(memberLecture.getLecture().getThumbnail())
                 ))
                 .toList();
+    }
+
+    public static String encodeThumbnailSafe(byte[] thumbnail) {
+        return thumbnail != null ? Base64.getEncoder().encodeToString(thumbnail) : null;
     }
 }
