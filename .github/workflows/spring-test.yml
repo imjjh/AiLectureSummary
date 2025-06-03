@@ -21,4 +21,6 @@ jobs:
         run: chmod +x backend/gradlew
 
       - name: Run Unit Tests
-        run: ./backend/gradlew test
+        run: |
+          cd backend
+          ./gradlew test
