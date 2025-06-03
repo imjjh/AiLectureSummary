@@ -1,17 +1,24 @@
 package com.ktnu.AiLectureSummary.service;
 
+import com.ktnu.AiLectureSummary.config.JwtProperties;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.domain.Role;
 import com.ktnu.AiLectureSummary.dto.member.*;
 import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
 import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
+import com.ktnu.AiLectureSummary.exception.InvalidTokenException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
+import com.ktnu.AiLectureSummary.util.CookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Duration;
 
 
 @Service
@@ -21,6 +28,8 @@ public class MemberAuthService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final JwtProperties jwtProperties;
 
     /**
      * 사용자가 입력한 정보로 회원가입 시도합니다.
@@ -75,11 +84,61 @@ public class MemberAuthService {
         }
 
         // JWT 생성
-        String token = jwtProvider.createToken(member.getId());
+        String accessToken = jwtProvider.generateAccessToken(member.getId());
+        String refreshToken = jwtProvider.generateRefreshToken(member.getId());
 
-        return new MemberLoginResponse(token);
+        // redis 저장 (refreshToken)
+        stringRedisTemplate.opsForValue()
+                .set("refresh:" + refreshToken, String.valueOf(member.getId()), Duration.ofMillis(jwtProperties.getRefreshExpiration()));
+
+
+        return new MemberLoginResponse(accessToken,refreshToken);
     }
 
 
+    /**
+     * refreshToken을 이용한 AccessToken 재발급
+     * 현재는 refreshToken을 만료전까지 재사용하는 방식, 보안 더 강화 필요시 rotate 방식으로 새로운 refresh token으로 재발급 하기도함
+     *
+     * @param request
+     * @return
+     */
+    public String reissueAccessToken(HttpServletRequest request) {
+        // refresh token 꺼내기
+        String refreshToken = CookieUtil.getCookieValue(request, "refresh_token")
+                .orElseThrow(() -> new InvalidTokenException("Refresh Token이 존재하지 않습니다."));
 
+        // redis에서 유효한 refreshToken인지 검사
+        String userId = stringRedisTemplate.opsForValue().get("refresh:" + refreshToken);
+        if (userId==null) {
+            throw new InvalidTokenException("유효하지 않은 Refresh Token입니다.");
+        }
+
+        // 새로운 accesstoken 반환
+        return jwtProvider.generateAccessToken(Long.parseLong(userId));
+    }
+
+
+    /**
+     *
+     * @param request
+     */
+    public void logout(HttpServletRequest request) {
+        // access_token 꺼내기
+        String accessToken = CookieUtil.getCookieValue(request, "access_token")
+                .orElseThrow(() -> new InvalidTokenException("Access Token이 존재하지 않습니다."));
+
+        // access_token 만료시간 계산
+        long expiration = jwtProvider.getExpiration(accessToken);
+
+        // 블랙리스트 등록
+        stringRedisTemplate.opsForValue()
+                .set("blacklist:" + accessToken, "logout", Duration.ofMillis(expiration));
+
+        // refreshToken도 쿠키에서 꺼내서 redis에서 삭제
+        CookieUtil.getCookieValue(request,"refresh_token").ifPresent(refreshToken->{
+            stringRedisTemplate.delete("refresh:" + refreshToken);
+        });
+
+    }
 }

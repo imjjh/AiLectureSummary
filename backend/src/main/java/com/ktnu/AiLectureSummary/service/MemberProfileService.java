@@ -54,7 +54,7 @@ public class MemberProfileService {
         if (!passwordUnchanged) {
             String encoded = passwordEncoder.encode(newPassword);
             member.changePassword(encoded);
-            token = jwtProvider.createToken(member.getId());
+            token = jwtProvider.generateAccessToken(member.getId());
         }
 
         return MemberEditResponse.builder()

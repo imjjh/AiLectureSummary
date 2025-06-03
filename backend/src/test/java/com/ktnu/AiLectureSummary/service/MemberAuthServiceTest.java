@@ -1,5 +1,6 @@
 package com.ktnu.AiLectureSummary.service;
 
+import com.ktnu.AiLectureSummary.config.JwtProperties;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
 import com.ktnu.AiLectureSummary.dto.member.MemberLoginResponse;
@@ -11,8 +12,10 @@ import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Duration;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,6 +26,9 @@ class MemberAuthServiceTest {
     private MemberRepository memberRepository;
     private PasswordEncoder passwordEncoder;
     private JwtProvider jwtProvider;
+    private StringRedisTemplate stringRedisTemplate;
+    private JwtProperties jwtProperties;
+
     private MemberAuthService memberAuthService;
 
     @BeforeEach
@@ -30,7 +36,9 @@ class MemberAuthServiceTest {
         memberRepository = mock(MemberRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
         jwtProvider = mock(JwtProvider.class);
-        memberAuthService = new MemberAuthService(memberRepository, passwordEncoder, jwtProvider);
+        stringRedisTemplate = mock(StringRedisTemplate.class);
+        jwtProperties = mock(JwtProperties.class);
+        memberAuthService = new MemberAuthService(memberRepository, passwordEncoder, jwtProvider,stringRedisTemplate,jwtProperties);
     }
 
     @Test
@@ -82,8 +90,13 @@ class MemberAuthServiceTest {
         when(passwordEncoder.matches(request.getPassword(), mockMember.getPassword()))
                 .thenReturn(true);
 
-        when(jwtProvider.createToken(mockMember.getId()))
+        when(jwtProvider.generateAccessToken(mockMember.getId()))
                 .thenReturn("mocked-jwt-token");
+
+        // TODO: redis 저장
+//        stringRedisTemplate.opsForValue()
+//                .set("refresh:" + refreshToken, String.valueOf(member.getId()), Duration.ofMillis(jwtProperties.getRefreshExpiration()));
+
 
         // when
         MemberLoginResponse response = memberAuthService.login(request);
@@ -106,7 +119,7 @@ class MemberAuthServiceTest {
 
         // then
         verify(jwtProvider, never())
-                .createToken(any());
+                .generateAccessToken(any());
     }
 
     @Test
@@ -133,6 +146,6 @@ class MemberAuthServiceTest {
 
         // then
         verify(jwtProvider, never())
-                .createToken(any());
+                .generateAccessToken(any());
     }
 }
