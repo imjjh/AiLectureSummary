@@ -99,9 +99,14 @@ export default function UploadTabs() {
 
         const lectureId = response.data.id;
         router.push(`/summary/${lectureId}`);
-    } catch (error: any) {
-        alert("업로드 실패: " + error.message);
-        console.error("Upload Error:", error);
+    } 
+    catch (error: any) {
+        toast({  
++            title: "업로드 실패",  
++            description: error.message || "오디오 파일 업로드 중 오류가 발생했습니다.",  
++            variant: "destructive",  
++        });  
++        console.error("Upload Error:", error); 
     } finally {
         setUploading(false);
         setProgress(0);
