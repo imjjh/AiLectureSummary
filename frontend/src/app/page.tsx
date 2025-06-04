@@ -9,6 +9,7 @@ import { motion } from "framer-motion"
 import { useRef } from "react"
 import { useAuth } from "@/hooks/use-auth"
 import { useRouter } from "next/navigation"
+import UploadTabs from "@/components/UploadTabs";
 
 export default function Home() {
 
@@ -75,7 +76,7 @@ export default function Home() {
           >
             <Card className="mb-12 border-2 border-dashed rounded-xl shadow-lg overflow-hidden bg-white dark:bg-gray-900">
               <CardContent className="p-6">
-                <VideoUploader />
+                <UploadTabs />
               </CardContent>
             </Card>
           </motion.div>
