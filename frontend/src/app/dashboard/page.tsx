@@ -271,8 +271,10 @@ export default function DashboardPage() {
               이 작업은 되돌릴 수 없습니다. "{targetLecture?.customTitle || targetLecture?.title}" 강의가 삭제됩니다.
             </p>
             <DialogFooter className="mt-4">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}
-                className="bg-muted text-foreground hover:bg-muted/80"
+              <Button
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+                className="bg-muted text-foreground hover:bg-muted/80 active:scale-95 transition-transform"
               >
                 취소
               </Button>
@@ -283,6 +285,7 @@ export default function DashboardPage() {
                     handleDelete(targetLecture);
                   }
                 }}
+                className="active:scale-95 transition-transform"
               >
                 삭제
               </Button>

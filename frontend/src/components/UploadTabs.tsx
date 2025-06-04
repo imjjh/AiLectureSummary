@@ -158,6 +158,9 @@ export default function UploadTabs() {
             </Button>
           </label>
         </div>
+        <p className="text-sm text-gray-500 mt-2">
+          ※ 파일 크기는 최대 25MB 이하만 업로드 가능합니다.
+        </p>
 
         {audioFile && (
           <>
