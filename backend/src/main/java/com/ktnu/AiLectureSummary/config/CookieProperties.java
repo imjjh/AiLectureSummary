@@ -16,4 +16,8 @@ public class CookieProperties {
 
     @Pattern(regexp = "^(None|Lax|Strict)$", message = "SameSite must be None, Lax, or Strict")
     private String sameSite;
+
+    private long accessTokenExpiry;
+    private long refreshTokenExpiry;
+
 }

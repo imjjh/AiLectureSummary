@@ -20,11 +20,13 @@ public class RedisConfig {
     /**
      * Redis에서 다양한 자료형(Object)을 다룰 수 있도록 설정된 일반적인 RedisTemplate Bean입니다.
      * 복잡한 객체 직렬화 및 다양한 Redis 자료구조(Hash, List 등) 작업에 사용됩니다.
+     *
+     * 필요하면 주석 해제 후 사용 예정
      */
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(connectionFactory);
-        return template;
-    }
+//    @Bean
+//    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+//        RedisTemplate<String, Object> template = new RedisTemplate<>();
+//        template.setConnectionFactory(connectionFactory);
+//        return template;
+//    }
 }

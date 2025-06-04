@@ -33,10 +33,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())  // API 서버는 보통 CSRF 비활성화
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // httponly 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register", "/health",
-                                "/v3/api-docs/**","/api/password/verify","/api/password/reset",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html").permitAll() // 로그인, 회원가입, 스웨거, 헬스체크, 비밀번호 변경 인증없이 접근 허용
+                        .requestMatchers("/api/auth/login", "/api/auth/register","/api/auth/refresh", //로그인 관련
+                                "/api/password/verify","/api/password/reset", // 비밀번호 재설정 관련
+                                "/health", "/swagger-ui/**","/v3/api-docs/**", // swagger & health check
+                                "/swagger-ui.html").permitAll() // 로그인, 회원가입, 스웨거, 헬스체크, 비밀번호 변경 등 인증없이 접근 허용
 //                        .requestMatchers(HttpMethod.GET, "/api/Lecture/**").permitAll()
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )

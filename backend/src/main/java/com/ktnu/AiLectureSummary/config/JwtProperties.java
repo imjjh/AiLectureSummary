@@ -19,4 +19,6 @@ public class JwtProperties {
 
 //    @Min(value=60000,message = "JWT expiration should be at least 60000ms (1 minute)") //Spring이 자꾸 String으로 환경변수를 읽어서 주석처리
     private long expiration;
+
+    private long refreshExpiration;
 }
