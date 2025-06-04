@@ -53,11 +53,12 @@ export default function AccountEditPage() {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/members/me`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING_API_URL}/api/members/me`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         credentials: "include",
-        body: JSON.stringify({ username,
+        body: JSON.stringify({
+          username,
           ...(password ? { password } : {})
         }),
       })
@@ -87,59 +88,59 @@ export default function AccountEditPage() {
               <CardTitle className="text-xl">정보 수정</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4">
-                <div className="grid gap-2">
-                    <Label htmlFor="username">닉네임</Label>
-                    <Input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className="rounded-full"
-                    required
-                    />
-                </div>
+              <div className="grid gap-2">
+                <Label htmlFor="username">닉네임</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="rounded-full"
+                  required
+                />
+              </div>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="email">이메일</Label>
-                    <Input
-                    id="email"
-                    type="email"
-                    value={user?.email || ""}
-                    disabled
-                    className="rounded-full bg-muted-foreground/10"
-                    />
-                </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">이메일</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  className="rounded-full bg-muted-foreground/10"
+                />
+              </div>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="password">비밀번호</Label>
-                    <PasswordInputWithCapsWarning
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="rounded-full"
-                    placeholder="변경하려면 입력"
-                    />
-                    {password && (password.length < 8 || password.length > 20) && (
-                    <p className="text-sm text-red-500 mt-1">비밀번호는 8자 이상 20자 이하로 입력해주세요.</p>
-                    )}
-                </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">비밀번호</Label>
+                <PasswordInputWithCapsWarning
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="rounded-full"
+                  placeholder="변경하려면 입력"
+                />
+                {password && (password.length < 8 || password.length > 20) && (
+                  <p className="text-sm text-red-500 mt-1">비밀번호는 8자 이상 20자 이하로 입력해주세요.</p>
+                )}
+              </div>
 
-                {/* 비밀번호 확인 입력 및 일치 여부 확인 */}
-                <div className="grid gap-2">
-                    <Label htmlFor="confirm-password">비밀번호 확인</Label>
-                    <PasswordInputWithCapsWarning
-                        id="confirm-password"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="rounded-full"
-                        required={!!password}
-                    />
-                    {confirmPassword && confirmPassword !== password && (
-                        <p className="text-sm text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
-                    )}
-                </div>
+              {/* 비밀번호 확인 입력 및 일치 여부 확인 */}
+              <div className="grid gap-2">
+                <Label htmlFor="confirm-password">비밀번호 확인</Label>
+                <PasswordInputWithCapsWarning
+                  id="confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="rounded-full"
+                  required={!!password}
+                />
+                {confirmPassword && confirmPassword !== password && (
+                  <p className="text-sm text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
+                )}
+              </div>
 
               {error && <p className="text-sm text-red-500">{error}</p>}
             </CardContent>

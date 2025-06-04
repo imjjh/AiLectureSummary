@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL;
 
 interface SummaryData {
   customTitle?: string
@@ -97,7 +97,7 @@ export default function Page() {
 
   // 메모 저장 함수
   const handleNoteSave = async () => {
-    if (!memo.trim()){
+    if (!memo.trim()) {
       alert("메모 내용을 작성해주세요.");
       return;
     }
@@ -113,8 +113,8 @@ export default function Page() {
       alert("메모가 저장되었습니다.")
     } catch (err) {
       alert("메모 저장 중 오류가 발생했습니다.")
-      }
     }
+  }
 
   // 메모 삭제 함수
   const handleNoteDelete = async () => {
@@ -214,9 +214,9 @@ export default function Page() {
 
           {/* 동영상 길이 및 업로드 날짜 표시 */}
           <p className="text-muted-foreground">
-            동영상 길이: {" "} 
-            {typeof summaryData.duration === "number" 
-            ? formatDuration(summaryData.duration) : "정보 없음"}{" "}
+            동영상 길이: {" "}
+            {typeof summaryData.duration === "number"
+              ? formatDuration(summaryData.duration) : "정보 없음"}{" "}
             • 업로드: {summaryData.enrolledAt ? formatDate(summaryData.enrolledAt) : "정보 없음"}
           </p>
         </div>
@@ -284,8 +284,8 @@ export default function Page() {
                   />
                   <div className="flex justify-end gap-2">
                     <Button variant="secondary"
-                            className="dark:hover:bg-zinc-600 hover:bg-zinc-300"
-                            onClick={handleNoteSave}>메모 저장</Button>
+                      className="dark:hover:bg-zinc-600 hover:bg-zinc-300"
+                      onClick={handleNoteSave}>메모 저장</Button>
                     <Button
                       variant="secondary"
                       className="hover:bg-destructive hover:text-white dark:hover:bg-destructive"
@@ -293,12 +293,12 @@ export default function Page() {
                     >
                       메모 삭제
                     </Button>
-            </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
           </div>
-        
+
 
           {/* 오른쪽 사이드바: 공유 기능 */}
           <div className="md:col-span-1">
@@ -355,23 +355,23 @@ export default function Page() {
             </Card>
           </div>
         </div>
-        </div>
+      </div>
 
-        {/* 비로그인 사용자에게 회원가입 및 로그인 유도 */}
-        {!isLoading && !user && (
+      {/* 비로그인 사용자에게 회원가입 및 로그인 유도 */}
+      {!isLoading && !user && (
         <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">더 많은 강의를 요약해 보세요</h2>
-            <p className="text-muted-foreground mb-6">회원가입하고 모든 요약 기록을 저장하세요</p>
+          <h2 className="text-2xl font-bold mb-4">더 많은 강의를 요약해 보세요</h2>
+          <p className="text-muted-foreground mb-6">회원가입하고 모든 요약 기록을 저장하세요</p>
           <div className="flex justify-center gap-4">
             <Link href="/">
               <Button>새 동영상 요약하기</Button>
             </Link>
-              <Link href="/login">
-                <Button variant="outline">로그인</Button>
-              </Link>
-            </div>
+            <Link href="/login">
+              <Button variant="outline">로그인</Button>
+            </Link>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+    </div>
   )
 }

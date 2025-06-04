@@ -49,7 +49,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   // 강의 목록을 저장하는 상태
   const [lectures, setLectures] = useState<Lecture[]>([]);
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL;
   // 총 절약한 시간을 저장하는 상태
   const [totalDuration, setTotalDuration] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +70,7 @@ export default function DashboardPage() {
         const sortedLectures = fetchedData.items.sort(
           (a: Lecture, b: Lecture) => b.lectureId - a.lectureId
         );
-        
+
         setLectures(sortedLectures);
         setTotalDuration(fetchedData.totalDuration);
 
@@ -213,7 +213,7 @@ export default function DashboardPage() {
                 <p className="text-muted-foreground">로그인된 사용자 정보가 없습니다.</p>
               )}
               <div className="mt-4 pt-4 border-t">
-                <Link href = "/accountedit">
+                <Link href="/accountedit">
                   <Button
                     size="sm"
                     className="w-full bg-background text-foreground border border-border hover:bg-muted"

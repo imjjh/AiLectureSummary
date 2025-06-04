@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
+const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL
 
 export default function ForgotPasswordPage() {
   const router = useRouter()
