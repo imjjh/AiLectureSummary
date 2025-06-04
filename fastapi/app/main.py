@@ -38,7 +38,7 @@ class SummaryResponse(BaseModel):
     duration: int
     filename: str
     timestamp: str
-    thumbnail: str = None  # base64 문자열(없을 수도 있으니 Optional)
+    thumbnail: str = None
 
 class YoutubeSummaryResponse(BaseModel):
     title: str
@@ -104,7 +104,7 @@ def extract_youtube_info_and_caption(youtube_url: str):
             'outtmpl': os.path.join(tmpdir, '%(id)s.%(ext)s'),
             'writesubtitles': True,
             'writeautomaticsub': True,
-            'subtitleslangs': ['ko', 'en'],
+            'subtitleslangs': ['ko'],  # 한국어만 우선 지정
             'skip_download': False,
             'quiet': True,
             'no_warnings': True,
@@ -119,7 +119,12 @@ def extract_youtube_info_and_caption(youtube_url: str):
             sub_files = []
             if 'requested_subtitles' in info and info['requested_subtitles']:
                 for lang, sub in info['requested_subtitles'].items():
-                    sub_files.append(sub.get('filepath'))
+                    if lang.startswith('ko') and sub.get('filepath'):
+                        sub_files.append(sub.get('filepath'))
+            if not sub_files:
+                for f in os.listdir(tmpdir):
+                    if (f.endswith('.vtt') or f.endswith('.srt')) and (f.startswith('ko') or '.ko.' in f):
+                        sub_files.append(os.path.join(tmpdir, f))
             if not sub_files:
                 for f in os.listdir(tmpdir):
                     if f.endswith('.vtt') or f.endswith('.srt'):
@@ -175,8 +180,8 @@ def get_gpt_summary(text):
                     {
                         "role": "system",
                         "content": (
-                            "아래의 텍스트를 한국어로 핵심만 뽑아 3줄 이내로 요약해줘. "
-                            "제목도 같이 1줄로 요약해줘. 형식은 다음과 같아:\n"
+                            "아래의 텍스트에서 핵심 내용만 한국어로 요약해줘. "
+                            "제목도 1줄로 요약해줘. 형식은 다음과 같아:\n"
                             "제목: ...\n요약: ..."
                         )
                     },
@@ -271,46 +276,51 @@ async def process_video(
                     except:
                         pass
 
-    # 파일 업로드인 경우
+    # 파일 업로드인 경우 (mp4, mov, mp3)
     if file:
         try:
-            if not file.filename.lower().endswith(('.mp4', '.mov')):
+            # mp4, mov, mp3 허용
+            if not file.filename.lower().endswith(('.mp4', '.mov', '.mp3')):
                 raise HTTPException(400, "지원하지 않는 파일 형식입니다.")
 
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as temp_file:
                 content = await file.read()
                 if len(content) > 500 * 1024 * 1024:
                     raise HTTPException(413, "파일 크기 초과 (최대 500MB)")
-                temp_video.write(content)
-                temp_video_path = temp_video.name
+                temp_file.write(content)
+                temp_video_path = temp_file.name
 
-            # 썸네일 추출, 200KB 이하로 압축, base64 인코딩
             thumbnail_base64 = None
-            try:
-                ffmpeg_cmd = [
-                    "ffmpeg", "-y", "-i", temp_video_path,
-                    "-ss", "00:00:01",
-                    "-vframes", "1",
-                    "-f", "image2pipe",
-                    "-vcodec", "mjpeg",
-                    "-"
-                ]
-                thumb_proc = subprocess.run(
-                    ffmpeg_cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                )
-                image_data = thumb_proc.stdout
-                if image_data:
-                    compressed_image_data = compress_image_to_target_size(image_data, target_kb=200)
-                    thumbnail_base64 = base64.b64encode(compressed_image_data).decode('utf-8')
-                else:
-                    logger.warning("썸네일 이미지 데이터가 비어있음")
+            # mp4, mov만 썸네일 생성
+            if file.filename.lower().endswith(('.mp4', '.mov')):
+                try:
+                    ffmpeg_cmd = [
+                        "ffmpeg", "-y", "-i", temp_video_path,
+                        "-ss", "00:00:01",
+                        "-vframes", "1",
+                        "-an",
+                        "-vf", "thumbnail,scale=640:360:force_original_aspect_ratio=decrease",
+                        "-f", "image2pipe",
+                        "-vcodec", "mjpeg",
+                        "-"
+                    ]
+                    thumb_proc = subprocess.run(
+                        ffmpeg_cmd,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE
+                    )
+                    image_data = thumb_proc.stdout
+                    if image_data:
+                        compressed_image_data = compress_image_to_target_size(image_data, target_kb=200)
+                        thumbnail_base64 = base64.b64encode(compressed_image_data).decode('utf-8')
+                    else:
+                        logger.warning("썸네일 이미지 데이터가 비어있음")
+                        thumbnail_base64 = None
+                except Exception as e:
+                    logger.warning(f"썸네일 추출/압축/base64 변환 중 예외 발생: {str(e)}")
                     thumbnail_base64 = None
-            except Exception as e:
-                logger.warning(f"썸네일 추출/압축/base64 변환 중 예외 발생: {str(e)}")
-                thumbnail_base64 = None
 
+            # mp3, mp4, mov 모두 오디오 추출(wav 변환)
             temp_audio_path = temp_video_path + ".wav"
             ffmpeg_cmd = [
                 "ffmpeg", "-y", "-i", temp_video_path,
@@ -368,7 +378,7 @@ async def process_video(
                     except:
                         pass
 
-    raise HTTPException(400, "mp4 파일 또는 유튜브 URL을 입력해주세요.")
+    raise HTTPException(400, "mp4, mov, mp3 파일 또는 유튜브 URL을 입력해주세요.")
 
 if __name__ == "__main__":
     import uvicorn
