@@ -2,6 +2,7 @@ package com.ktnu.AiLectureSummary.dto.memberLecture;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.domain.MemberLecture;
+import com.ktnu.AiLectureSummary.util.ThumbnailUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +34,8 @@ public class LectureDetailResponse {
                 .originalText(lecture.getOriginalText())
                 .memo(memberLecture.getMemo())
                 .enrolledAt(memberLecture.getEnrolledAt())
-                .thumbnailBase64(Base64.getEncoder().encodeToString(memberLecture.getLecture().getThumbnail()))
+                .thumbnailBase64(ThumbnailUtil.encodeThumbnailSafe(memberLecture.getLecture().getThumbnail()))
                 .build();
     }
+
 }
