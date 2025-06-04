@@ -16,12 +16,13 @@ import org.springframework.web.multipart.MultipartFile;
  * 해당 사용자가 업로드한 강의로 기록을 남깁니다.
  * <p>
  * 내부적으로 LectureService와 MemberLectureService를 조합하여
- * 하나의 유스케이스 단위 로직을 처리합니다.
+ * 유스케이스 단위 로직을 처리합니다.
+ *
  */
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class LectureApplicationService {
+public class LectureUploadService {
     private final LectureService lectureService;
     private final MemberLectureService memberLectureService;
     private final YoutubeLectureService youtubeLectureService;

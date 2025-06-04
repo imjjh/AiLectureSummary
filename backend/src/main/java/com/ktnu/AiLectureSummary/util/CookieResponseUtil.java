@@ -19,7 +19,7 @@ public class CookieResponseUtil {
                 .httpOnly(properties.isHttpOnly()) // true: JS에서 접근 불가 (XSS 방어)
                 .path("/")                         // 루트 경로 이하 요청에 자동 포함
                 .sameSite(properties.getSameSite()) // CSRF 방지용. Lax 또는 None (OAuth 등)
-                .secure(properties.isSecure())     // HTTPS에서만 전송. 로컬 개발 시 false 가능
+                .secure(properties.isSecure())     // HTTPS에서만 전송. 로컬 개발 시 false 가능 (chrome)
                 // 아래 주석 중 하나만 선택하여 사용:
                 // .maxAge(Duration.ofSeconds(properties.getAccessTokenExpiry())) // 지속 쿠키: JWT 유지 시간과 일치시키는 경우
                 // 세션 쿠키로 만들려면 .maxAge() 생략하거나 -1로 설정 (브라우저 종료 시 쿠키 삭제됨)

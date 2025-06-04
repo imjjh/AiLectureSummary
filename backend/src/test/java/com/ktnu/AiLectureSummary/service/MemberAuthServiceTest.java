@@ -10,9 +10,11 @@ import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
+import com.ktnu.AiLectureSummary.support.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Duration;
@@ -36,8 +38,14 @@ class MemberAuthServiceTest {
         memberRepository = mock(MemberRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
         jwtProvider = mock(JwtProvider.class);
-        stringRedisTemplate = mock(StringRedisTemplate.class);
         jwtProperties = mock(JwtProperties.class);
+
+        // Redis
+        stringRedisTemplate = mock(StringRedisTemplate.class); // Redis 템플릿 자체를 모킹
+        ValueOperations<String, String> valueOps = mock(ValueOperations.class); // 내부의 opsForValue()가 반환할 객체도 모킹
+        when(stringRedisTemplate.opsForValue()).thenReturn(valueOps); // Redis가 opsForValue() 호출할 때 반환할 mock 지정
+
+
         memberAuthService = new MemberAuthService(memberRepository, passwordEncoder, jwtProvider,stringRedisTemplate,jwtProperties);
     }
 
@@ -76,12 +84,7 @@ class MemberAuthServiceTest {
         // given
         MemberLoginRequest request = new MemberLoginRequest("test@example.com", "password123");
 
-        Member mockMember = Member.builder()
-                .id(1L) // ID를 명시적으로 설정
-                .email("test@example.com")
-                .password("encoded_password") // 인코딩된 비밀번호
-                .username("TestUser")
-                .build();
+        Member mockMember = TestFixture.mockMember();
 
         String email = request.getEmail();
         when(memberRepository.findByEmail(email))
@@ -91,18 +94,21 @@ class MemberAuthServiceTest {
                 .thenReturn(true);
 
         when(jwtProvider.generateAccessToken(mockMember.getId()))
-                .thenReturn("mocked-jwt-token");
+                .thenReturn("mocked-jwt-access-token");
 
-        // TODO: redis 저장
-//        stringRedisTemplate.opsForValue()
-//                .set("refresh:" + refreshToken, String.valueOf(member.getId()), Duration.ofMillis(jwtProperties.getRefreshExpiration()));
-
+        when(jwtProvider.generateRefreshToken(mockMember.getId()))
+                .thenReturn("mocked-jwt-refresh-token");
 
         // when
         MemberLoginResponse response = memberAuthService.login(request);
 
         // then
-        assertEquals("mocked-jwt-token", response.getAccessToken());
+        verify(stringRedisTemplate.opsForValue())
+                .set("refresh:" + "mocked-jwt-refresh-token", String.valueOf(mockMember.getId()), Duration.ofMillis(jwtProperties.getRefreshExpiration()));
+
+        assertEquals("mocked-jwt-access-token", response.getAccessToken());
+        assertEquals("mocked-jwt-refresh-token", response.getRefreshToken());
+
     }
 
     @Test
@@ -127,12 +133,8 @@ class MemberAuthServiceTest {
         // given
         MemberLoginRequest request = new MemberLoginRequest("test@example.com", "password123");
 
-        Member mockMember = Member.builder()
-                .id(1L) // ID를 명시적으로 설정
-                .email("test@example.com")
-                .password("encoded_password") // 인코딩된 비밀번호
-                .username("TestUser")
-                .build();
+
+        Member mockMember = TestFixture.mockMember();
 
         String email = request.getEmail();
         when(memberRepository.findByEmail(email))
