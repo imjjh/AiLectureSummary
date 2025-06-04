@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)    // 사용자 정보 로딩 상태
   const [token, setToken] = useState<string | null>(null)
   const router = useRouter()
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL // 환경변수로부터 API base URL 읽기
+  const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL // 환경변수로부터 API base URL 읽기
 
   // 컴포넌트 마운트 시 자동 로그인 여부 확인
   useEffect(() => {

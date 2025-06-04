@@ -11,7 +11,7 @@ import { motion } from "framer-motion"
 import { useAuth } from "@/hooks/use-auth"
 import { toast } from "@/hooks/use-toast"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL;
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 export default function VideoUploader() {
@@ -73,7 +73,7 @@ export default function VideoUploader() {
   }, [files])
 
   const handleUpload = useCallback(async () => {
-    if(!user){
+    if (!user) {
       toast({
         title: "로그인이 필요합니다‼️",
         description: "동영상을 업로드하려면 먼저 로그인해주세요.",
@@ -129,9 +129,8 @@ export default function VideoUploader() {
   return (
     <div className="w-full">
       <div
-        className={`border-2 border-dashed rounded-xl p-8 text-center ${
-          isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/20"
-        } transition-colors`}
+        className={`border-2 border-dashed rounded-xl p-8 text-center ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/20"
+          } transition-colors`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -148,17 +147,17 @@ export default function VideoUploader() {
             <p className="text-sm text-muted-foreground mt-1">여기로 파일을 드래그하거나 클릭해서 선택하세요</p>
           </div>
 
-          <input 
-            type="file" 
-            id="video-upload" 
-            className="hidden" 
-            accept="video/*" 
+          <input
+            type="file"
+            id="video-upload"
+            className="hidden"
+            accept="video/*"
             onChange={handleFileChange}
             multiple
           />
           <label htmlFor="video-upload">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="cursor-pointer rounded-full px-6 bg-background dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               asChild
             >
@@ -179,20 +178,20 @@ export default function VideoUploader() {
               <li
                 key={file.name + index}
                 className="flex items-center justify-between px-4 py-2 text-sm">
-              <span>
-                {file.name} ({(file.size / (1024 * 1024)).toFixed(2)}MB)
-              </span>
-              <button
-                onClick={() =>
-                  setFiles(prevFiles =>
-                    prevFiles.filter((_, i) => i !== index)
-                  )
-                }
-                className="text-gray-500 hover:text-red-500 text-xs ml-4"
-              >
-                X
-              </button>
-            </li>
+                <span>
+                  {file.name} ({(file.size / (1024 * 1024)).toFixed(2)}MB)
+                </span>
+                <button
+                  onClick={() =>
+                    setFiles(prevFiles =>
+                      prevFiles.filter((_, i) => i !== index)
+                    )
+                  }
+                  className="text-gray-500 hover:text-red-500 text-xs ml-4"
+                >
+                  X
+                </button>
+              </li>
             ))}
           </p>
 

@@ -5,8 +5,8 @@ import { useEffect } from "react";
 
 export default function ServerWakeup() {
   useEffect(() => {
-    const springURL = process.env.NEXT_PUBLIC_SPRING_API_URL + "/api/ping";
-    const fastapiURL = process.env.NEXT_PUBLIC_FASTAPI_API_URL + "/api/ping";
+    const springURL = process.env.NEXT_PUBLIC_SPRING_API_URL + "/health";
+    const fastapiURL = process.env.NEXT_PUBLIC_FASTAPI_API_URL + "/";
 
     Promise.all([
       fetch(springURL).then(() => console.log("✅ Spring 서버 깨움")),
