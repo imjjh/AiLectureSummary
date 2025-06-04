@@ -75,8 +75,9 @@ export default function VideoUploader() {
   const handleUpload = useCallback(async () => {
     if(!user){
       toast({
-        title: "로그인이 필요합니다.",
-        description: "동영상을 업로드하려면 먼저 로그인해주세요."
+        title: "로그인이 필요합니다‼️",
+        description: "동영상을 업로드하려면 먼저 로그인해주세요.",
+        duration: 1000,
       })
       return
     }
@@ -137,7 +138,7 @@ export default function VideoUploader() {
       >
         <div className="flex flex-col items-center justify-center gap-4">
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-          onClick={() => document.getElementById("video-upload")?.click()}>
+            onClick={() => document.getElementById("video-upload")?.click()}>
             <div className="w-20 h-20 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 flex items-center justify-center">
               <Upload className="h-10 w-10 text-white" />
             </div>
@@ -174,10 +175,24 @@ export default function VideoUploader() {
       {files.length > 0 && (
         <div className="mt-4">
           <p className="text-sm font-medium mb-2">
-            {files.map((file) => (
-              <span key={file.name} className="block">
+            {files.map((file, index) => (
+              <li
+                key={file.name + index}
+                className="flex items-center justify-between px-4 py-2 text-sm">
+              <span>
                 {file.name} ({(file.size / (1024 * 1024)).toFixed(2)}MB)
               </span>
+              <button
+                onClick={() =>
+                  setFiles(prevFiles =>
+                    prevFiles.filter((_, i) => i !== index)
+                  )
+                }
+                className="text-gray-500 hover:text-red-500 text-xs ml-4"
+              >
+                X
+              </button>
+            </li>
             ))}
           </p>
 

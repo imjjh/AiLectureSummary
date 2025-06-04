@@ -5,18 +5,19 @@ import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
-import { Download, Share2, Bookmark } from "lucide-react"
+import { Download } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SummaryData {
   customTitle?: string
-  duration?: string
-  thumbnailUrl?: string
+  duration?: number
+  thumbnailBase64?: string
   aiSummary?: string
   originalText?: string
   memo?: string
@@ -86,12 +87,13 @@ export default function Page() {
   }, [summaryData?.customTitle])
 
   useEffect(() => {
-    if (summaryData?.thumbnailUrl) {
-      setImgSrc(summaryData.thumbnailUrl)
+    if (summaryData?.thumbnailBase64) {
+      setImgSrc(`data:image/png;base64,${summaryData.thumbnailBase64}`)
     } else {
       setImgSrc("/images/1.png")
     }
-  }, [summaryData?.thumbnailUrl])
+  }, [summaryData?.thumbnailBase64])
+
 
   // 메모 저장 함수
   const handleNoteSave = async () => {
@@ -218,7 +220,6 @@ export default function Page() {
             • 업로드: {summaryData.enrolledAt ? formatDate(summaryData.enrolledAt) : "정보 없음"}
           </p>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* 왼쪽 주요 콘텐츠 영역 */}
           <div className="md:col-span-2">
@@ -297,15 +298,54 @@ export default function Page() {
               </Card>
             )}
           </div>
+        
 
           {/* 오른쪽 사이드바: 공유 기능 */}
-          <div>
+          <div className="md:col-span-1">
             <Card>
               <CardContent className="p-6">
                 <h3 className="text-lg font-medium mb-4">요약 저장하기</h3>
                 <div className="mt-4 flex justify-center">
                   <Button
-                    className="w-full max-w-xs gap-2 border border-border bg-muted hover:bg-muted/80 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white"
+                    className="w-full max-w-xs gap-2 border border-border bg-muted hover:bg-zinc-300 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/pdf`, {
+                          credentials: "include",
+                        });
+
+                        if (res.status === 404) {
+                          alert("해당 강의의 PDF 파일을 찾을 수 없습니다.");
+                          return;
+                        }
+
+                        if (!res.ok) {
+                          alert("PDF 다운로드에 실패했습니다.");
+                          return;
+                        }
+
+                        const blob = await res.blob();
+
+                        // PDF MIME 타입 확인
+                        if (blob.type !== "application/pdf") {
+                          alert("서버에서 올바른 PDF 파일이 도착하지 않았습니다.");
+                          return;
+                        }
+
+                        // PDF 다운로드 처리
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = `${summaryData?.customTitle || "summary"}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                      } catch (err) {
+                        console.error("PDF 다운로드 오류:", err);
+                        alert("PDF 다운로드 중 오류가 발생했습니다.");
+                      }
+                    }}
                   >
                     <Download size={16} />
                     PDF로 저장
@@ -314,6 +354,7 @@ export default function Page() {
               </CardContent>
             </Card>
           </div>
+        </div>
         </div>
 
         {/* 비로그인 사용자에게 회원가입 및 로그인 유도 */}
@@ -332,6 +373,5 @@ export default function Page() {
           </div>
         )}
       </div>
-    </div>
   )
 }

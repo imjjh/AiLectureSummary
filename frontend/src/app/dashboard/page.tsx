@@ -10,11 +10,22 @@ import Link from "next/link"
 import Image from "next/image"
 import axios from "axios"
 import LectureCard from "@/components/lecture-card";
+import { toast } from "@/hooks/use-toast"
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
+
 
 axios.defaults.withCredentials = true;
 type Lecture = {
   lectureId: number;
-  title: string;
+  customTitle: string;
+  title: string,
   createdAt: string;
   duration: number;
   thumbnailUrl?: string;
@@ -43,6 +54,10 @@ export default function DashboardPage() {
   const [totalDuration, setTotalDuration] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [targetLecture, setTargetLecture] = useState<Lecture | null>(null);
+
 
   useEffect(() => {
     async function fetchLectures() {
@@ -85,9 +100,6 @@ export default function DashboardPage() {
 
   // 강의 삭제 처리 함수
   const handleDelete = async (lecture: Lecture) => {
-    const confirmed = window.confirm("정말 강의를 삭제하시겠습니까?");
-    if (!confirmed) return;
-
     try {
       const res = await fetch(`${API_BASE_URL}/api/member-lectures/${lecture.lectureId}`, {
         method: "DELETE",
@@ -98,17 +110,27 @@ export default function DashboardPage() {
         throw new Error("삭제 실패");
       }
 
-      // UI에서 해당 강의 제거
-      setLectures((prevLectures) =>
-      prevLectures.filter((l) => l.lectureId !== lecture.lectureId)
-    );
-    setTotalDuration((prev) => Math.max(0, prev - (lecture.duration ?? 0)));
+      setLectures(prev => prev.filter(l => l.lectureId !== lecture.lectureId));
+      setTotalDuration(prev => Math.max(0, prev - (lecture.duration ?? 0)));
 
+      toast({
+        title: "삭제 완료✔️",
+        description: `"${lecture.customTitle}" 강의가 삭제되었습니다.`,
+        duration: 1500,
+      });
     } catch (err) {
-      alert("삭제 중 오류가 발생했습니다.");
+      toast({
+        title: "삭제 실패✖️",
+        description: "강의 삭제 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
       console.error(err);
+    } finally {
+      setIsDialogOpen(false);
+      setTargetLecture(null);
     }
   };
+
 
   // 총 절약한 시간(초)을 "X시간 Y분" 형식으로 변환하는 헬퍼 함수
   const getTotalDurationText = () => {
@@ -119,6 +141,12 @@ export default function DashboardPage() {
     if (minutes === 0) return `${hours}시간`;
     return `${hours}시간 ${minutes}분`;
   };
+
+  const openDeleteDialog = (lecture: Lecture) => {
+    setTargetLecture(lecture);
+    setIsDialogOpen(true);
+  };
+
 
   //로딩중 흰배경 출력
   if (isLoading) {
@@ -211,7 +239,7 @@ export default function DashboardPage() {
                 <LectureCard
                   key={lecture.lectureId}
                   lecture={lecture}
-                  onDelete={() => handleDelete(lecture)}
+                  onDelete={() => openDeleteDialog(lecture)}
                 />
               ))
             ) : (
@@ -226,7 +254,7 @@ export default function DashboardPage() {
                 <LectureCard
                   key={lecture.lectureId}
                   lecture={lecture}
-                  onDelete={() => handleDelete(lecture)}
+                  onDelete={() => openDeleteDialog(lecture)}
                 />
               ))
             ) : (
@@ -234,6 +262,33 @@ export default function DashboardPage() {
             )}
           </TabsContent>
         </Tabs>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>정말 삭제하시겠습니까?</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              이 작업은 되돌릴 수 없습니다. "{targetLecture?.customTitle || targetLecture?.title}" 강의가 삭제됩니다.
+            </p>
+            <DialogFooter className="mt-4">
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}
+                className="bg-muted text-foreground hover:bg-muted/80"
+              >
+                취소
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (targetLecture) {
+                    handleDelete(targetLecture);
+                  }
+                }}
+              >
+                삭제
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

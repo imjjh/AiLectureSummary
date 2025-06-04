@@ -9,7 +9,7 @@ interface Lecture {
     lectureId: number;
     customTitle: string;
     duration: string;
-    thumbnailUrl?: string;
+    thumbnailBase64?: string;
     enrolledAt: string;
 }
 
@@ -36,6 +36,9 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
         });
     };
 
+    const thumbnailSrc = lecture.thumbnailBase64
+        ? `data:image/png;base64,${lecture.thumbnailBase64}`
+        : "/images/1.png";
 
     return (
         <Link href={`/summary/${lecture.lectureId}`}>
@@ -57,11 +60,14 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
                 <CardContent className="p-4">
                     <div className="aspect-video bg-muted rounded mb-3 overflow-hidden">
                         <Image
-                            src={lecture.thumbnailUrl || "/images/1.png"}
+                            src={thumbnailSrc}
                             alt="썸네일"
                             width={320}
                             height={180}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                                (e.target as HTMLImageElement).src = "/images/1.png";
+                            }}
                         />
                     </div>
                     <div className="text-base font-medium truncate">{lecture.customTitle}</div>
