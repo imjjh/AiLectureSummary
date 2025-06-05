@@ -28,7 +28,7 @@ public class MemberLectureListItemResponse {
                         memberLecture.getCustomTitle(),
                         memberLecture.getLecture().getDuration(),
                         memberLecture.getEnrolledAt(),
-                        ThumbnailUtil.encodeThumbnailSafe(memberLecture.getLecture().getThumbnail())
+                        ThumbnailUtil.encodeBase64ThumbnailSafe(memberLecture.getLecture().getThumbnail())
                 ))
                 .toList();
     }

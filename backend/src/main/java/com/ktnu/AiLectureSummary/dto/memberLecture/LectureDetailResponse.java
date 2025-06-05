@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Base64;
 
 @Getter
 @AllArgsConstructor
@@ -34,7 +33,7 @@ public class LectureDetailResponse {
                 .originalText(lecture.getOriginalText())
                 .memo(memberLecture.getMemo())
                 .enrolledAt(memberLecture.getEnrolledAt())
-                .thumbnailBase64(ThumbnailUtil.encodeThumbnailSafe(memberLecture.getLecture().getThumbnail()))
+                .thumbnailBase64(ThumbnailUtil.encodeBase64ThumbnailSafe(memberLecture.getLecture().getThumbnail()))
                 .build();
     }
 
