@@ -20,14 +20,17 @@ export async function 로그인(page: Page) {
 
 
 export async function 회원가입(page: Page) {
+  const timestamp = Date.now();
+  const uniqueEmail = `test${timestamp}@example.com`;
+
   // '회원가입' 버튼 클릭
   await page.getByRole('button', { name: '회원가입' }).click();
 
   // 입력 필드에 값 입력
   await page.locator('#name').fill('테스터');
-  await page.locator('#email').fill('wnsgh@wnsgh.com');
-  await page.locator('#password').fill('wnsghwnsgh');
-  await page.locator('#confirm-password').fill('wnsghwnsgh');
+  await page.locator('#email').fill(uniqueEmail);
+  await page.locator('#password').fill('password123');
+  await page.locator('#confirm-password').fill('password123');
 
   // '회원가입' 제출 버튼 클릭 (main 내에서)
   await page.locator('main').getByRole('button', { name: '회원가입' }).click();
