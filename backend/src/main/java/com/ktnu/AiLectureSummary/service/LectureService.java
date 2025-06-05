@@ -9,6 +9,7 @@ import com.ktnu.AiLectureSummary.exception.FileProcessingException;
 import com.ktnu.AiLectureSummary.exception.InvalidVideoFileException;
 import com.ktnu.AiLectureSummary.repository.LectureRepository;
 import com.ktnu.AiLectureSummary.util.MultipartFileResource;
+import com.ktnu.AiLectureSummary.util.ThumbnailUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -34,17 +35,17 @@ public class LectureService {
     private final FastApiProperties fastApiProperties;
 
     /**
-     * 업로드된 비디오 파일을 해싱하여 중복 여부를 검사하고, (업로드된 적이 있는 "영상"에 대해서만 중복여부 판단 가능)
+     * 업로드된 음성 또는 비디오 파일을 해싱하여 중복 여부를 검사하고, (업로드된 적이 있는 "영상 또는 음성파일"에 대해서만 중복여부 판단 가능)
      * FastAPI 서버에 전송하여 요약 정보를 받은 후, 이를 DB에 저장한다.
      *
      * @param file 사용자가 업로드한 비디오 파일
      * @return lecture 객체
      */
     public Lecture processLecture(MultipartFile file) {
-        validateVideoFile(file);
+        validateMediaFile(file);
 
         // VideoHasing & DB에 중복되는 영상이 존재하는지 확인
-        String videoHash = VideoHashing(file);
+        String videoHash = generateMediaHash(file);
         Optional<Lecture> optionalLecture = lectureRepository.findByHash(videoHash);
 
         // 이미 존재하는 경우 바로 바로 반환
@@ -56,8 +57,8 @@ public class LectureService {
         LectureSummaryResponse registerRequest = requestLectureSummaryFromFile(file);
 
         // 썸네일 이미지는 DB에 저장되며, 프론트 전달 시 Base64로 인코딩되어 전송됨
-        // 썸네일 Base64 디코딩
-        byte[] thumbnailBytes = Base64.getDecoder().decode(registerRequest.getThumbnail());
+        // 썸네일 Base64 디코딩 // 음성 파일의 경우 썸네일 없음
+        byte[] thumbnailBytes = ThumbnailUtil.decodeBase64ThumbnailSafe(registerRequest.getThumbnail());
 
         // DB에 강의 내용 저장
         return lectureRepository.save(Lecture.fromUploadedVideo(registerRequest, videoHash,thumbnailBytes));
@@ -132,7 +133,7 @@ public class LectureService {
      * @return Base64로 인코딩된 해시 문자열
      * @throws RuntimeException 파일 읽기 실패 또는 해시 처리 실패 시
      */
-    private String VideoHashing(MultipartFile file) {
+    private String generateMediaHash(MultipartFile file) {
         // 비디오 해싱
         try (InputStream inputStream = file.getInputStream()) {
             // SHA-256 해시 알고리즘 계산기 객체 생성
@@ -162,20 +163,17 @@ public class LectureService {
      *
      * @param file
      */
-    private void validateVideoFile(MultipartFile file) {
+    private void validateMediaFile(MultipartFile file) {
         // 파일 확장자는 사용자가 쉽게 변경할 수 있으므로 신뢰할 수 없음
         // MIME 타입(Content-Type)을 기반으로 파일 형식을 검증함
         if (file == null || file.isEmpty()) {
             throw new InvalidVideoFileException("파일이 비어 있습니다.");
         }
         String contentType = file.getContentType();
-        if (contentType == null || !contentType.startsWith("video/")) {
-            throw new InvalidVideoFileException("지원하지 않는 파일 형식입니다. 비디오 파일만 업로드 가능합니다.");
+        if (contentType == null || !(contentType.startsWith("video/")|| contentType.startsWith("audio/"))) {
+            throw new InvalidVideoFileException("지원하지 않는 파일 형식입니다. 비디오 또는 오디오 파일만 업로드 가능합니다.");
         }
     }
-
-
-// 비디오 삭제?
-
+    // 비디오 삭제?
 
 }
