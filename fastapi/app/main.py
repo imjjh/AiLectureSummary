@@ -75,15 +75,15 @@ def clean_caption_text(text):
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
-def compress_image_to_target_size(image_bytes, target_kb=200):
+def compress_image_to_webp(image_bytes, target_kb=300, quality=80):
     image = Image.open(io.BytesIO(image_bytes))
-    quality_min, quality_max = 25, 95
+    quality_min, quality_max = 50, 100
     result_bytes = None
 
     while quality_min <= quality_max:
         mid_quality = (quality_min + quality_max) // 2
         buffer = io.BytesIO()
-        image.save(buffer, format="JPEG", quality=mid_quality, optimize=True)
+        image.save(buffer, format="WEBP", quality=mid_quality, method=6)
         size_kb = buffer.tell() / 1024
 
         if size_kb <= target_kb:
@@ -94,7 +94,7 @@ def compress_image_to_target_size(image_bytes, target_kb=200):
 
     if result_bytes is None:
         buffer = io.BytesIO()
-        image.save(buffer, format="JPEG", quality=25, optimize=True)
+        image.save(buffer, format="WEBP", quality=quality, method=6)
         result_bytes = buffer.getvalue()
     return result_bytes
 
@@ -104,7 +104,7 @@ def extract_youtube_info_and_caption(youtube_url: str):
             'outtmpl': os.path.join(tmpdir, '%(id)s.%(ext)s'),
             'writesubtitles': True,
             'writeautomaticsub': True,
-            'subtitleslangs': ['ko'],  # 한국어만 우선 지정
+            'subtitleslangs': ['ko'],
             'skip_download': False,
             'quiet': True,
             'no_warnings': True,
@@ -279,7 +279,6 @@ async def process_video(
     # 파일 업로드인 경우 (mp4, mov, mp3)
     if file:
         try:
-            # mp4, mov, mp3 허용
             if not file.filename.lower().endswith(('.mp4', '.mov', '.mp3')):
                 raise HTTPException(400, "지원하지 않는 파일 형식입니다.")
 
@@ -291,7 +290,7 @@ async def process_video(
                 temp_video_path = temp_file.name
 
             thumbnail_base64 = None
-            # mp4, mov만 썸네일 생성
+            # mp4, mov만 썸네일 생성 (webp로 변경)
             if file.filename.lower().endswith(('.mp4', '.mov')):
                 try:
                     ffmpeg_cmd = [
@@ -301,7 +300,7 @@ async def process_video(
                         "-an",
                         "-vf", "thumbnail,scale=640:360:force_original_aspect_ratio=decrease",
                         "-f", "image2pipe",
-                        "-vcodec", "mjpeg",
+                        "-vcodec", "webp",
                         "-"
                     ]
                     thumb_proc = subprocess.run(
@@ -311,7 +310,7 @@ async def process_video(
                     )
                     image_data = thumb_proc.stdout
                     if image_data:
-                        compressed_image_data = compress_image_to_target_size(image_data, target_kb=200)
+                        compressed_image_data = compress_image_to_webp(image_data, target_kb=300, quality=80)
                         thumbnail_base64 = base64.b64encode(compressed_image_data).decode('utf-8')
                     else:
                         logger.warning("썸네일 이미지 데이터가 비어있음")
