@@ -110,7 +110,7 @@ export default function VideoUploader() {
           }
         }
 
-        xhr.open('POST', `${API_BASE_URL}/api/lecture/upload`)
+        xhr.open('POST', `${API_BASE_URL}/api/lectures/mediaFile`)
         xhr.withCredentials = true
         xhr.send(formData)
       })

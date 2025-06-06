@@ -18,6 +18,7 @@ public class MemberLectureListItemResponse {
     private String customTitle;
     private Long duration;
     private LocalDateTime enrolledAt;
+    private String youtubeUrl;
     private String thumbnailBase64;
 
     public static List<MemberLectureListItemResponse> fromList(List<MemberLecture> memberLectures) {
@@ -28,6 +29,7 @@ public class MemberLectureListItemResponse {
                         memberLecture.getCustomTitle(),
                         memberLecture.getLecture().getDuration(),
                         memberLecture.getEnrolledAt(),
+                        memberLecture.getLecture().getYoutubeUrl(),
                         ThumbnailUtil.encodeBase64ThumbnailSafe(memberLecture.getLecture().getThumbnail())
                 ))
                 .toList();

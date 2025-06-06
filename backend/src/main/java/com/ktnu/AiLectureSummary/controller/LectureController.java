@@ -18,13 +18,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/lecture")
+@RequestMapping("/api/lectures")
 public class LectureController {
 
     private final LectureUploadService lectureUploadService;
 
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/mediaFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "업로드 영상 요약 생성", description = "업로드 된 영상을 Ai를 사용해 요약합니다.")
     public ResponseEntity<ApiResponse<LectureUploadResponse>> uploadLecture(
             @AuthenticationPrincipal CustomUserDetails user,
@@ -34,7 +34,7 @@ public class LectureController {
         return ResponseEntity.ok(ApiResponse.success("요약 생성 성공", data));
     }
 
-    @PostMapping("/youtubeSummary")
+    @PostMapping("/youtube")
     @Operation(summary = "유트브 영상 요약 생성", description = "유트브 영상을 자막기반으로 Ai를 사용해 요약합니다.")
     public ResponseEntity<ApiResponse<LectureUploadResponse>> uploadYoutubeLecture(
             @AuthenticationPrincipal CustomUserDetails user,
