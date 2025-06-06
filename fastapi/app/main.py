@@ -75,9 +75,9 @@ def clean_caption_text(text):
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
-def compress_image_to_webp(image_bytes, target_kb=300, quality=80):
+def compress_image_to_webp(image_bytes, target_kb=350, quality=90):
     image = Image.open(io.BytesIO(image_bytes))
-    quality_min, quality_max = 50, 100
+    quality_min, quality_max = 85, 95
     result_bytes = None
 
     while quality_min <= quality_max:
@@ -298,7 +298,7 @@ async def process_video(
                         "-ss", "00:00:01",
                         "-vframes", "1",
                         "-an",
-                        "-vf", "thumbnail,scale=640:360:force_original_aspect_ratio=decrease",
+                        "-vf", "thumbnail,scale=1920:1080:force_original_aspect_ratio=decrease",
                         "-f", "image2pipe",
                         "-vcodec", "webp",
                         "-"
@@ -310,7 +310,7 @@ async def process_video(
                     )
                     image_data = thumb_proc.stdout
                     if image_data:
-                        compressed_image_data = compress_image_to_webp(image_data, target_kb=300, quality=80)
+                        compressed_image_data = compress_image_to_webp(image_data, target_kb=300, quality=90)
                         thumbnail_base64 = base64.b64encode(compressed_image_data).decode('utf-8')
                     else:
                         logger.warning("썸네일 이미지 데이터가 비어있음")
