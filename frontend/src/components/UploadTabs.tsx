@@ -48,13 +48,13 @@ export default function UploadTabs() {
 
       setProgress(100);
       const lectureId = data.data.id;
-      localStorage.setItem(`lecture-type-${lectureId}`, "youtube");
       router.push(`/summary/${lectureId}`);
     } catch (error: any) {
       toast({
         title: "요약 실패",
         description: error.message || "유튜브 요약 중 오류가 발생했습니다.",
         variant: "destructive",
+        duration: 1000,
       });
     } finally {
       setUploading(false);
@@ -105,7 +105,6 @@ export default function UploadTabs() {
       });
 
       const lectureId = response.data.id;
-      localStorage.setItem(`lecture-type-${lectureId}`, "audio");
       router.push(`/summary/${lectureId}`);
     }
     catch (error: any) {
@@ -113,6 +112,7 @@ export default function UploadTabs() {
         title: "업로드 실패",
         description: error.message || "오디오 파일 업로드 중 오류가 발생했습니다.",
         variant: "destructive",
+        duration: 1000,
       });
       console.error("Upload Error:", error);
     } finally {

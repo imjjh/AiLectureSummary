@@ -22,13 +22,14 @@ import {
 
 axios.defaults.withCredentials = true;
 
-type Lecture = {
+interface Lecture {
   lectureId: number;
   customTitle: string;
   title: string,
   duration: number;
   thumbnailUrl?: string;
-  enrolledAt?: string,
+  enrolledAt?: string;
+  url?: string;
 };
 
 type User = {

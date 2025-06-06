@@ -11,6 +11,7 @@ interface Lecture {
     duration: number;
     thumbnailBase64?: string;
     enrolledAt: string;
+    url?: string;
 }
 
 interface LectureCardProps {
@@ -37,17 +38,14 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
 
     const getThumbnailSrc = (): string => {
         if (lecture.thumbnailBase64) {
-            return `data:image/png;base64,${lecture.thumbnailBase64}`;
+        return `data:image/png;base64,${lecture.thumbnailBase64}`;
         }
 
-        // CSR 환경에서만 localStorage 접근
-        if (typeof window !== "undefined") {
-            const type = localStorage.getItem(`lecture-type-${lecture.lectureId}`);
-            if (type === "youtube") return "/images/youtube.jpg";
-            if (type === "audio") return "/images/audio.avif";
+        if (!lecture.thumbnailBase64 && lecture.url) {
+        return "/images/youtube.jpg";
         }
 
-        return "/images/1.png"; // 기본 fallback
+        return "/images/audio.avif";
     };
 
     const thumbnailSrc = getThumbnailSrc();

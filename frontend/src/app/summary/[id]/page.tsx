@@ -21,7 +21,8 @@ interface SummaryData {
   aiSummary?: string
   originalText?: string
   memo?: string
-  enrolledAt?: string
+  enrolledAt?: string,
+  url: string
 }
 
 export default function Page() {
@@ -87,18 +88,14 @@ export default function Page() {
   }, [summaryData?.customTitle])
 
   const getThumbnailSrc = (): string => {
-  if (summaryData?.thumbnailBase64) {
-    return `data:image/png;base64,${summaryData.thumbnailBase64}`;
-  }
-
-  if (typeof window !== "undefined") {
-    const type = localStorage.getItem(`lecture-type-${id}`);
-    if (type === "youtube") return "/images/youtube.jpg";
-    if (type === "audio") return "/images/audio.avif";
-  }
-
-  return "/images/1.png";
-};
+    if (summaryData?.thumbnailBase64) {
+      return `data:image/png;base64,${summaryData.thumbnailBase64}`;
+    }
+    if (!summaryData?.thumbnailBase64 && summaryData?.url) {
+      return "/images/youtube.jpg";
+    }
+    return "/images/audio.avif";
+  };
 
   useEffect(() => {
     setImgSrc(getThumbnailSrc());

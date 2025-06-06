@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image";
 import { X } from "lucide-react"
@@ -10,7 +9,8 @@ interface Lecture {
   customTitle: string
   duration: number;
   thumbnailBase64?: string;
-  enrolledAt?: string
+  enrolledAt?: string,
+  url: string,
 }
 
 interface LectureListProps {
@@ -34,30 +34,19 @@ const formatDuration = (duration: number): string => {
 }
 
 export default function LectureList({ lectures, onDelete }: LectureListProps) {
-  const [thumbnailMap, setThumbnailMap] = useState<Record<number, string>>({})
-
-  useEffect(() => {
-    const map: Record<number, string> = {}
-    lectures.forEach((lecture) => {
-      if (lecture.thumbnailBase64) {
-        map[lecture.lectureId] = `data:image/png;base64,${lecture.thumbnailBase64}`
-      } else {
-        const type = localStorage.getItem(`lecture-type-${lecture.lectureId}`)
-        if (type === "youtube") {
-          map[lecture.lectureId] = "/images/youtube.jpg"
-        } else if (type === "audio") {
-          map[lecture.lectureId] = "/images/audio.avif"
-        } else {
-          map[lecture.lectureId] = "/images/1.png"
-        }
-      }
-    })
-    setThumbnailMap(map)
-  }, [lectures])
+  const getThumbnailSrc = (lecture: Lecture): string => {
+    if (lecture.thumbnailBase64) {
+      return `data:image/png;base64,${lecture.thumbnailBase64}`
+    }
+    if (!lecture.thumbnailBase64 && lecture.url) {
+      return "/images/youtube.jpg"
+    }
+    return "/images/audio.avif"
+  }
   return (
     <div className="space-y-2">
       {lectures.map((lecture) => {
-        const thumbnailSrc = thumbnailMap[lecture.lectureId] || "/images/1.png"
+        const thumbnailSrc = getThumbnailSrc(lecture)
 
         return (
           <div
