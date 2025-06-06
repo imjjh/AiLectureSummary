@@ -13,10 +13,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class LectureUploadResponse {
     private long id;
-    private String title;
-    private String originalText;
-    private String aiSummary;
-    private long duration;
+//    private String title;
+//    private String originalText;
+//    private String aiSummary;
+//    private long duration;
 
 
 
@@ -24,10 +24,10 @@ public class LectureUploadResponse {
 
     return    LectureUploadResponse.builder()
                 .id(lecture.getId())
-                .title(lecture.getTitleByAi())
-                .originalText(lecture.getOriginalText())
-                .aiSummary(lecture.getAiSummary())
-                .duration(lecture.getDuration())
+//                .title(lecture.getTitleByAi())
+//                .originalText(lecture.getOriginalText())
+//                .aiSummary(lecture.getAiSummary())
+//                .duration(lecture.getDuration())
                 .build();
         }
 }

@@ -44,9 +44,9 @@ public class LectureService {
     public Lecture processLecture(MultipartFile file) {
         validateMediaFile(file);
 
-        // VideoHasing & DB에 중복되는 영상이 존재하는지 확인
-        String videoHash = generateMediaHash(file);
-        Optional<Lecture> optionalLecture = lectureRepository.findByHash(videoHash);
+        // MediaHasing & DB에 중복되는 영상이 존재하는지 확인
+        String mediaHash = generateMediaHash(file);
+        Optional<Lecture> optionalLecture = lectureRepository.findByHash(mediaHash);
 
         // 이미 존재하는 경우 바로 바로 반환
         if (optionalLecture.isPresent()) {
@@ -61,7 +61,7 @@ public class LectureService {
         byte[] thumbnailBytes = ThumbnailUtil.decodeBase64ThumbnailSafe(registerRequest.getThumbnail());
 
         // DB에 강의 내용 저장
-        return lectureRepository.save(Lecture.fromUploadedVideo(registerRequest, videoHash,thumbnailBytes));
+        return lectureRepository.save(Lecture.fromUploadedVideo(registerRequest, mediaHash,thumbnailBytes));
 
     }
 
@@ -127,9 +127,9 @@ public class LectureService {
     }
 
     /**
-     * 비디오 파일을 SHA-256 해시 알고리즘으로 해싱하여 고유 문자열을 생성한다.
+     * 미디어 파일(비디오/오디오)을 SHA-256 해시 알고리즘으로 해싱하여 고유 문자열을 생성한다.
      *
-     * @param file 해싱할 비디오 파일
+     * @param file 해싱할 미디어 파일
      * @return Base64로 인코딩된 해시 문자열
      * @throws RuntimeException 파일 읽기 실패 또는 해시 처리 실패 시
      */
@@ -154,7 +154,7 @@ public class LectureService {
             // 이진 데이터-> 문자열 형태의 해시값으로 리턴
             return Base64.getEncoder().encodeToString(hashBytes);
         } catch (IOException | NoSuchAlgorithmException e) {
-            throw new RuntimeException("비디오 해싱 실패", e);
+            throw new RuntimeException("미디어 해싱 실패", e);
         }
     }
 
@@ -174,6 +174,4 @@ public class LectureService {
             throw new InvalidVideoFileException("지원하지 않는 파일 형식입니다. 비디오 또는 오디오 파일만 업로드 가능합니다.");
         }
     }
-    // 비디오 삭제?
-
 }

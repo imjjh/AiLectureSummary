@@ -37,7 +37,7 @@ public class SecurityConfig {
                                 "/api/password/verify","/api/password/reset", // 비밀번호 재설정 관련
                                 "/health", "/swagger-ui/**","/v3/api-docs/**", // swagger & health check
                                 "/swagger-ui.html").permitAll() // 로그인, 회원가입, 스웨거, 헬스체크, 비밀번호 변경 등 인증없이 접근 허용
-//                        .requestMatchers(HttpMethod.GET, "/api/Lecture/**").permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/api/lectures/**").permitAll()
                         .anyRequest().authenticated() // 그 외 요청은 인증 필요
                 )
                 .exceptionHandling(ex -> ex

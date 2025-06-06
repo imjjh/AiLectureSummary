@@ -21,6 +21,7 @@ public class LectureDetailResponse {
     private long duration;
     private LocalDateTime enrolledAt;
     private String thumbnailBase64;
+    private String youtubeUrl;
 
     public static LectureDetailResponse from(MemberLecture memberLecture) {
         Lecture lecture = memberLecture.getLecture();
@@ -33,6 +34,7 @@ public class LectureDetailResponse {
                 .originalText(lecture.getOriginalText())
                 .memo(memberLecture.getMemo())
                 .enrolledAt(memberLecture.getEnrolledAt())
+                .youtubeUrl(lecture.getYoutubeUrl())
                 .thumbnailBase64(ThumbnailUtil.encodeBase64ThumbnailSafe(memberLecture.getLecture().getThumbnail()))
                 .build();
     }
