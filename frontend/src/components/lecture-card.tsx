@@ -8,7 +8,7 @@ import Link from "next/link";
 interface Lecture {
     lectureId: number;
     customTitle: string;
-    duration: string;
+    duration: number;
     thumbnailBase64?: string;
     enrolledAt: string;
 }
@@ -18,12 +18,11 @@ interface LectureCardProps {
     onDelete?: (id: number) => void;
 }
 
+
 export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
-    const formatDuration = (duration: string): string => {
-        const seconds = parseInt(duration, 10);
-        if (isNaN(seconds)) return duration;
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
+    const formatDuration = (duration: number): string => {
+        const mins = Math.floor(duration / 60);
+        const secs = duration % 60;
         return `${mins}:${secs.toString().padStart(2, "0")}`;
     };
 
@@ -36,9 +35,23 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
         });
     };
 
-    const thumbnailSrc = lecture.thumbnailBase64
-        ? `data:image/png;base64,${lecture.thumbnailBase64}`
-        : "/images/1.png";
+    const getThumbnailSrc = (): string => {
+        if (lecture.thumbnailBase64) {
+            return `data:image/png;base64,${lecture.thumbnailBase64}`;
+        }
+
+        // CSR 환경에서만 localStorage 접근
+        if (typeof window !== "undefined") {
+            const type = localStorage.getItem(`lecture-type-${lecture.lectureId}`);
+            if (type === "youtube") return "/images/2.png";
+            if (type === "audio") return "/images/3.png";
+        }
+
+        return "/images/1.png"; // 기본 fallback
+    };
+
+    const thumbnailSrc = getThumbnailSrc();
+
 
     return (
         <Link href={`/summary/${lecture.lectureId}`}>
