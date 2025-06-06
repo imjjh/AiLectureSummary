@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 토큰에서 사용자 ID 추출
                 Long userId = jwtProvider.getUserIdFromAccessToken(token);
 
-                // 해당 ID로 사용자 정보 조회
+                // 해당 ID로 사용자 정보 조회 // 탈퇴 여부 검사 포함
                 CustomUserDetails userDetails = (CustomUserDetails) userDetailsService.loadUserById(userId);
 
                 // 사용자 정보가 없는 경우 인증 실패 처리

@@ -4,10 +4,7 @@ import com.ktnu.AiLectureSummary.config.JwtProperties;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.domain.Role;
 import com.ktnu.AiLectureSummary.dto.member.*;
-import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
-import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
-import com.ktnu.AiLectureSummary.exception.InvalidTokenException;
-import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
+import com.ktnu.AiLectureSummary.exception.*;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
 import com.ktnu.AiLectureSummary.util.CookieUtil;
@@ -48,7 +45,7 @@ public class MemberAuthService {
 
         // 중복된 이메일 체크
         if (memberRepository.existsByEmail(email)) {
-            throw new DuplicateLoginIdException("이미 사용 중인 이메일입니다");
+            throw new DuplicateLoginIdException("이미 사용 중인 이메일입니다.");
         }
 
         // 멤버 생성
@@ -79,6 +76,12 @@ public class MemberAuthService {
 
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("이메일이 존재하지 않습니다."));
+
+        // 탈퇴한 회원 차단
+        if (!member.isActive()){
+            throw new AccountInactiveException("탈퇴한 회원입니다.");
+        }
+
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
         }

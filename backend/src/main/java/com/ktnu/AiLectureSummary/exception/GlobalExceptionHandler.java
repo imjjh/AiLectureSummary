@@ -165,4 +165,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of("VALIDATION_ERROR", errorMessage, HttpStatus.BAD_REQUEST.value(), request.getRequestURI()));
     }
+
+
+    /**
+     * 탈퇴한 계정으로 로그인 시도할 때 발생하는 예외 처리 핸들러
+     *
+     * @param e 탈퇴 계정 접근 시 발생한 예외 객체
+     * @param request request 요청 객체 (요청 URI 포함)
+     * @return 401 Unauthorized 응답과 상세 에러 메시지
+     */
+    @ExceptionHandler(AccountInactiveException.class)
+    public ResponseEntity<ErrorResponse> handleAccountInactiveException(AccountInactiveException e, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.of("ACCOUNT_INACTIVE", e.getMessage(), HttpStatus.UNAUTHORIZED.value(), request.getRequestURI()));
+    }
 }
