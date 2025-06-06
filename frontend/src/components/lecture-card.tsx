@@ -43,8 +43,8 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
         // CSR 환경에서만 localStorage 접근
         if (typeof window !== "undefined") {
             const type = localStorage.getItem(`lecture-type-${lecture.lectureId}`);
-            if (type === "youtube") return "/images/2.png";
-            if (type === "audio") return "/images/3.png";
+            if (type === "youtube") return "/images/youtube.jpg";
+            if (type === "audio") return "/images/audio.avif";
         }
 
         return "/images/1.png"; // 기본 fallback

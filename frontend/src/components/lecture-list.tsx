@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image";
 import { X } from "lucide-react"
@@ -34,22 +34,30 @@ const formatDuration = (duration: number): string => {
 }
 
 export default function LectureList({ lectures, onDelete }: LectureListProps) {
-    const getThumbnailSrc = (lecture: Lecture): string => {
-        if (lecture.thumbnailBase64) {
-            return `data:image/png;base64,${lecture.thumbnailBase64}`
-        }
+  const [thumbnailMap, setThumbnailMap] = useState<Record<number, string>>({})
 
-        if (typeof window !== "undefined") {
-            const type = localStorage.getItem(`lecture-type-${lecture.lectureId}`)
-            if (type === "youtube") return "/images/2.png"
-            if (type === "audio") return "/images/1.png"
+  useEffect(() => {
+    const map: Record<number, string> = {}
+    lectures.forEach((lecture) => {
+      if (lecture.thumbnailBase64) {
+        map[lecture.lectureId] = `data:image/png;base64,${lecture.thumbnailBase64}`
+      } else {
+        const type = localStorage.getItem(`lecture-type-${lecture.lectureId}`)
+        if (type === "youtube") {
+          map[lecture.lectureId] = "/images/youtube.jpg"
+        } else if (type === "audio") {
+          map[lecture.lectureId] = "/images/audio.avif"
+        } else {
+          map[lecture.lectureId] = "/images/1.png"
         }
-        return "/images/1.png"
-        }
+      }
+    })
+    setThumbnailMap(map)
+  }, [lectures])
   return (
     <div className="space-y-2">
       {lectures.map((lecture) => {
-        const thumbnailSrc = getThumbnailSrc(lecture)
+        const thumbnailSrc = thumbnailMap[lecture.lectureId] || "/images/1.png"
 
         return (
           <div

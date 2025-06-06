@@ -74,7 +74,9 @@ export default function AccountEditPage() {
         })
       }
 
-      alert("계정 정보가 수정되었습니다.")
+      toast({
+        description: "계정 정보가 수정되었습니다.",
+      })
       router.push("/dashboard")
     } catch (err: any) {
       setError(err.message || "계정 수정 중 오류가 발생했습니다.")

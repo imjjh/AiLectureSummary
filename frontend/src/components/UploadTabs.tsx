@@ -27,6 +27,9 @@ export default function UploadTabs() {
     e.preventDefault();
     if (!youtubeUrl.trim()) return;
 
+    setUploading(true);
+    setProgress(0);
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/lecture/youtubeSummary`, {
         method: "POST",
@@ -43,6 +46,7 @@ export default function UploadTabs() {
         throw new Error(data.message || "요약 실패");
       }
 
+      setProgress(100);
       const lectureId = data.data.id;
       localStorage.setItem(`lecture-type-${lectureId}`, "youtube");
       router.push(`/summary/${lectureId}`);
@@ -52,6 +56,9 @@ export default function UploadTabs() {
         description: error.message || "유튜브 요약 중 오류가 발생했습니다.",
         variant: "destructive",
       });
+    } finally {
+      setUploading(false);
+      setProgress(0);
     }
   };
 

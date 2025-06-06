@@ -86,13 +86,23 @@ export default function Page() {
     }
   }, [summaryData?.customTitle])
 
+  const getThumbnailSrc = (): string => {
+  if (summaryData?.thumbnailBase64) {
+    return `data:image/png;base64,${summaryData.thumbnailBase64}`;
+  }
+
+  if (typeof window !== "undefined") {
+    const type = localStorage.getItem(`lecture-type-${id}`);
+    if (type === "youtube") return "/images/youtube.jpg";
+    if (type === "audio") return "/images/audio.avif";
+  }
+
+  return "/images/1.png";
+};
+
   useEffect(() => {
-    if (summaryData?.thumbnailBase64) {
-      setImgSrc(`data:image/png;base64,${summaryData.thumbnailBase64}`)
-    } else {
-      setImgSrc("/images/1.png")
-    }
-  }, [summaryData?.thumbnailBase64])
+    setImgSrc(getThumbnailSrc());
+}, [summaryData?.thumbnailBase64]);
 
 
   // 메모 저장 함수

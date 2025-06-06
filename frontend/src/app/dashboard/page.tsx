@@ -28,7 +28,7 @@ type Lecture = {
   title: string,
   duration: number;
   thumbnailUrl?: string;
-  enrolloedAt?: string,
+  enrolledAt?: string,
 };
 
 type User = {
@@ -36,20 +36,20 @@ type User = {
   username: string;
 };
 
-const formatDuration = (duration: number): string => {
-  const mins = Math.floor(duration / 60);
-  const secs = duration % 60;
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-};
+// const formatDuration = (duration: number): string => {
+//   const mins = Math.floor(duration / 60);
+//   const secs = duration % 60;
+//   return `${mins}:${secs.toString().padStart(2, "0")}`;
+// };
 
-const formatDate = (isoString: string): string => {
-  const date = new Date(isoString)
-  return date.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
-}
+// const formatDate = (isoString: string): string => {
+//   const date = new Date(isoString)
+//   return date.toLocaleDateString("ko-KR", {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//   })
+// }
 
 export default function DashboardPage() {
   // 로그인한 사용자 정보를 저장하는 상태
@@ -124,13 +124,14 @@ export default function DashboardPage() {
       toast({
         title: "삭제 완료✔️",
         description: `"${lecture.customTitle}" 강의가 삭제되었습니다.`,
-        duration: 1500,
+        duration: 1000,
       });
     } catch (err) {
       toast({
         title: "삭제 실패✖️",
         description: "강의 삭제 중 오류가 발생했습니다.",
         variant: "destructive",
+        duration: 1000,
       });
       console.error(err);
     } finally {
