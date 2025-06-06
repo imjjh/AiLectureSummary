@@ -5,7 +5,7 @@ import com.ktnu.AiLectureSummary.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.LectureUploadResponse;
 import com.ktnu.AiLectureSummary.dto.lecture.YoutubeLectureRequest;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
-import com.ktnu.AiLectureSummary.service.LectureUploadService;
+import com.ktnu.AiLectureSummary.application.LectureUploadApplicationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/lectures")
 public class LectureController {
 
-    private final LectureUploadService lectureUploadService;
+    private final LectureUploadApplicationService lectureUploadApplicationService;
 
 
     @PostMapping(value = "/mediaFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -30,7 +30,7 @@ public class LectureController {
             @AuthenticationPrincipal CustomUserDetails user,
             @Parameter(description = "요약할 영상 파일", required = true)
             @RequestPart("file") MultipartFile file) {
-        LectureUploadResponse data = lectureUploadService.uploadLecture(user, file);
+        LectureUploadResponse data = lectureUploadApplicationService.uploadLecture(user, file);
         return ResponseEntity.ok(ApiResponse.success("요약 생성 성공", data));
     }
 
@@ -41,7 +41,7 @@ public class LectureController {
             @Parameter(description = "요약할 영상 youtubeUrl", required = true)
             @Valid @RequestBody YoutubeLectureRequest request) {
         String url = request.getUrl();
-        LectureUploadResponse data = lectureUploadService.uploadYoutubeLecture(user, url);
+        LectureUploadResponse data = lectureUploadApplicationService.uploadYoutubeLecture(user, url);
         return ResponseEntity.ok(ApiResponse.success("요약 생성 성공", data));
     }
 }
