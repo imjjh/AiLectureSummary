@@ -1,8 +1,11 @@
-package com.ktnu.AiLectureSummary.service;
+package com.ktnu.AiLectureSummary.application;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureUploadResponse;
+import com.ktnu.AiLectureSummary.dto.lecture.response.LectureUploadResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
+import com.ktnu.AiLectureSummary.service.LectureService;
+import com.ktnu.AiLectureSummary.service.MemberLectureService;
+import com.ktnu.AiLectureSummary.service.YoutubeLectureService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class LectureUploadService {
+public class LectureUploadApplicationService {
     private final LectureService lectureService;
     private final MemberLectureService memberLectureService;
     private final YoutubeLectureService youtubeLectureService;
@@ -44,7 +47,7 @@ public class LectureUploadService {
         memberLectureService.save(user.getId(), lecture);
 
         // 3. 응답 반환
-        return LectureUploadResponse.from(lecture);
+        return new LectureUploadResponse(lecture.getId());
     }
 
     /**
@@ -64,6 +67,6 @@ public class LectureUploadService {
         memberLectureService.save(user.getId(), lecture);
 
         // 3. 응답 반환
-        return LectureUploadResponse.from(lecture);
+        return new LectureUploadResponse(lecture.getId());
     }
 }

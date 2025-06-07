@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.dto.memberLecture;
+package com.ktnu.AiLectureSummary.dto.memberLecture.response;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.domain.MemberLecture;

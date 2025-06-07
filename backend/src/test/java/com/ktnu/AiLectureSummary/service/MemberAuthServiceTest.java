@@ -2,9 +2,9 @@ package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.config.JwtProperties;
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
-import com.ktnu.AiLectureSummary.dto.member.MemberLoginResponse;
-import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberLoginRequest;
+import com.ktnu.AiLectureSummary.dto.member.response.MemberLoginResponse;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberRegisterRequest;
 import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
 import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;

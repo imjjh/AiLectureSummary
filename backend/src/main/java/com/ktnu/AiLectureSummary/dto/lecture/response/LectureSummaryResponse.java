@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.dto.lecture;
+package com.ktnu.AiLectureSummary.dto.lecture.response;
 // FastAPI -> Spring
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

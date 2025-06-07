@@ -1,10 +1,10 @@
 package com.ktnu.AiLectureSummary.controller;
 
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.memberLecture.CustomTitleRequest;
-import com.ktnu.AiLectureSummary.dto.memberLecture.LectureDetailResponse;
-import com.ktnu.AiLectureSummary.dto.memberLecture.MemoRequest;
-import com.ktnu.AiLectureSummary.dto.memberLecture.MemberLectureListResponse;
+import com.ktnu.AiLectureSummary.dto.memberLecture.request.CustomTitleRequest;
+import com.ktnu.AiLectureSummary.dto.memberLecture.response.LectureDetailResponse;
+import com.ktnu.AiLectureSummary.dto.memberLecture.request.MemoRequest;
+import com.ktnu.AiLectureSummary.dto.memberLecture.response.MemberLectureListResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberLectureService;
 import io.swagger.v3.oas.annotations.Operation;

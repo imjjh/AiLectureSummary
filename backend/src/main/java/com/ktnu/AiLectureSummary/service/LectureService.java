@@ -3,7 +3,7 @@ package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.config.FastApiProperties;
 import com.ktnu.AiLectureSummary.domain.Lecture;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureSummaryResponse;
+import com.ktnu.AiLectureSummary.dto.lecture.response.LectureSummaryResponse;
 import com.ktnu.AiLectureSummary.exception.ExternalApiException;
 import com.ktnu.AiLectureSummary.exception.FileProcessingException;
 import com.ktnu.AiLectureSummary.exception.InvalidVideoFileException;

@@ -2,9 +2,9 @@ package com.ktnu.AiLectureSummary.controller;
 
 import com.ktnu.AiLectureSummary.config.CookieProperties;
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.member.MemberLoginRequest;
-import com.ktnu.AiLectureSummary.dto.member.MemberLoginResponse;
-import com.ktnu.AiLectureSummary.dto.member.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberLoginRequest;
+import com.ktnu.AiLectureSummary.dto.member.response.MemberLoginResponse;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberRegisterRequest;
 import com.ktnu.AiLectureSummary.service.MemberAuthService;
 import com.ktnu.AiLectureSummary.util.CookieResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +36,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "로그인", description = "사용자 정보를 입력 받아 로그인 시도 성공시 jwt(httponly) 반환")
+    @Operation(summary = "로그인", description = "사용자 정보를 입력 받아 로그인 시도 성공시 jwt(accessToken, refreshToken) 반환")
     public ResponseEntity<ApiResponse<MemberLoginResponse>> login(@Valid @RequestBody MemberLoginRequest request, HttpServletResponse response) { // HttpServletResponse response는 응답 헤더, 쿠키를 직접 조작할수 있게 하기 위해 사용됨
         // 로그인 처리 시도 (memberAuthService에서 인증 처리 + JWT 발급)
         MemberLoginResponse result = memberAuthService.login(request);

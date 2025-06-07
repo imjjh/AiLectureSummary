@@ -1,8 +1,8 @@
 package com.ktnu.AiLectureSummary.controller;
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.member.MemberPasswordResetTokenResponse;
-import com.ktnu.AiLectureSummary.dto.member.MemberResetPasswordRequest;
-import com.ktnu.AiLectureSummary.dto.member.MemberVerifyRequest;
+import com.ktnu.AiLectureSummary.dto.member.response.MemberPasswordResetTokenResponse;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberResetPasswordRequest;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberVerifyRequest;
 import com.ktnu.AiLectureSummary.service.PasswordResetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

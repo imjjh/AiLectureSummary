@@ -1,8 +1,8 @@
 package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.member.MemberEditRequest;
-import com.ktnu.AiLectureSummary.dto.member.MemberEditResponse;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberEditRequest;
+import com.ktnu.AiLectureSummary.dto.member.response.MemberEditResponse;
 import com.ktnu.AiLectureSummary.exception.NoProfileChangesException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;

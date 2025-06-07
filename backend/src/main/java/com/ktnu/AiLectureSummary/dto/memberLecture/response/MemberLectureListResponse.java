@@ -1,10 +1,9 @@
-package com.ktnu.AiLectureSummary.dto.memberLecture;
+package com.ktnu.AiLectureSummary.dto.memberLecture.response;
 
 import com.ktnu.AiLectureSummary.domain.MemberLecture;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 

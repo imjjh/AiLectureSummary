@@ -1,10 +1,12 @@
 package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.member.MemberEditRequest;
-import com.ktnu.AiLectureSummary.dto.member.MemberEditResponse;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberEditRequest;
+import com.ktnu.AiLectureSummary.dto.member.response.MemberEditResponse;
+import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.exception.NoProfileChangesException;
+import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
@@ -31,15 +33,22 @@ public class MemberProfileService {
     @Transactional
     public MemberEditResponse editProfile(CustomUserDetails user, MemberEditRequest request) {
         // 필요한 필드 꺼내기
-        String newPassword = request.getPassword();
+        String currentPassword = request.getCurrentPassword();
+        String newPassword = request.getNewPassword();
         String newUsername = request.getUsername();
 
         // 로그인한 사용자의 정보 찾기
         Member member = memberRepository.findByEmail(user.getEmail())
                 .orElseThrow(() -> new MemberNotFoundException("이메일이 존재하지 않습니다."));
 
+        // 사용자가 입력한 비밀번호가 실제 저장된 비밀번호와 일치하는지 확인
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+            throw new InvalidPasswordException("비밀번호가 일치하지 않습니다.");
+        }
+
         boolean usernameUnchanged = newUsername == null || newUsername.equals(member.getUsername());
         boolean passwordUnchanged = newPassword == null || passwordEncoder.matches(newPassword, member.getPassword());
+
 
         // 수정된 정보가 없는 경우
         if (usernameUnchanged && passwordUnchanged) {
@@ -62,5 +71,13 @@ public class MemberProfileService {
                 .email(member.getEmail())
                 .token(token)
                 .build();
+    }
+
+    public void deactivate(Long id) {
+        // 로그인한 사용자의 정보 찾기
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("존재 하지 않는 회원입니다."));
+        // 회원 탈퇴
+        member.deactivate();
     }
 }

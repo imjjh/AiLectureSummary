@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.dto.memberLecture;
+package com.ktnu.AiLectureSummary.dto.memberLecture.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
