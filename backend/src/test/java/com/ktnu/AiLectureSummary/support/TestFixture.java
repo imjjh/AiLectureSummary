@@ -1,7 +1,6 @@
 package com.ktnu.AiLectureSummary.support;
 
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 
 public class TestFixture {
 

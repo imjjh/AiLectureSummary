@@ -1,12 +1,12 @@
 package com.ktnu.AiLectureSummary.service;
 
+import com.ktnu.AiLectureSummary.application.service.PasswordResetService;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 class PasswordResetServiceTest {

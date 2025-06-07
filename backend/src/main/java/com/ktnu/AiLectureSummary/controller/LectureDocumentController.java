@@ -1,7 +1,7 @@
 package com.ktnu.AiLectureSummary.controller;
 
-import com.ktnu.AiLectureSummary.security.CustomUserDetails;
-import com.ktnu.AiLectureSummary.service.LectureDocumentService;
+import com.ktnu.AiLectureSummary.global.security.CustomUserDetails;
+import com.ktnu.AiLectureSummary.application.service.LectureDocumentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;

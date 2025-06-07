@@ -107,5 +107,10 @@ public class Member {
     private Role role;
 
 
+    // 소프트 삭제(비활성화)
+    public void deactivate() {
+        this.active = false;
+    }
+
 
 }
