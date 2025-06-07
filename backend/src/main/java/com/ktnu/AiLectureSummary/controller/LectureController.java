@@ -2,8 +2,8 @@ package com.ktnu.AiLectureSummary.controller;
 
 
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureUploadResponse;
-import com.ktnu.AiLectureSummary.dto.lecture.YoutubeLectureRequest;
+import com.ktnu.AiLectureSummary.dto.lecture.response.LectureUploadResponse;
+import com.ktnu.AiLectureSummary.dto.lecture.request.YoutubeLectureRequest;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.application.LectureUploadApplicationService;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,16 +1,17 @@
-package com.ktnu.AiLectureSummary.dto.member;
+package com.ktnu.AiLectureSummary.dto.member.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.validation.annotation.Validated;
 
+
+/**
+ * 로그인 요청 DTO
+ */
 @Getter
-@Setter
 @AllArgsConstructor
 public class MemberLoginRequest {
 

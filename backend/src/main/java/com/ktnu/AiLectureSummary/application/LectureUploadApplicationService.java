@@ -1,7 +1,7 @@
 package com.ktnu.AiLectureSummary.application;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
-import com.ktnu.AiLectureSummary.dto.lecture.LectureUploadResponse;
+import com.ktnu.AiLectureSummary.dto.lecture.response.LectureUploadResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.LectureService;
 import com.ktnu.AiLectureSummary.service.MemberLectureService;
@@ -47,7 +47,7 @@ public class LectureUploadApplicationService {
         memberLectureService.save(user.getId(), lecture);
 
         // 3. 응답 반환
-        return LectureUploadResponse.from(lecture);
+        return new LectureUploadResponse(lecture.getId());
     }
 
     /**
@@ -67,6 +67,6 @@ public class LectureUploadApplicationService {
         memberLectureService.save(user.getId(), lecture);
 
         // 3. 응답 반환
-        return LectureUploadResponse.from(lecture);
+        return new LectureUploadResponse(lecture.getId());
     }
 }
