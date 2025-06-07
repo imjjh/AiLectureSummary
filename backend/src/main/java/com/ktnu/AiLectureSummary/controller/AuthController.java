@@ -1,11 +1,11 @@
 package com.ktnu.AiLectureSummary.controller;
 
-import com.ktnu.AiLectureSummary.config.CookieProperties;
-import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.member.request.MemberLoginRequest;
-import com.ktnu.AiLectureSummary.dto.member.response.MemberLoginResponse;
-import com.ktnu.AiLectureSummary.dto.member.request.MemberRegisterRequest;
-import com.ktnu.AiLectureSummary.service.MemberAuthService;
+import com.ktnu.AiLectureSummary.global.config.CookieProperties;
+import com.ktnu.AiLectureSummary.application.dto.ApiResponse;
+import com.ktnu.AiLectureSummary.application.dto.member.request.MemberLoginRequest;
+import com.ktnu.AiLectureSummary.application.dto.member.response.MemberLoginResponse;
+import com.ktnu.AiLectureSummary.application.dto.member.request.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.application.service.MemberAuthService;
 import com.ktnu.AiLectureSummary.util.CookieResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;

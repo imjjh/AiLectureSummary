@@ -1,6 +1,6 @@
 package com.ktnu.AiLectureSummary.util;
 
-import com.ktnu.AiLectureSummary.config.CookieProperties;
+import com.ktnu.AiLectureSummary.global.config.CookieProperties;
 import org.springframework.http.ResponseCookie;
 
 public class CookieResponseUtil {

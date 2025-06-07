@@ -1,13 +1,13 @@
 package com.ktnu.AiLectureSummary.controller;
 
-import com.ktnu.AiLectureSummary.application.MemberDeleteApplicationService;
-import com.ktnu.AiLectureSummary.config.CookieProperties;
-import com.ktnu.AiLectureSummary.dto.ApiResponse;
-import com.ktnu.AiLectureSummary.dto.member.request.MemberEditRequest;
-import com.ktnu.AiLectureSummary.dto.member.response.MemberEditResponse;
-import com.ktnu.AiLectureSummary.dto.member.response.MemberProfileResponse;
-import com.ktnu.AiLectureSummary.security.CustomUserDetails;
-import com.ktnu.AiLectureSummary.service.MemberProfileService;
+import com.ktnu.AiLectureSummary.application.service.usecase.DeleteMemberUseCase;
+import com.ktnu.AiLectureSummary.global.config.CookieProperties;
+import com.ktnu.AiLectureSummary.application.dto.ApiResponse;
+import com.ktnu.AiLectureSummary.application.dto.member.request.MemberEditRequest;
+import com.ktnu.AiLectureSummary.application.dto.member.response.MemberEditResponse;
+import com.ktnu.AiLectureSummary.application.dto.member.response.MemberProfileResponse;
+import com.ktnu.AiLectureSummary.global.security.CustomUserDetails;
+import com.ktnu.AiLectureSummary.application.service.MemberProfileService;
 import com.ktnu.AiLectureSummary.util.CookieResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -25,7 +25,7 @@ public class ProfileController {
 
     private final MemberProfileService memberProfileService;
     private final CookieProperties cookieProperties;
-    private final MemberDeleteApplicationService memberDeleteApplicationService;
+    private final DeleteMemberUseCase deleteMemberUseCase;
 
 
     @GetMapping("/me")
@@ -62,7 +62,7 @@ public class ProfileController {
     @DeleteMapping("/me")
     @Operation(summary = "회원 탈퇴", description = "소프트 삭제로 멤버를 비활성화합니다.")
     public ResponseEntity<ApiResponse<Void>> deleteAccount(@AuthenticationPrincipal CustomUserDetails user) {
-        memberDeleteApplicationService.deleteMember(user.getId());
+        deleteMemberUseCase.deleteMember(user.getId());
 
         ResponseCookie expiredAccessToken = CookieResponseUtil.expireAccessTokenCookie(cookieProperties);
         ResponseCookie expiredRefreshToken = CookieResponseUtil.expireRefreshTokenCookie(cookieProperties);

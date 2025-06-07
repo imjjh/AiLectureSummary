@@ -1,12 +1,13 @@
 package com.ktnu.AiLectureSummary.service;
 
+import com.ktnu.AiLectureSummary.application.service.MemberProfileService;
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.member.request.MemberEditRequest;
-import com.ktnu.AiLectureSummary.dto.member.response.MemberEditResponse;
-import com.ktnu.AiLectureSummary.exception.NoProfileChangesException;
+import com.ktnu.AiLectureSummary.application.dto.member.request.MemberEditRequest;
+import com.ktnu.AiLectureSummary.application.dto.member.response.MemberEditResponse;
+import com.ktnu.AiLectureSummary.global.exception.NoProfileChangesException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
-import com.ktnu.AiLectureSummary.security.CustomUserDetails;
-import com.ktnu.AiLectureSummary.security.JwtProvider;
+import com.ktnu.AiLectureSummary.global.security.CustomUserDetails;
+import com.ktnu.AiLectureSummary.global.security.JwtProvider;
 import com.ktnu.AiLectureSummary.support.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
