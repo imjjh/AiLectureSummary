@@ -5,6 +5,7 @@ import com.ktnu.AiLectureSummary.dto.member.MemberEditRequest;
 import com.ktnu.AiLectureSummary.dto.member.MemberEditResponse;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.exception.NoProfileChangesException;
+import com.ktnu.AiLectureSummary.repository.MemberLectureRepository;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.security.JwtProvider;
@@ -20,6 +21,8 @@ public class MemberProfileService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final MemberLectureRepository memberLectureRepository;
+    private final MemberLectureService memberLectureService;
 
     /**
      * 사용자 정보를 수정합니다. (수정 가능한 정보: 이름, 비밀번호)
@@ -62,5 +65,13 @@ public class MemberProfileService {
                 .email(member.getEmail())
                 .token(token)
                 .build();
+    }
+
+    public void deactivate(Long id) {
+        // 로그인한 사용자의 정보 찾기
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("존재 하지 않는 회원입니다."));
+        // 회원 탈퇴
+        member.deactivate();
     }
 }

@@ -1,5 +1,6 @@
 package com.ktnu.AiLectureSummary.controller;
 
+import com.ktnu.AiLectureSummary.application.MemberDeleteApplicationService;
 import com.ktnu.AiLectureSummary.config.CookieProperties;
 import com.ktnu.AiLectureSummary.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberEditRequest;
@@ -7,6 +8,7 @@ import com.ktnu.AiLectureSummary.dto.member.MemberEditResponse;
 import com.ktnu.AiLectureSummary.dto.member.MemberProfileResponse;
 import com.ktnu.AiLectureSummary.security.CustomUserDetails;
 import com.ktnu.AiLectureSummary.service.MemberProfileService;
+import com.ktnu.AiLectureSummary.util.CookieResponseUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class ProfileController {
 
     private final MemberProfileService memberProfileService;
     private final CookieProperties cookieProperties;
+    private final MemberDeleteApplicationService memberDeleteApplicationService;
 
 
     @GetMapping("/me")
@@ -54,5 +57,19 @@ public class ProfileController {
 
         // 비밀번호 등 민감한 정보를 변경하지 않은 경우
         return ResponseEntity.ok(ApiResponse.success("수정된 사용자 정보", memberEditResponse));
+    }
+
+    @DeleteMapping("/me")
+    @Operation(summary = "회원 탈퇴", description = "소프트 삭제로 멤버를 비활성화합니다.")
+    public ResponseEntity<ApiResponse<Void>> deleteAccount(@AuthenticationPrincipal CustomUserDetails user) {
+        memberDeleteApplicationService.deleteMember(user.getId());
+
+        ResponseCookie expiredAccessToken = CookieResponseUtil.expireAccessTokenCookie(cookieProperties);
+        ResponseCookie expiredRefreshToken = CookieResponseUtil.expireRefreshTokenCookie(cookieProperties);
+
+        return ResponseEntity.ok()
+                .header("set-cookie", expiredAccessToken.toString())
+                .header("set-cookie", expiredRefreshToken.toString())
+                .body(ApiResponse.success("정상적으로 탈퇴 처리되었습니다.", null));
     }
 }

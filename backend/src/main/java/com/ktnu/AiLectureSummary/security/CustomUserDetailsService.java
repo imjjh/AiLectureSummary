@@ -1,6 +1,7 @@
 package com.ktnu.AiLectureSummary.security;
 
 import com.ktnu.AiLectureSummary.domain.Member;
+import com.ktnu.AiLectureSummary.exception.AccountInactiveException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +29,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+        if (!member.isActive()) {
+            throw new AccountInactiveException("탈퇴한 회원입니다.");
+        }
         return new CustomUserDetails(member);
     }
 
@@ -39,6 +43,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserById(Long userId) {
         Member member = memberRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다. ID=" + userId));
+        if (!member.isActive()) {
+            throw new AccountInactiveException("탈퇴한 회원입니다.");
+        }
+
         return new CustomUserDetails(member);
     }
 }

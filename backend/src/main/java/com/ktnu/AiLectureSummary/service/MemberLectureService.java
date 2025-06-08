@@ -66,6 +66,7 @@ public class MemberLectureService {
     public MemberLectureListResponse getUserLectureList(CustomUserDetails user) {
 
         List<MemberLecture> memberLectures = memberLectureRepository.findAllByMember_Id(user.getId());
+        // TODO: N+1
         Long totalDuration = calculateTotalDuration(memberLectures); // 하나도 없는 경우 0?
         return MemberLectureListResponse.from(memberLectures, totalDuration);
     }
@@ -164,8 +165,33 @@ public class MemberLectureService {
     public void deleteLecture(CustomUserDetails user, Long lectureId) {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다"));
+        deleteMemberLectureAndCleanupLectureIfOrphan(memberLecture);
+    }
 
-        // 강의 정보
+
+    /**
+     * 사용자의 모든 강의 등록 정보를 삭제하고,
+     * 더 이상 아무도 해당 강의를 참조하지 않으면 Lecture 엔티티도 함께 삭제합니다.
+     * @param memberId
+     */
+    @Transactional
+    public void deleteLecturesByMemberId(Long memberId) {
+        // 사용자의 모든 강의 조회
+        List<MemberLecture> memberLectures = memberLectureRepository.findAllByMember_Id(memberId);
+
+        for (MemberLecture memberLecture: memberLectures ) {
+            deleteMemberLectureAndCleanupLectureIfOrphan(memberLecture);
+        }
+    }
+
+    /**
+     * 사용자와 강의의 연관관계를 제거하고,
+     * 더 이상 아무도 해당 강의를 참조하지 않으면 Lecture 엔티티도 함께 삭제합니다.
+     * @param memberLecture
+     */
+    @Transactional
+    public void deleteMemberLectureAndCleanupLectureIfOrphan(MemberLecture memberLecture) {
+        // 강의 정보 // TODO: N+1
         Lecture lecture = memberLecture.getLecture();
 
         // 강의와 사용자의 연관 관계 제거
@@ -176,7 +202,4 @@ public class MemberLectureService {
             lectureRepository.delete(lecture);
         }
     }
-
-
-
 }
