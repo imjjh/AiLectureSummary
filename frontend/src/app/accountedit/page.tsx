@@ -8,6 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
 
 import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
 
@@ -34,7 +35,11 @@ export default function AccountEditPage() {
 
     // 변경사항 없음 체크
     if (username === user?.name && password.trim() === "") {
-      alert("변경할 내용을 입력해주세요.")
+      toast({
+        variant: "destructive",
+        description: "변경할 내용을 입력해주세요.",
+        duration: 1000,
+      })
       setIsLoading(false)
       return
     }
@@ -63,9 +68,18 @@ export default function AccountEditPage() {
         }),
       })
 
-      if (!res.ok) throw new Error("수정 실패")
+      if (!res.ok) {
+        toast({
+          variant: "destructive",
+          description: "변경할 내용을 입력해주세요.",
+          duration: 1000,
+        })
+      }
 
-      alert("계정 정보가 수정되었습니다.")
+      toast({
+        description: "계정 정보가 수정되었습니다.",
+        duration: 1000,
+      })
       router.push("/dashboard")
     } catch (err: any) {
       setError(err.message || "계정 수정 중 오류가 발생했습니다.")

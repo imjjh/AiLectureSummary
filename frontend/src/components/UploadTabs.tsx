@@ -2,7 +2,6 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
@@ -28,6 +27,9 @@ export default function UploadTabs() {
     e.preventDefault();
     if (!youtubeUrl.trim()) return;
 
+    setUploading(true);
+    setProgress(0);
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/lectures/youtube`, {
         method: "POST",
@@ -44,6 +46,7 @@ export default function UploadTabs() {
         throw new Error(data.message || "요약 실패");
       }
 
+      setProgress(100);
       const lectureId = data.data.id;
       router.push(`/summary/${lectureId}`);
     } catch (error: any) {
@@ -51,7 +54,11 @@ export default function UploadTabs() {
         title: "요약 실패",
         description: error.message || "유튜브 요약 중 오류가 발생했습니다.",
         variant: "destructive",
+        duration: 1000,
       });
+    } finally {
+      setUploading(false);
+      setProgress(0);
     }
   };
 
@@ -105,6 +112,7 @@ export default function UploadTabs() {
         title: "업로드 실패",
         description: error.message || "오디오 파일 업로드 중 오류가 발생했습니다.",
         variant: "destructive",
+        duration: 1000,
       });
       console.error("Upload Error:", error);
     } finally {
@@ -119,7 +127,7 @@ export default function UploadTabs() {
     <Tabs defaultValue="video" className="w-full">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="video">영상 파일</TabsTrigger>
-        <TabsTrigger value="audio">녹음 파일</TabsTrigger>
+        <TabsTrigger value="audio">음성 파일</TabsTrigger>
         <TabsTrigger value="youtube">YouTube 링크</TabsTrigger>
       </TabsList>
 
@@ -211,13 +219,23 @@ export default function UploadTabs() {
           />
         </div>
         {youtubeUrl && (
-          <div className="mt-4">
-            <Button
-              onClick={handleYouTubeSubmit}
-              className="w-full flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 text-white"
-            >
-              <Upload size={16} /> 요약 시작
-            </Button>
+          <div className="mt-4 space-y-2">
+            {uploading ? (
+              <>
+                <Progress value={progress} className="h-2 rounded-full" />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>업로드 진행률: {progress}%</span>
+                  <span>{progress === 100 ? "요약 생성 중..." : "업로드 중"}</span>
+                </div>
+              </>
+            ) : (
+              <Button
+                onClick={handleYouTubeSubmit}
+                className="w-full flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 text-white"
+              >
+                <Upload size={16} /> 요약 시작
+              </Button>
+            )}
           </div>
         )}
       </TabsContent>

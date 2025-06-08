@@ -21,7 +21,8 @@ interface SummaryData {
   aiSummary?: string
   originalText?: string
   memo?: string
-  enrolledAt?: string
+  enrolledAt?: string,
+  url: string
 }
 
 export default function Page() {
@@ -86,13 +87,19 @@ export default function Page() {
     }
   }, [summaryData?.customTitle])
 
-  useEffect(() => {
+  const getThumbnailSrc = (): string => {
     if (summaryData?.thumbnailBase64) {
-      setImgSrc(`data:image/png;base64,${summaryData.thumbnailBase64}`)
-    } else {
-      setImgSrc("/images/1.png")
+      return `data:image/png;base64,${summaryData.thumbnailBase64}`;
     }
-  }, [summaryData?.thumbnailBase64])
+    if (!summaryData?.thumbnailBase64 && summaryData?.url) {
+      return "/images/youtube.jpg";
+    }
+    return "/images/audio.avif";
+  };
+
+  useEffect(() => {
+    setImgSrc(getThumbnailSrc());
+}, [summaryData?.thumbnailBase64]);
 
 
   // 메모 저장 함수
