@@ -1,7 +1,9 @@
 package com.ktnu.AiLectureSummary.service;
 
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.member.*;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberResetPasswordRequest;
+import com.ktnu.AiLectureSummary.dto.member.request.MemberVerifyRequest;
+import com.ktnu.AiLectureSummary.dto.member.response.MemberPasswordResetTokenResponse;
 import com.ktnu.AiLectureSummary.exception.InvalidTokenException;
 import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
