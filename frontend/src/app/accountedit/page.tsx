@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
+
 import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
 import DeleteConfirmDialog from "@/components/DeleteConfirmDialog"
 
@@ -39,7 +40,11 @@ export default function AccountEditPage() {
 
     // 변경사항 없음 체크
     if (username === user?.name && password.trim() === "") {
-      alert("변경할 내용을 입력해주세요.")
+      toast({
+        variant: "destructive",
+        description: "변경할 내용을 입력해주세요.",
+        duration: 1000,
+      })
       setIsLoading(false)
       return
     }

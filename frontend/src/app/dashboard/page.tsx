@@ -5,15 +5,14 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Clock, FileText, Upload } from "lucide-react"
+import { Clock, FileText, Upload, LayoutGrid, List } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import axios from "axios"
 import LectureCard from "@/components/lecture-card";
+import LectureList from "@/components/lecture-list"
 import { toast } from "@/hooks/use-toast"
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -22,15 +21,15 @@ import {
 
 
 axios.defaults.withCredentials = true;
-type Lecture = {
+
+interface Lecture {
   lectureId: number;
   customTitle: string;
   title: string,
-  createdAt: string;
   duration: number;
   thumbnailUrl?: string;
-  email: string;
-  username: string;
+  enrolledAt?: string;
+  url?: string;
 };
 
 type User = {
@@ -38,11 +37,20 @@ type User = {
   username: string;
 };
 
-const formatDuration = (duration: number): string => {
-  const mins = Math.floor(duration / 60);
-  const secs = duration % 60;
-  return `${mins}:${secs.toString().padStart(2, "0")}`;
-};
+// const formatDuration = (duration: number): string => {
+//   const mins = Math.floor(duration / 60);
+//   const secs = duration % 60;
+//   return `${mins}:${secs.toString().padStart(2, "0")}`;
+// };
+
+// const formatDate = (isoString: string): string => {
+//   const date = new Date(isoString)
+//   return date.toLocaleDateString("ko-KR", {
+//     year: "numeric",
+//     month: "long",
+//     day: "numeric",
+//   })
+// }
 
 export default function DashboardPage() {
   // 로그인한 사용자 정보를 저장하는 상태
@@ -57,6 +65,7 @@ export default function DashboardPage() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [targetLecture, setTargetLecture] = useState<Lecture | null>(null);
+  const [viewMode, setViewMode] = useState<"card" | "list">("card")
 
 
   useEffect(() => {
@@ -116,13 +125,14 @@ export default function DashboardPage() {
       toast({
         title: "삭제 완료✔️",
         description: `"${lecture.customTitle}" 강의가 삭제되었습니다.`,
-        duration: 1500,
+        duration: 1000,
       });
     } catch (err) {
       toast({
         title: "삭제 실패✖️",
         description: "강의 삭제 중 오류가 발생했습니다.",
         variant: "destructive",
+        duration: 1000,
       });
       console.error(err);
     } finally {
@@ -171,11 +181,11 @@ export default function DashboardPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight mb-1">마이 페이지</h1>
-            <p className="text-muted-foreground">요약한 동영상 목록과 계정 정보를 관리하세요</p>
+            <p className="text-muted-foreground">요약한 강의 목록과 계정 정보를 관리하세요</p>
           </div>
           <Link href="/">
             <Button className="gap-2">
-              <Upload size={16} />새 동영상 요약하기
+              <Upload size={16} />새 강의 요약하기
             </Button>
           </Link>
         </div>
@@ -187,7 +197,7 @@ export default function DashboardPage() {
                 <FileText className="h-10 w-10 text-primary" />
               </div>
               <h3 className="text-2xl font-bold mb-1">{lectures.length}</h3>
-              <p className="text-sm text-muted-foreground">요약한 동영상</p>
+              <p className="text-sm text-muted-foreground">요약한 강의</p>
             </CardContent>
           </Card>
 
@@ -226,6 +236,23 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        <div className="flex justify-end mb-4 gap-2">
+          <Button
+            variant={viewMode === "card" ? "default" : "outline"}
+            onClick={() => setViewMode("card")}
+            size="sm"
+          >
+            <LayoutGrid className="w-4 h-4 mr-1" /> 카드
+          </Button>
+          <Button
+            variant={viewMode === "list" ? "default" : "outline"}
+            onClick={() => setViewMode("list")}
+            size="sm"
+          >
+            <List className="w-4 h-4 mr-1" /> 리스트
+          </Button>
+        </div>
+
         <Tabs defaultValue="recent" className="mb-12">
           <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
             <TabsTrigger value="recent">최근 요약</TabsTrigger>
@@ -233,35 +260,60 @@ export default function DashboardPage() {
           </TabsList>
 
           {/* 최근 요약 */}
-          <TabsContent value="recent" className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <TabsContent value="recent" className="mt-6">
             {lectures.length > 0 ? (
-              lectures.slice(0, 2).map((lecture: any) => (
-                <LectureCard
-                  key={lecture.lectureId}
-                  lecture={lecture}
-                  onDelete={() => openDeleteDialog(lecture)}
+              viewMode === "card" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {lectures.slice(0, 2).map((lecture : any) => (
+                    <LectureCard
+                      key={lecture.lectureId}
+                      lecture={lecture}
+                      onDelete={() => openDeleteDialog(lecture)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <LectureList
+                  lectures={lectures.slice(0, 2)}
+                  onDelete={(id) => {
+                    const lecture = lectures.find((l) => l.lectureId === id);
+                    if (lecture) openDeleteDialog(lecture);
+                  }}
                 />
-              ))
+              )
             ) : (
-              <p className="text-muted-foreground text-center col-span-full">요약한 동영상이 없습니다.</p>
+              <p className="text-muted-foreground text-center">요약한 동영상이 없습니다.</p>
             )}
           </TabsContent>
 
           {/* 모든 요약 */}
-          <TabsContent value="all" className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <TabsContent value="all" className="mt-6">
             {lectures.length > 0 ? (
-              lectures.map((lecture: any) => (
-                <LectureCard
-                  key={lecture.lectureId}
-                  lecture={lecture}
-                  onDelete={() => openDeleteDialog(lecture)}
+              viewMode === "card" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {lectures.map((lecture : any) => (
+                    <LectureCard
+                      key={lecture.lectureId}
+                      lecture={lecture}
+                      onDelete={() => openDeleteDialog(lecture)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <LectureList
+                  lectures={lectures}
+                  onDelete={(id) => {
+                    const lecture = lectures.find((l) => l.lectureId === id);
+                    if (lecture) openDeleteDialog(lecture);
+                  }}
                 />
-              ))
+              )
             ) : (
-              <p className="text-muted-foreground text-center col-span-full">요약한 동영상이 없습니다.</p>
+              <p className="text-muted-foreground text-center">요약한 동영상이 없습니다.</p>
             )}
           </TabsContent>
         </Tabs>
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
