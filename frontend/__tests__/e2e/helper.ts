@@ -59,8 +59,8 @@ export async function 영상업로드(page: Page) {
 
 export async function 녹음파일업로드(page: Page) {
 
-  // 탭에서 '녹음 파일' 클릭
-  await page.getByRole('tab', { name: '녹음 파일' }).click();
+  // 탭에서 '음성 파일' 클릭
+  await page.getByRole('tab', { name: '음성 파일' }).click();
 
   // 파일 선택 input 클릭 후 파일 업로드
   const filePath = path.resolve(__dirname, '../fixtures/test-audio.mp3');
