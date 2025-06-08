@@ -8,18 +8,23 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
+import DeleteConfirmDialog from "@/components/DeleteConfirmDialog"
 
 export default function AccountEditPage() {
   const router = useRouter()
-  const { user, token } = useAuth()
+  const { user, token, logout } = useAuth()
+  const { toast } = useToast()
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [currentPassword, setCurrentPassword] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -59,18 +64,64 @@ export default function AccountEditPage() {
         credentials: "include",
         body: JSON.stringify({
           username,
-          ...(password ? { password } : {})
+          currentPassword,
+          newPassword: password,
         }),
       })
 
-      if (!res.ok) throw new Error("수정 실패")
+      const result = await res.json()
 
-      alert("계정 정보가 수정되었습니다.")
+      if (!res.ok || result.success === false){
+        if(result.message?.includes("일치")){
+          toast({title: result.message,
+            variant: "destructive",
+            duration: 1000})
+        } else{
+          toast({title: "수정 실패",
+            description: result.message || "",
+            variant: "destructive",
+            duration: 1000})
+        }
+        return
+      }
+
+      toast({title: "계정 정보가 수정되었습니다🎉", duration: 1000})
       router.push("/dashboard")
+
     } catch (err: any) {
       setError(err.message || "계정 수정 중 오류가 발생했습니다.")
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    console.log("현재 토큰: ", token)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING_API_URL}/api/members/me`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      })
+
+
+      const result = await res.json()
+      console.log("응답 본문:", result)
+      
+      if (!res.ok || result.success !== true) {
+        throw new Error(`탈퇴 실패: ${result.message}`)
+      }
+
+      // 토큰/세션 정리 로직
+      localStorage.clear()
+      document.cookie = "" // 쿠키 지우기 등
+      alert("계정이 삭제되었습니다.")
+      await logout()
+      router.push("/")
+
+    } catch (err) {
+      console.error("에러 발생: ", err)
+      alert(err || "탈퇴 중 오류가 발생했습니다.")
     }
   }
 
@@ -108,6 +159,18 @@ export default function AccountEditPage() {
                   value={user?.email || ""}
                   disabled
                   className="rounded-full bg-muted-foreground/10"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="current-password">기존 비밀번호</Label>
+                <PasswordInputWithCapsWarning
+                  id="current-password"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="rounded-full"
+                  required
                 />
               </div>
 
@@ -160,9 +223,24 @@ export default function AccountEditPage() {
                   "정보 저장"
                 )}
               </Button>
+
+              {/* 회원 탈퇴 버튼 */}
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-red-600 hover:text-red-700 text-sm underline"
+                onClick={() => setIsDialogOpen(true)}
+              >
+                회원 탈퇴
+              </Button>
             </CardFooter>
           </form>
         </Card>
+        <DeleteConfirmDialog
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          onConfirm={handleDeleteAccount}
+        />
       </div>
     </div>
   )
