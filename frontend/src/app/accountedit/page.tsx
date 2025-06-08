@@ -38,6 +38,7 @@ export default function AccountEditPage() {
       toast({
         variant: "destructive",
         description: "변경할 내용을 입력해주세요.",
+        duration: 1000,
       })
       setIsLoading(false)
       return
@@ -71,11 +72,13 @@ export default function AccountEditPage() {
         toast({
           variant: "destructive",
           description: "변경할 내용을 입력해주세요.",
+          duration: 1000,
         })
       }
 
       toast({
         description: "계정 정보가 수정되었습니다.",
+        duration: 1000,
       })
       router.push("/dashboard")
     } catch (err: any) {

@@ -10,7 +10,7 @@ interface Lecture {
   duration: number;
   thumbnailBase64?: string;
   enrolledAt?: string,
-  url: string,
+  url?: string;
 }
 
 interface LectureListProps {
