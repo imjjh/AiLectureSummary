@@ -1,15 +1,16 @@
 package com.ktnu.AiLectureSummary.service;
 
-import com.ktnu.AiLectureSummary.config.JwtProperties;
+import com.ktnu.AiLectureSummary.application.service.MemberAuthService;
+import com.ktnu.AiLectureSummary.global.config.JwtProperties;
 import com.ktnu.AiLectureSummary.domain.Member;
-import com.ktnu.AiLectureSummary.dto.member.request.MemberLoginRequest;
-import com.ktnu.AiLectureSummary.dto.member.response.MemberLoginResponse;
-import com.ktnu.AiLectureSummary.dto.member.request.MemberRegisterRequest;
-import com.ktnu.AiLectureSummary.exception.DuplicateLoginIdException;
-import com.ktnu.AiLectureSummary.exception.InvalidPasswordException;
-import com.ktnu.AiLectureSummary.exception.MemberNotFoundException;
+import com.ktnu.AiLectureSummary.application.dto.member.request.MemberLoginRequest;
+import com.ktnu.AiLectureSummary.application.dto.member.response.MemberLoginResponse;
+import com.ktnu.AiLectureSummary.application.dto.member.request.MemberRegisterRequest;
+import com.ktnu.AiLectureSummary.global.exception.DuplicateLoginIdException;
+import com.ktnu.AiLectureSummary.global.exception.InvalidPasswordException;
+import com.ktnu.AiLectureSummary.global.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
-import com.ktnu.AiLectureSummary.security.JwtProvider;
+import com.ktnu.AiLectureSummary.global.security.JwtProvider;
 import com.ktnu.AiLectureSummary.support.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package com.ktnu.AiLectureSummary.domain;
 
-import com.ktnu.AiLectureSummary.dto.lecture.response.LectureSummaryResponse;
+import com.ktnu.AiLectureSummary.application.dto.lecture.response.LectureSummaryResponse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Builder;
