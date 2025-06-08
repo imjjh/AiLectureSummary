@@ -51,11 +51,29 @@ public class MemberLecture {
     private LocalDateTime enrolledAt;
 
     @Column(nullable = false)
-    @Setter(AccessLevel.PUBLIC) // 사용자가 수정 가능
     private String customTitle;
 
-    @Setter(AccessLevel.PUBLIC) // 사용자가 수정 가능
     @Column(nullable = true, columnDefinition = "TEXT") // 사용자 개별 메모 저장용 (TEXT 타입)
     private String memo;
 
+    public void updateMemo(String memo) {
+        this.memo = memo;
+    }
+
+    public void clearMemo() {
+        this.memo = null;
+    }
+
+    public void updateCustomTitle(String customTitle) {
+        this.customTitle = customTitle;
+    }
+
+    public static MemberLecture create(Member member, Lecture lecture) {
+        return MemberLecture.builder()
+                .member(member)
+                .lecture(lecture)
+                .customTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
+                .build();
+
+    }
 }

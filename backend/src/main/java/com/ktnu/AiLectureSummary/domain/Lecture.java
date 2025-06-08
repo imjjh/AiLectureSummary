@@ -74,4 +74,17 @@ public class Lecture {
                 .youtubeUrl(youtubeUrl)
                 .build();
     }
+
+
+//    public boolean hasSameHash(String otherHash) {
+//        return this.hash != null && this.hash.equals(otherHash);
+//    }
+//
+//    public boolean isYouTubeLecture() {
+//        return youtubeUrl != null;
+//    }
+//
+//    public boolean isUploadedLecture() {
+//        return hash != null && youtubeUrl == null;
+//    }
 }

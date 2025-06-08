@@ -22,8 +22,8 @@ import {
 } from './helper';
 
 test('모든 기능 동작 검사 (발표 녹화용)', async ({ page }) => {
-  // await page.goto('http://localhost:3000/');
-  await page.goto('https://aisummarymono.vercel.app/');
+  await page.goto('http://localhost:3000/');
+  // await page.goto('https://aisummarymono.vercel.app/');
 
 
   await 영상업로드(page); // 비회원 업로드 불가 확인
