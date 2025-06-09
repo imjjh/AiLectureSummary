@@ -10,7 +10,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
-
+import { isYoutube } from "@/lib/isYoutube";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL;
 
@@ -22,7 +22,7 @@ interface SummaryData {
   originalText?: string
   memo?: string
   enrolledAt?: string,
-  url: string
+  youtubeUrl: string
 }
 
 export default function Page() {
@@ -91,7 +91,7 @@ export default function Page() {
     if (summaryData?.thumbnailBase64) {
       return `data:image/png;base64,${summaryData.thumbnailBase64}`;
     }
-    if (!summaryData?.thumbnailBase64 && summaryData?.url) {
+    if (summaryData?.youtubeUrl && isYoutube(summaryData.youtubeUrl)) {
       return "/images/youtube.jpg";
     }
     return "/images/audio.avif";

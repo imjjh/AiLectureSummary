@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { isYoutube } from "@/lib/isYoutube";
 
 interface Lecture {
     lectureId: number;
@@ -11,7 +12,7 @@ interface Lecture {
     duration: number;
     thumbnailBase64?: string;
     enrolledAt: string;
-    url?: string;
+    youtubeUrl?: string;
 }
 
 interface LectureCardProps {
@@ -41,7 +42,7 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
             return `data:image/png;base64,${lecture.thumbnailBase64}`;
         }
 
-        if (!lecture.thumbnailBase64 && lecture.url) {
+        if (lecture.youtubeUrl && isYoutube(lecture.youtubeUrl)) {
             return "/images/youtube.jpg";
         }
 

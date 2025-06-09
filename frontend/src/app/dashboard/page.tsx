@@ -37,21 +37,6 @@ type User = {
   username: string;
 };
 
-// const formatDuration = (duration: number): string => {
-//   const mins = Math.floor(duration / 60);
-//   const secs = duration % 60;
-//   return `${mins}:${secs.toString().padStart(2, "0")}`;
-// };
-
-// const formatDate = (isoString: string): string => {
-//   const date = new Date(isoString)
-//   return date.toLocaleDateString("ko-KR", {
-//     year: "numeric",
-//     month: "long",
-//     day: "numeric",
-//   })
-// }
-
 export default function DashboardPage() {
   // 로그인한 사용자 정보를 저장하는 상태
   const [user, setUser] = useState<User | null>(null);
@@ -241,6 +226,10 @@ export default function DashboardPage() {
             variant={viewMode === "card" ? "default" : "outline"}
             onClick={() => setViewMode("card")}
             size="sm"
+            className={viewMode === "card"
+              ? ""
+              : "bg-white hover:bg-zinc-100 text-black dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white"
+            }
           >
             <LayoutGrid className="w-4 h-4 mr-1" /> 카드
           </Button>
@@ -248,6 +237,10 @@ export default function DashboardPage() {
             variant={viewMode === "list" ? "default" : "outline"}
             onClick={() => setViewMode("list")}
             size="sm"
+            className={viewMode === "list"
+              ? ""
+              : "bg-white hover:bg-zinc-100 text-black dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white"
+            }
           >
             <List className="w-4 h-4 mr-1" /> 리스트
           </Button>

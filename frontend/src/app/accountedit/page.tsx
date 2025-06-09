@@ -17,6 +17,7 @@ export default function AccountEditPage() {
   const router = useRouter()
   const { user, token, logout } = useAuth()
   const { toast } = useToast()
+  const { refreshUser } = useAuth()
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
@@ -37,8 +38,11 @@ export default function AccountEditPage() {
     setIsLoading(true)
     setError("")
 
+    const isPasswordChanged = password.trim() !== ""
+    const isUsernameChanged = username !== user?.name
+
     // 변경사항 없음 체크
-    if (username === user?.name && password.trim() === "") {
+    if (!isPasswordChanged && !isUsernameChanged) {
       toast({
         variant: "destructive",
         description: "변경할 내용을 입력해주세요.",
@@ -49,47 +53,53 @@ export default function AccountEditPage() {
     }
 
 
-    if (password && (password.length < 8 || password.length > 20)) {
-      setError("비밀번호는 8자 이상 20자 이하로 입력해주세요.")
-      setIsLoading(false)
-      return
-    }
+    if (isPasswordChanged) {
+      if (password.length < 8 || password.length > 20) {
+        setError("비밀번호는 8자 이상 20자 이하로 입력해주세요.")
+        setIsLoading(false)
+        return
+      }
 
-    if (password !== confirmPassword) {
-      setError("비밀번호가 일치하지 않습니다.")
-      setIsLoading(false)
-      return
+      if (password !== confirmPassword) {
+        setError("비밀번호가 일치하지 않습니다.")
+        setIsLoading(false)
+        return
+      }
     }
 
     try {
+      const requestBody: any = {
+        username,
+        currentPassword,
+      }
+
+      if (isPasswordChanged) {
+        requestBody.newPassword = password
+      }
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING_API_URL}/api/members/me`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         credentials: "include",
-        body: JSON.stringify({
-          username,
-          currentPassword,
-          newPassword: password,
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       const result = await res.json()
 
       if (!res.ok || result.success === false){
-        if(result.message?.includes("일치")){
-          toast({title: result.message,
-            variant: "destructive",
-            duration: 1000})
-        } else{
-          toast({title: "수정 실패",
-            description: result.message || "",
-            variant: "destructive",
-            duration: 1000})
-        }
+        toast({
+          title: result.message?.includes("일치") ? result.message : "수정 실패",
+          variant: result.message || "",
+          duration: 1000
+        })
         return
       }
 
       toast({title: "계정 정보가 수정되었습니다🎉", duration: 1000})
+      await refreshUser()
       router.push("/dashboard")
 
     } catch (err: any) {
