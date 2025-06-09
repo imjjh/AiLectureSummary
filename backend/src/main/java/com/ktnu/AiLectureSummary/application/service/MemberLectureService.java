@@ -39,11 +39,7 @@ public class MemberLectureService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("해당 사용자를 찾을 수 없습니다."));
 
-        MemberLecture memberLecture = MemberLecture.builder()
-                .member(member)
-                .lecture(lecture)
-                .customTitle(lecture.getTitleByAi()) // 초기 값은 ai가 생성한 것으로 저장됩니다. 이후 사용자가 변경 가능
-                .build();
+        MemberLecture memberLecture = MemberLecture.create(member, lecture);
 
         memberLectureRepository.save(memberLecture);
 
@@ -109,7 +105,7 @@ public class MemberLectureService {
     public LectureDetailResponse saveMemo(CustomUserDetails user, Long lectureId, String note) {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
-        memberLecture.setMemo(note);
+        memberLecture.updateMemo(note);
         return LectureDetailResponse.from(memberLecture);
     }
 
@@ -125,7 +121,7 @@ public class MemberLectureService {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
 
-        memberLecture.setMemo(null);
+        memberLecture.clearMemo();
 
         return LectureDetailResponse.from(memberLecture);
     }
@@ -143,7 +139,7 @@ public class MemberLectureService {
     public LectureDetailResponse updateCustomTitle(CustomUserDetails user, Long lectureId, String newTitle) {
         MemberLecture memberLecture = memberLectureRepository.findByMember_IdAndLecture_Id(user.getId(), lectureId)
                 .orElseThrow(() -> new LectureNotFoundException("해당 강의를 찾을 수 없습니다."));
-        memberLecture.setCustomTitle(newTitle);
+        memberLecture.updateCustomTitle(newTitle);
 
         return LectureDetailResponse.from(memberLecture);
     }

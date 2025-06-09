@@ -59,9 +59,9 @@ public class UploadLectureUseCase {
      * @param url 업로드된 YouTube 링크
      * @return 저장된 강의에 대한 응답 DTO
      */
-    public LectureUploadResponse uploadYoutubeLecture(CustomUserDetails user, String url) {
-        // 1. 강의 처리 ()
-        Lecture lecture = youtubeLectureService.ProcessYoutubeLecture(url);
+    public LectureUploadResponse uploadLectureByYoutubeUrl(CustomUserDetails user, String url) {
+        // 1. YouTube 링크로부터 강의 생성 및 저장
+        Lecture lecture = youtubeLectureService.processYoutubeLecture(url);
 
         // 2. 사용자와 강의 연결 저장
         memberLectureService.save(user.getId(), lecture);

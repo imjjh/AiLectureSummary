@@ -25,7 +25,7 @@ public class YoutubeLectureService {
     private final FastApiProperties fastApiProperties;
 
 
-    public Lecture ProcessYoutubeLecture(String url) {
+    public Lecture processYoutubeLecture(String url) {
 
         // DB에 중복되는 링크이 존재하는지 확인
         Optional<Lecture> optionalLecture = lectureRepository.findByYoutubeUrl(url);

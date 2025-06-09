@@ -41,7 +41,7 @@ public class LectureController {
             @Parameter(description = "요약할 영상 youtubeUrl", required = true)
             @Valid @RequestBody YoutubeLectureRequest request) {
         String url = request.getUrl();
-        LectureUploadResponse data = lectureUploadUsecase.uploadYoutubeLecture(user, url);
+        LectureUploadResponse data = lectureUploadUsecase.uploadLectureByYoutubeUrl(user, url);
         return ResponseEntity.ok(ApiResponse.success("요약 생성 성공", data));
     }
 }
