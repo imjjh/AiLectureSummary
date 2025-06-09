@@ -19,6 +19,7 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<boolean>
   logout: () => Promise<void>
   register: (name: string, email: string, password: string) => Promise<boolean>
+  refreshUser: () => Promise<void>
 }
 
 // 초기 컨텍스트 생성 (기본값은 비어 있음)
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => false,
   logout: async () => { },
   register: async () => false,
+  refreshUser: async () => { },
 })
 
 // 인증 관련 상태와 메서드를 제공하는 Provider 컴포넌트
@@ -184,9 +186,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const refreshUser = async () => {
+    if (!token) return
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/members/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      })
+      const data = await res.json()
+      if (res.ok && data.data) {
+        const refreshedUser: User = {
+          id: String(data.data.id),
+          name: data.data.username,
+          email: data.data.email,
+          joinDate: user?.joinDate || new Date().toISOString(), // 기존 joinDate 유지
+        }
+        setUser(refreshedUser)
+      }
+    } catch (err) {
+      console.error("유저 정보 새로고침 실패:", err)
+    }
+  }
+
+
   // Context Provider로 로그인 상태 및 메서드 전달
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, register, token }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, register, token, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

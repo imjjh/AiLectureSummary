@@ -46,8 +46,9 @@ export default function UploadTabs() {
         throw new Error(data.message || "요약 실패");
       }
 
-      setProgress(100);
       const lectureId = data.data.id;
+      setProgress(100);
+
       router.push(`/summary/${lectureId}`);
     } catch (error: any) {
       toast({

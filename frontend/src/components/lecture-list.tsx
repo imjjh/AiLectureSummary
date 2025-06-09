@@ -3,6 +3,7 @@
 import Link from "next/link"
 import Image from "next/image";
 import { X } from "lucide-react"
+import { isYoutube } from "@/lib/isYoutube";
 
 interface Lecture {
   lectureId: number
@@ -10,7 +11,7 @@ interface Lecture {
   duration: number;
   thumbnailBase64?: string;
   enrolledAt?: string,
-  url?: string;
+  youtubeUrl?: string;
 }
 
 interface LectureListProps {
@@ -38,7 +39,7 @@ export default function LectureList({ lectures, onDelete }: LectureListProps) {
     if (lecture.thumbnailBase64) {
       return `data:image/png;base64,${lecture.thumbnailBase64}`
     }
-    if (!lecture.thumbnailBase64 && lecture.url) {
+    if (lecture.youtubeUrl && isYoutube(lecture.youtubeUrl)) {
       return "/images/youtube.jpg"
     }
     return "/images/audio.avif"
