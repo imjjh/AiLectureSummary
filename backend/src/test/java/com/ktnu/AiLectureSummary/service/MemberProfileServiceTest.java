@@ -4,6 +4,7 @@ import com.ktnu.AiLectureSummary.application.service.MemberProfileService;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.application.dto.member.request.MemberEditRequest;
 import com.ktnu.AiLectureSummary.application.dto.member.response.MemberEditResponse;
+import com.ktnu.AiLectureSummary.global.exception.InvalidPasswordException;
 import com.ktnu.AiLectureSummary.global.exception.NoProfileChangesException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
 import com.ktnu.AiLectureSummary.global.security.CustomUserDetails;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
+// TODO: 기존 비밀번호가 맞는지 확인하는 로직 추가
 class MemberProfileServiceTest {
 
     private MemberRepository memberRepository;
@@ -39,14 +40,16 @@ class MemberProfileServiceTest {
         // given // 이름 변경 & 다른 비밀번호로 수정 시도
         Member mockMember = TestFixture.mockMember();
         CustomUserDetails user = new CustomUserDetails(mockMember);
-        MemberEditRequest request = new MemberEditRequest("newName", "newPassword");
+        MemberEditRequest request = new MemberEditRequest("newName",mockMember.getPassword(), "newPassword");
 
         when(memberRepository.findByEmail(mockMember.getEmail()))
                 .thenReturn(Optional.of(mockMember));
 
-        when(passwordEncoder.matches(request.getPassword(), mockMember.getPassword()))
+        when(passwordEncoder.matches(request.getCurrentPassword(), mockMember.getPassword()))
+                .thenReturn(true); // 본인 인증을 위한 기존 비밀번호 검사 일치
+        when(passwordEncoder.matches(request.getNewPassword(), mockMember.getPassword()))
                 .thenReturn(false); // 새 비밀번호와 기존 비밀번호가 다름 -> 재설정
-        when(passwordEncoder.encode(request.getPassword()))
+        when(passwordEncoder.encode(request.getNewPassword()))
                 .thenReturn("new_encoded_password");
         when(jwtProvider.generateAccessToken(mockMember.getId()))
                 .thenReturn("newToken123"); // 비밀번호가 수정되어 새로운 토큰 발급
@@ -68,17 +71,39 @@ class MemberProfileServiceTest {
         // given // 이름 변경 없음 & 같은 비밀번호로 수정 시도
         Member mockMember = TestFixture.mockMember();
         CustomUserDetails user = new CustomUserDetails(mockMember);
-        MemberEditRequest request = new MemberEditRequest(null, mockMember.getPassword()); // 같은 이름, 같은 비밀번호
+        MemberEditRequest request = new MemberEditRequest(null, mockMember.getPassword(), mockMember.getPassword()); // 같은 이름, 같은 비밀번호
 
+        when(passwordEncoder.matches(request.getCurrentPassword(), mockMember.getPassword()))
+                .thenReturn(true); // 본인 인증을 위한 기존 비밀번호 검사 일치
         when(memberRepository.findByEmail(mockMember.getEmail()))
                 .thenReturn(Optional.of(mockMember));
 
-        when(passwordEncoder.matches(request.getPassword(), mockMember.getPassword()))
+        when(passwordEncoder.matches(request.getNewPassword(), mockMember.getPassword()))
                 .thenReturn(true); // 새 비밀번호와 기존 비밀번호가 같음
 
         // when & then
         assertThrows(NoProfileChangesException.class, () -> {
             memberProfileService.editProfile(user, request);
         });
+    }
+
+    @Test
+    void 계정정보수정_실패_기존비밀번호불일치() {
+        // given // 이름 변경 & 다른 비밀번호로 수정 시도
+        Member mockMember = TestFixture.mockMember();
+        CustomUserDetails user = new CustomUserDetails(mockMember);
+        MemberEditRequest request = new MemberEditRequest("newName", mockMember.getPassword(), "newPassword");
+
+        when(memberRepository.findByEmail(mockMember.getEmail()))
+                .thenReturn(Optional.of(mockMember));
+
+        when(passwordEncoder.matches(request.getCurrentPassword(), mockMember.getPassword()))
+                .thenReturn(false); // 본인 인증을 위한 기존 비밀번호 검사 불일치
+
+        // when & then
+        assertThrows(InvalidPasswordException.class, () -> {
+            memberProfileService.editProfile(user, request);
+        });
+
     }
 }

@@ -38,11 +38,11 @@ export default function LectureCard({ lecture, onDelete }: LectureCardProps) {
 
     const getThumbnailSrc = (): string => {
         if (lecture.thumbnailBase64) {
-        return `data:image/png;base64,${lecture.thumbnailBase64}`;
+            return `data:image/png;base64,${lecture.thumbnailBase64}`;
         }
 
         if (!lecture.thumbnailBase64 && lecture.url) {
-        return "/images/youtube.jpg";
+            return "/images/youtube.jpg";
         }
 
         return "/images/audio.avif";

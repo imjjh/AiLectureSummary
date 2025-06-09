@@ -4,6 +4,7 @@ import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.application.dto.member.request.MemberResetPasswordRequest;
 import com.ktnu.AiLectureSummary.application.dto.member.request.MemberVerifyRequest;
 import com.ktnu.AiLectureSummary.application.dto.member.response.MemberPasswordResetTokenResponse;
+import com.ktnu.AiLectureSummary.global.exception.AccountInactiveException;
 import com.ktnu.AiLectureSummary.global.exception.InvalidTokenException;
 import com.ktnu.AiLectureSummary.global.exception.MemberNotFoundException;
 import com.ktnu.AiLectureSummary.repository.MemberRepository;
@@ -39,6 +40,11 @@ public class PasswordResetService {
 
         Member member = memberRepository.findByUsernameAndEmail(name, email)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 사용자 정보입니다."));
+
+        // 탈퇴한 회원인지 검사
+        if (!member.isActive()) {
+            throw new AccountInactiveException("탈퇴한 회원입니다.");
+        }
 
         // 이름과 이메일이 일치하는 사용자가 존재함을 확인했으므로, 임시 토큰을 발급 (실제 서비스의 경우 이메일로 토큰 전송)
         String token = UUID.randomUUID().toString(); // 유니버설 고유 식별자 생성 // TODO 예측이 가능한 구조 SecureRandom로 리팩터링
