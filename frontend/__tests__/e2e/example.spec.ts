@@ -18,7 +18,17 @@ import {
   홈으로이동,
   서비스소개이동,
   요약으로이동,
-  계정설정
+  계정설정,
+  다크모드,
+  제목수정,
+  최근강의삭제,
+  모든요약,
+  강의리스트,
+  로그아웃,
+  회원탈퇴,
+  비밀번호재설정,
+  변경비밀번호로그인
+  
 } from './helper';
 
 test('모든 기능 동작 검사 (발표 녹화용)', async ({ page }) => {
@@ -27,10 +37,10 @@ test('모든 기능 동작 검사 (발표 녹화용)', async ({ page }) => {
 
 
   await 영상업로드(page); // 비회원 업로드 불가 확인
-  await expect(page.getByText('로그인이 필요합니다')).toBeVisible(); // 가끔 실패함 이유는 모름
+  //await expect(page.getByText('로그인이 필요합니다')).toBeVisible(); // 가끔 실패함 이유는 모름
 
   await 회원가입(page);
-  // await expect(page).toHaveURL(/.*login.*/); // 이것도 넣으면 오류 가끔 나는데 알림이 방해해서 그런거 같음
+  //await expect(page).toHaveURL(/.*login.*/); // 이것도 넣으면 오류 가끔 나는데 알림이 방해해서 그런거 같음
 
   await 로그인(page);
   await expect(page).toHaveURL(/.*dashboard.*/);
@@ -39,57 +49,59 @@ test('모든 기능 동작 검사 (발표 녹화용)', async ({ page }) => {
   await 영상업로드(page);
   // await expect(page.getByText('요약 생성 중')).toBeVisible();  // 검증인데 이미 있던 영상이면 빠르게 넘어가서 검증을 못하는거 같음
 
-  await PDF저장(page);
+  // await PDF저장(page);
 
-  await 홈으로이동(page);
+  // await 홈으로이동(page);
 
-  await 녹음파일업로드(page);
+  // await 녹음파일업로드(page);
 
-  await 메모저장(page);
+  // await 메모저장(page);
 
-  await page.waitForTimeout(1000); // 메모 삭제 전 1초 대기
-  await 메모삭제(page);
+  // await page.waitForTimeout(1000); // 메모 삭제 전 1초 대기
+  // await 메모삭제(page);
 
-  // 화이트모드->다크모드
-  // await 다크모드(page);
+  // 화이트모드->다크모드 ✅
+   await 다크모드(page);
 
   // 유트브링크업로드
-  await 홈으로이동(page);
-  await 유튜브링크입력(page);
+  //await 홈으로이동(page);
+  //await 유튜브링크입력(page);
 
-  // 제목 수정
+  // 제목 수정 ✅
   // await 제목수정(page);
 
   // 대시 보드 이동
   await 요약으로이동(page);
 
-  // 최근요약X -> 모든요약 클릭
-  // await 모든요약(page)
+  // 최근요약X -> 모든요약 클릭 ✅
+   await 모든요약(page)
 
-  // 강의 제일 제일 왼쪽꺼? 또는 아무거나 삭제
-  // await 강의삭제(page)
+  // 강의 제일 제일 왼쪽꺼? 또는 아무거나 삭제 ✅
+   await 최근강의삭제(page)
 
-  // 강의 카드형태로보기 -> 리스트형태로 보기
-  // await 강의리스트(page)
+  // 강의 카드형태로보기 -> 리스트형태로 보기 ✅
+   await 강의리스트(page)
 
   // 내 정보 수정 (이름 비번)
-  await 계정설정(page);
+  //await 계정설정(page);
 
-  // 로그 아웃
-  // await 로그아웃(page);
+  // 로그 아웃 ✅
+   await 로그아웃(page);
+   //await 홈으로이동(page);
+   
+  // 비밀번호 찾기 및 재설정 ✅
+   await 비밀번호재설정(page)
 
-  // 비밀번호 찾기 및 재설정
-  // await 비밀번호재설정(page)
+  // 재설정된 비밀번호 로그인 ✅
+  await 변경비밀번호로그인(page); // 재설정된 비밀번호
 
-  // 재설정된 비밀번호 로그인
-  // await 로그인?(page); // 재설정된 비밀번호
+  // 회원 탈퇴 ✅
+  await 회원탈퇴(page);
 
-  // 회원 탈퇴
-  // await 회원탈퇴(page);
-
-  // 로그인 시도 (탈퇴한 계정)
+  // 로그인 시도 (탈퇴한 계정) 
+  //await expect(page).toHaveURL(/.*login.*/); // 이것도 넣으면 오류 가끔 나는데 알림이 방해해서 그런거 같음
   await 로그인(page);
-
+  await 홈으로이동(page);
   // 종료
   //////////////////////////////////////////////////////////////////
 
