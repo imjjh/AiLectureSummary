@@ -36,9 +36,15 @@ export default function ForgotPasswordPage() {
         credentials: "include",
         body: JSON.stringify({ username: name, email }),
       })
+      
+      const result = await res.json()
+      if (result.message?.includes("탈퇴")){
+        alert("이미 탈퇴한 회원입니다. 사용자 정보를 찾을 수 없습니다.")
+        router.push("/login")
+        return
+      }
 
       if (!res.ok) throw new Error("입력한 정보가 일치하지 않습니다.")
-      const result = await res.json()
       setToken(result.data.token)
       setStep(2)
     } catch (err: any) {
@@ -158,6 +164,9 @@ export default function ForgotPasswordPage() {
                       className="rounded-full"
                       required
                     />
+                    {confirmPassword && confirmPassword !== password && (
+                      <p className="text-sm text-red-500 mt-1">비밀번호가 일치하지 않습니다.</p>
+                    )}
                   </div>
                 </>
               )}
