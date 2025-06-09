@@ -5,7 +5,7 @@ import com.ktnu.AiLectureSummary.application.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.application.dto.lecture.response.LectureUploadResponse;
 import com.ktnu.AiLectureSummary.application.dto.lecture.request.YoutubeLectureRequest;
 import com.ktnu.AiLectureSummary.global.security.CustomUserDetails;
-import com.ktnu.AiLectureSummary.application.service.usecase.UploadLectureUseCase;
+import com.ktnu.AiLectureSummary.application.usecase.UploadLectureUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;

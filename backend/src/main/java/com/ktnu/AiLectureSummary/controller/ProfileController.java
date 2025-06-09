@@ -1,6 +1,6 @@
 package com.ktnu.AiLectureSummary.controller;
 
-import com.ktnu.AiLectureSummary.application.service.usecase.DeleteMemberUseCase;
+import com.ktnu.AiLectureSummary.application.usecase.DeleteMemberUseCase;
 import com.ktnu.AiLectureSummary.global.config.CookieProperties;
 import com.ktnu.AiLectureSummary.application.dto.ApiResponse;
 import com.ktnu.AiLectureSummary.application.dto.member.request.MemberEditRequest;

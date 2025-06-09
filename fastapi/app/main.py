@@ -211,15 +211,13 @@ def get_gpt_summary(text):
         logger.error(f"GPT 처리 중 오류: {str(e)}")
         return "요약 실패", "요약 중 오류가 발생했습니다."
 
-@app.post("/api/summary")
-async def process_video(
-    file: UploadFile = File(None),
-    youtube_url: str = Form(None)
-):
+
+@app.post("/api/youtubeSummary")
+async def process_youtube_video(data: dict):
+    youtube_url = data.get("youtubeUrl")
     temp_video_path = None
     temp_audio_path = None
-
-    # 유튜브 URL이 들어온 경우
+ # 유튜브 URL이 들어온 경우
     if youtube_url and is_youtube_url(youtube_url):
         try:
             title, duration, video_path, caption_text = extract_youtube_info_and_caption(youtube_url)
@@ -275,6 +273,15 @@ async def process_video(
                         os.remove(path)
                     except:
                         pass
+
+@app.post("/api/summary")
+async def process_uploaded_video(
+    file: UploadFile = File(None)
+):
+    temp_video_path = None
+    temp_audio_path = None
+
+   
 
     # 파일 업로드인 경우 (mp4, mov, mp3)
     if file:

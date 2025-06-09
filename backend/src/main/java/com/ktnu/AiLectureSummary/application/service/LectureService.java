@@ -1,6 +1,7 @@
 package com.ktnu.AiLectureSummary.application.service;
 
 
+import com.ktnu.AiLectureSummary.application.port.out.LectureSummaryFromFilePort;
 import com.ktnu.AiLectureSummary.global.config.FastApiProperties;
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.application.dto.lecture.response.LectureSummaryResponse;
@@ -32,7 +33,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LectureService {
     private final LectureRepository lectureRepository;
-    private final FastApiProperties fastApiProperties;
+    private final LectureSummaryFromFilePort lectureSummaryFromFilePort;
 
     /**
      * 업로드된 음성 또는 비디오 파일을 해싱하여 중복 여부를 검사하고, (업로드된 적이 있는 "영상 또는 음성파일"에 대해서만 중복여부 판단 가능)
@@ -54,7 +55,7 @@ public class LectureService {
         }
 
         // FastAPI 호출
-        LectureSummaryResponse registerRequest = requestLectureSummaryFromFile(file);
+        LectureSummaryResponse registerRequest = lectureSummaryFromFilePort.requestSummary(file);
 
         // 썸네일 이미지는 DB에 저장되며, 프론트 전달 시 Base64로 인코딩되어 전송됨
         // 썸네일 Base64 디코딩 // 음성 파일의 경우 썸네일 없음
@@ -63,67 +64,6 @@ public class LectureService {
         // DB에 강의 내용 저장
         return lectureRepository.save(Lecture.fromUploadedVideo(registerRequest, mediaHash,thumbnailBytes));
 
-    }
-
-    /**
-     * 업로드된 비디오 파일을 FastAPI 서버로 전송하고,
-     * 요약 정보를 LectureRegisterRequest 형태로 반환한다.
-     * 동기 처리 방식으로 타임아웃이 발생할 수 있다.
-     *
-     * @param file 전송할 비디오 파일
-     * @return 요약 정보가 담긴 요청 객체
-     * @throws ExternalApiException FastAPI 요청 중 오류가 발생한 경우
-     */
-
-    private LectureSummaryResponse requestLectureSummaryFromFile(MultipartFile file) {
-        // Spring에서 외부 HTTP 요청을 보낼 수 있는 기본 클라이언트
-        RestTemplate restTemplate = new RestTemplate();
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(3000); // 연결 타임아웃: 3초
-        factory.setReadTimeout(100000); // 응답 타임 아웃: 100초
-        restTemplate.setRequestFactory(factory);
-
-        // 요청 헤더 설정, FastAPI가 multipart 형식으로 파일을 받을 수 있게 Content-Type을 multipart/form-data로 지정
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        // 하나의 key에 여러 개의 value를 가질 수 있는 Map, multipart 요청에서는 "file" 같은 form 필드명을 키로 설정해야 함
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        try {
-            // FastAPI 파라미터 이름 == Spring 쪽 key 일치해야 동작? "file"
-            //  Spring 서버가 FastAPI 서버에 파일을 전송하기 위해 multipart/form-data 요청 본문(body)을 구성
-            body.add("file", new MultipartFileResource(file.getInputStream(), file.getOriginalFilename()));
-        } catch (IOException e) {
-            throw new FileProcessingException("FastAPI 전송 중 파일 읽기 실패", e);
-        }
-        //  Spring에서 FastAPI로 파일을 보내기 위한 HTTP 요청 객체(requestEntity)를 구성하는 부분
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        // 동기식 처리로 FastAPI 요청 결과를 기다린 후 응답을 반환함
-        try {
-            ResponseEntity<LectureSummaryResponse> response = restTemplate.exchange(
-                    fastApiProperties.getUrl() + "/api/summary",  // FastAPI 엔드포인트
-                    HttpMethod.POST,
-                    requestEntity,
-                    LectureSummaryResponse.class // 받은 json 응답을 역직렬화
-            );
-            if (response.getBody() == null) {
-                throw new ExternalApiException("FastAPI 응답이 비어 있습니다.");
-            }
-
-            return response.getBody();
-        } catch (ResourceAccessException e) {
-            // 타임아웃 or 연결 실패
-            throw new ExternalApiException("FastAPI 서버와의 연결이 실패했거나 응답 시간이 초과되었습니다.", e);
-
-        } catch (HttpStatusCodeException e) {
-            // FastAPI 응답이 400, 500 에러일 때
-            String errorBody = e.getResponseBodyAsString();
-            throw new ExternalApiException("FastAPI 응답 오류: " + errorBody, e);
-
-        } catch (Exception e) {
-            throw new ExternalApiException("FastAPI 요청 중 알 수 없는 오류 발생", e);
-        }
     }
 
     /**
