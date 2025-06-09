@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.application.service.usecase;
+package com.ktnu.AiLectureSummary.application.usecase;
 
 import com.ktnu.AiLectureSummary.application.service.MemberLectureService;
 import com.ktnu.AiLectureSummary.application.service.MemberProfileService;

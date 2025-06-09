@@ -1,4 +1,4 @@
-package com.ktnu.AiLectureSummary.application.service.usecase;
+package com.ktnu.AiLectureSummary.application.usecase;
 
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.application.dto.lecture.response.LectureUploadResponse;
