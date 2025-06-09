@@ -22,7 +22,9 @@ import {
 } from './helper';
 
 test('모든 기능 동작 검사 (발표 녹화용)', async ({ page }) => {
-  await page.goto('http://localhost:3000/');
+  // await page.goto('http://localhost:3000/');
+  await page.goto('https://aisummarymono.vercel.app/');
+
 
   await 영상업로드(page); // 비회원 업로드 불가 확인
   await expect(page.getByText('로그인이 필요합니다')).toBeVisible(); // 가끔 실패함 이유는 모름
@@ -49,33 +51,46 @@ test('모든 기능 동작 검사 (발표 녹화용)', async ({ page }) => {
   await 메모삭제(page);
 
   // 화이트모드->다크모드
+  // await 다크모드(page);
 
   // 유트브링크업로드
+  await 홈으로이동(page);
+  await 유튜브링크입력(page);
 
   // 제목 수정
+  // await 제목수정(page);
 
   // 대시 보드 이동
+  await 요약으로이동(page);
 
   // 최근요약X -> 모든요약 클릭
+  // await 모든요약(page)
 
   // 강의 제일 제일 왼쪽꺼? 또는 아무거나 삭제
+  // await 강의삭제(page)
 
   // 강의 카드형태로보기 -> 리스트형태로 보기
+  // await 강의리스트(page)
 
   // 내 정보 수정 (이름 비번)
+  await 계정설정(page);
 
   // 로그 아웃
+  // await 로그아웃(page);
 
   // 비밀번호 찾기 및 재설정
+  // await 비밀번호재설정(page)
 
   // 재설정된 비밀번호 로그인
+  // await 로그인?(page); // 재설정된 비밀번호
 
   // 회원 탈퇴
+  // await 회원탈퇴(page);
 
   // 로그인 시도 (탈퇴한 계정)
+  await 로그인(page);
 
   // 종료
-
   //////////////////////////////////////////////////////////////////
 
 
