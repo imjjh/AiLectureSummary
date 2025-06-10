@@ -3,6 +3,7 @@ package com.ktnu.AiLectureSummary.repository;
 import com.ktnu.AiLectureSummary.domain.Lecture;
 import com.ktnu.AiLectureSummary.domain.Member;
 import com.ktnu.AiLectureSummary.domain.MemberLecture;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,9 +13,11 @@ import java.util.Optional;
 @Repository
 public interface MemberLectureRepository extends JpaRepository<MemberLecture, Long> {
     // 주어진 회원 ID와 강의 ID로 해당 회원이 해당 강의를 등록했는지 확인
+    @EntityGraph(attributePaths = "lecture") // 연관된 Lecture 엔티티도 함꼐 한 번에 가져와 N+1 문제 해결
     Optional<MemberLecture> findByMember_IdAndLecture_Id(long memberId, long lectureId);
 
     // 특정 회원이 등록한 모든 강의 목록 조회
+    @EntityGraph(attributePaths = "lecture") // 연관된 Lecture 엔티티도 함꼐 한 번에 가져와 N+1 문제 해결
     List<MemberLecture> findAllByMember_Id(Long memberId);
 
     // 해당 강의가 어떤 회원에게라도 등록되어 있는지 확인 (참조 유무 확인)
