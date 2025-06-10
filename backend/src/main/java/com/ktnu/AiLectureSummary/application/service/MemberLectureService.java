@@ -56,7 +56,6 @@ public class MemberLectureService {
     public MemberLectureListResponse getUserLectureList(CustomUserDetails user) {
 
         List<MemberLecture> memberLectures = memberLectureRepository.findAllByMember_Id(user.getId());
-        // TODO: N+1
         Long totalDuration = calculateTotalDuration(memberLectures); // 하나도 없는 경우 0?
         return MemberLectureListResponse.from(memberLectures, totalDuration);
     }
@@ -181,7 +180,7 @@ public class MemberLectureService {
      */
     @Transactional
     public void deleteMemberLectureAndCleanupLectureIfOrphan(MemberLecture memberLecture) {
-        // 강의 정보 // TODO: N+1
+        // 강의 정보
         Lecture lecture = memberLecture.getLecture();
 
         // 강의와 사용자의 연관 관계 제거
