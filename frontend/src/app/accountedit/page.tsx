@@ -9,13 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { customFetch } from "@/lib/fetch";
 
 import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
 import DeleteConfirmDialog from "@/components/DeleteConfirmDialog"
 
 export default function AccountEditPage() {
   const router = useRouter()
-  const { user, token, logout } = useAuth()
+  const { user, logout } = useAuth()
   const { toast } = useToast()
   const { refreshUser } = useAuth()
 
@@ -77,11 +78,10 @@ export default function AccountEditPage() {
         requestBody.newPassword = password
       }
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING_API_URL}/api/members/me`, {
+      const res = await customFetch(`${process.env.NEXT_PUBLIC_SPRING_API_URL}/api/members/me`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         credentials: "include",
         body: JSON.stringify(requestBody),
@@ -110,11 +110,9 @@ export default function AccountEditPage() {
   }
 
   const handleDeleteAccount = async () => {
-    console.log("현재 토큰: ", token)
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_SPRING_API_URL}/api/members/me`, {
+      const res = await customFetch(`${process.env.NEXT_PUBLIC_SPRING_API_URL}/api/members/me`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
         credentials: "include",
       })
 

@@ -11,6 +11,7 @@ import Image from "next/image"
 import { Textarea } from "@/components/ui/textarea"
 import { useAuth } from "@/hooks/use-auth"
 import { isYoutube } from "@/lib/isYoutube";
+import { customFetch } from "@/lib/fetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL;
 
@@ -58,7 +59,7 @@ export default function Page() {
   useEffect(() => {
     async function fetchSummary() {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}`, {
+        const res = await customFetch(`${API_BASE_URL}/api/member-lectures/${id}`, {
           method: "GET",
           credentials: "include",
           cache: "no-store",
@@ -110,7 +111,7 @@ export default function Page() {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/memo`, {
+      const res = await customFetch(`${API_BASE_URL}/api/member-lectures/${id}/memo`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -129,7 +130,7 @@ export default function Page() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/memo`, {
+      const res = await customFetch(`${API_BASE_URL}/api/member-lectures/${id}/memo`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -147,7 +148,7 @@ export default function Page() {
     if (editedTitle === summaryData?.customTitle) return
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/title`, {
+      const res = await customFetch(`${API_BASE_URL}/api/member-lectures/${id}/title`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -317,7 +318,7 @@ export default function Page() {
                     className="w-full max-w-xs gap-2 border border-border bg-muted hover:bg-zinc-300 text-foreground dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-white"
                     onClick={async () => {
                       try {
-                        const res = await fetch(`${API_BASE_URL}/api/member-lectures/${id}/pdf`, {
+                        const res = await customFetch(`${API_BASE_URL}/api/member-lectures/${id}/pdf`, {
                           credentials: "include",
                         });
 

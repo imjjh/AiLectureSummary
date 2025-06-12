@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Upload, PlayCircle, FileText, Info, ArrowRight } from "lucide-react"
 import Link from "next/link"
-import VideoUploader from "@/components/video-uploader"
 import { motion } from "framer-motion"
 import { useRef } from "react"
 import { useAuth } from "@/hooks/use-auth"
@@ -93,9 +92,9 @@ export default function Home() {
                   <div className="w-16 h-16 rounded-full bg-linear-to-r from-pink-500 to-orange-500 flex items-center justify-center mb-4">
                     <Upload className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">동영상 업로드</h3>
+                  <h3 className="text-lg font-medium mb-2">강의 업로드</h3>
                   <p className="text-sm text-muted-foreground">
-                    강의 또는 다양한 동영상을 업로드하세요.
+                    영상/음성 파일 또는 YouTube 링크를 업로드하세요.
                   </p>
                 </CardContent>
               </Card>
@@ -107,9 +106,9 @@ export default function Home() {
                   <div className="w-16 h-16 rounded-full bg-linear-to-r from-pink-500 to-orange-500 flex items-center justify-center mb-4">
                     <PlayCircle className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">AI 분석</h3>
+                  <h3 className="text-lg font-medium mb-2">AI 요약 생성</h3>
                   <p className="text-sm text-muted-foreground">
-                    AI가 동영상 내용을 자동으로 분석합니다. 중요한 내용을 선별하고, 핵심 주제를 파악합니다.
+                    AI가 강의 내용을 분석하여 핵심 내용을 추출합니다.
                   </p>
                 </CardContent>
               </Card>
@@ -142,7 +141,7 @@ export default function Home() {
             </p>*/}
             <Button 
             onClick={handleStartClick} className="rounded-full px-8 py-6 text-lg bg-linear-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-              <span>무료로 시작하기</span>
+              <span>강의 업로드하기</span>
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </motion.div>
