@@ -7,10 +7,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Clock, FileText, Upload, LayoutGrid, List } from "lucide-react"
 import Link from "next/link"
-import axios from "axios"
 import LectureCard from "@/components/lecture-card";
 import LectureList from "@/components/lecture-list"
 import { toast } from "@/hooks/use-toast"
+import { customFetch } from "@/lib/fetch";
 import {
   Dialog,
   DialogContent,
@@ -18,9 +18,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-
-
-axios.defaults.withCredentials = true;
 
 interface Lecture {
   lectureId: number;
@@ -56,11 +53,11 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchLectures() {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/member-lectures/dashboard`, {
-          withCredentials: true,
-        });
+        const res = await customFetch(`${API_BASE_URL}/api/member-lectures/dashboard`);
+        if (!res.ok) throw new Error("강의 데이터 불러오기 실패");
 
-        const fetchedData = res.data.data;
+        const json = await res.json();
+        const fetchedData = json.data;
         const sortedLectures = fetchedData.items.sort(
           (a: Lecture, b: Lecture) => b.lectureId - a.lectureId
         );
@@ -77,10 +74,11 @@ export default function DashboardPage() {
 
     async function fetchUserInfo() {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/members/me`, {
-          withCredentials: true,
-        });
-        setUser(res.data.data); // 사용자 정보
+        const res = await customFetch(`${API_BASE_URL}/api/members/me`);
+        if (!res.ok) throw new Error("사용자 정보 불러오기 실패");
+
+        const json = await res.json();
+        setUser(json.data); // 사용자 정보
       } catch (error) {
         console.error("사용자 정보 불러오기 실패", error);
       } finally {
@@ -95,7 +93,7 @@ export default function DashboardPage() {
   // 강의 삭제 처리 함수
   const handleDelete = async (lecture: Lecture) => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/member-lectures/${lecture.lectureId}`, {
+      const res = await customFetch(`${API_BASE_URL}/api/member-lectures/${lecture.lectureId}`, {
         method: "DELETE",
         credentials: "include",
       });

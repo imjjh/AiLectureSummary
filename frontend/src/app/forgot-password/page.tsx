@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
+import { customFetch } from "@/lib/fetch";
 import { PasswordInputWithCapsWarning } from "@/components/ui/password-input"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL
@@ -30,7 +31,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true)
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/password/verify`, {
+      const res = await customFetch(`${API_BASE_URL}/api/password/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -78,7 +79,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/password/reset`, {
+      const res = await customFetch(`${API_BASE_URL}/api/password/reset`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useEffect, useState } from "react"
 
 export function ModeToggle() {
-  const { setTheme, theme } = useTheme()
+  const { setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   // Fix hydration issues

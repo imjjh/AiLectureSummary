@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -10,9 +10,9 @@ import logging
 import requests
 from PIL import Image
 import io
-import yt_dlp
 import re
 import base64
+from youtube_transcript_api import YouTubeTranscriptApi
 
 # Load environment variables
 load_dotenv()
@@ -39,6 +39,10 @@ class SummaryResponse(BaseModel):
     filename: str
     timestamp: str
     thumbnail: str = None
+
+class YoutubeSummaryRequest(BaseModel):
+    youtubeUrl: str
+    languages: list = ['ko', 'en', 'ja']  # 기본 우선순위: 한/영/일
 
 class YoutubeSummaryResponse(BaseModel):
     title: str
@@ -98,53 +102,27 @@ def compress_image_to_webp(image_bytes, target_kb=350, quality=90):
         result_bytes = buffer.getvalue()
     return result_bytes
 
-def extract_youtube_info_and_caption(youtube_url: str):
-    with tempfile.TemporaryDirectory() as tmpdir:
-        ydl_opts = {
-            'outtmpl': os.path.join(tmpdir, '%(id)s.%(ext)s'),
-            'writesubtitles': True,
-            'writeautomaticsub': True,
-            'subtitleslangs': ['ko'],
-            'skip_download': False,
-            'quiet': True,
-            'no_warnings': True,
-            'format': 'best[ext=mp4]/best',
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(youtube_url, download=True)
-            title = info.get('title', '제목없음')
-            duration = info.get('duration', 0)
-            video_path = ydl.prepare_filename(info)
-            caption_text = None
-            sub_files = []
-            if 'requested_subtitles' in info and info['requested_subtitles']:
-                for lang, sub in info['requested_subtitles'].items():
-                    if lang.startswith('ko') and sub.get('filepath'):
-                        sub_files.append(sub.get('filepath'))
-            if not sub_files:
-                for f in os.listdir(tmpdir):
-                    if (f.endswith('.vtt') or f.endswith('.srt')) and (f.startswith('ko') or '.ko.' in f):
-                        sub_files.append(os.path.join(tmpdir, f))
-            if not sub_files:
-                for f in os.listdir(tmpdir):
-                    if f.endswith('.vtt') or f.endswith('.srt'):
-                        sub_files.append(os.path.join(tmpdir, f))
-            for sub_file in sub_files:
-                try:
-                    with open(sub_file, 'r', encoding='utf-8') as f:
-                        lines = f.readlines()
-                        texts = []
-                        for line in lines:
-                            if line.strip() and not line.startswith(('WEBVTT', 'NOTE', 'X-TIMESTAMP', 'Kind:', 'Language:', 'STYLE', 'Region:')) \
-                               and not re.match(r'^\d+$', line.strip()) and not re.match(r'^\d{2}:\d{2}:\d{2}', line.strip()):
-                                texts.append(line.strip())
-                        caption_text = clean_caption_text(' '.join(texts))
-                        if caption_text.strip():
-                            break
-                except Exception as e:
-                    continue
-            return title, duration, video_path, caption_text
-        return title, duration, video_path, None
+def extract_video_id(url_or_id: str) -> str:
+    # 유튜브 URL 또는 ID에서 영상 ID 추출
+    if re.match(r"^[\w-]{11}$", url_or_id):
+        return url_or_id
+    match = re.search(r"(?:v=|youtu\.be/)([\w-]{11})", url_or_id)
+    if match:
+        return match.group(1)
+    raise HTTPException(status_code=400, detail="유효하지 않은 유튜브 URL 또는 ID입니다.")
+
+def extract_youtube_caption_by_api(youtube_url: str, languages: list):
+    """
+    youtube_transcript_api로 여러 언어 우선순위로 자막 추출
+    """
+    video_id = extract_video_id(youtube_url)
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=languages)
+        caption_text = " ".join([entry['text'] for entry in transcript])
+        return caption_text
+    except Exception as e:
+        logger.error(f"자막 추출 실패: {e}")
+        return None
 
 def get_whisper_transcription(audio_path, file_name):
     api_key = os.getenv("GPT_SECRET_KEY")
@@ -182,7 +160,8 @@ def get_gpt_summary(text):
                         "content": (
                             "아래의 텍스트에서 핵심 내용만 한국어로 요약해줘. "
                             "제목도 1줄로 요약해줘. 형식은 다음과 같아:\n"
-                            "제목: ...\n요약: ..."
+                            "제목: ...\n요약: ...\n"
+                            "반드시 한국어로만 답변해."
                         )
                     },
                     {
@@ -211,53 +190,21 @@ def get_gpt_summary(text):
         logger.error(f"GPT 처리 중 오류: {str(e)}")
         return "요약 실패", "요약 중 오류가 발생했습니다."
 
-
 @app.post("/api/youtubeSummary")
-async def process_youtube_video(data: dict):
-    youtube_url = data.get("youtubeUrl")
-    temp_video_path = None
-    temp_audio_path = None
- # 유튜브 URL이 들어온 경우
+async def process_youtube_video(data: YoutubeSummaryRequest):
+    youtube_url = data.youtubeUrl
+    languages = data.languages if hasattr(data, 'languages') and data.languages else ['ko', 'en', 'ja']
     if youtube_url and is_youtube_url(youtube_url):
         try:
-            title, duration, video_path, caption_text = extract_youtube_info_and_caption(youtube_url)
+            caption_text = extract_youtube_caption_by_api(youtube_url, languages)
             if not caption_text or not caption_text.strip():
-                temp_audio_path = video_path + ".wav"
-                ffmpeg_cmd = [
-                    "ffmpeg", "-y", "-i", video_path,
-                    "-vn", "-acodec", "pcm_s16le",
-                    "-ar", "16000", "-ac", "1",
-                    temp_audio_path
-                ]
-                audio_proc = subprocess.run(
-                    ffmpeg_cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE
-                )
-                if audio_proc.returncode != 0:
-                    stderr_str = audio_proc.stderr.decode("utf-8", errors="ignore")
-                    if (
-                        "Stream map 'a'" in stderr_str or 
-                        "does not contain any stream" in stderr_str or
-                        "Stream specifier 'a'" in stderr_str or
-                        "Output file #" in stderr_str and "has no audio stream" in stderr_str or
-                        "could not find codec parameters for stream" in stderr_str or
-                        "no audio" in stderr_str
-                    ):
-                        logger.error("오디오 트랙 없음: " + stderr_str)
-                        raise HTTPException(400, "소리가 없는 영상입니다. 소리가 포함된 영상을 업로드 해주세요.")
-                    else:
-                        logger.error("ffmpeg 에러: " + stderr_str)
-                        raise HTTPException(500, "오디오 추출 중 알 수 없는 에러가 발생했습니다.")
-                if not os.path.exists(temp_audio_path) or os.path.getsize(temp_audio_path) == 0:
-                    raise HTTPException(400, "소리가 없는 영상입니다. 소리가 포함된 영상을 업로드 해주세요.")
-                caption_text = get_whisper_transcription(temp_audio_path, os.path.basename(video_path))
+                raise HTTPException(404, "자막을 찾을 수 없습니다. (수동/자동 생성 자막 모두 없음)")
             gpt_title, gpt_summary = get_gpt_summary(caption_text)
             return {
                 "title": gpt_title,
                 "aiSummary": gpt_summary,
                 "originalText": caption_text,
-                "duration": int(duration),
+                "duration": 0,  # yt-dlp 제거로 길이 정보 없음
                 "url": youtube_url,
                 "timestamp": datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S"),
             }
@@ -266,13 +213,7 @@ async def process_youtube_video(data: dict):
         except Exception as e:
             logger.error(str(e), exc_info=True)
             raise HTTPException(500, "유튜브 영상 처리 중 서버 오류")
-        finally:
-            for path in [temp_audio_path, video_path if 'video_path' in locals() else None]:
-                if path and os.path.exists(path):
-                    try:
-                        os.remove(path)
-                    except:
-                        pass
+    raise HTTPException(400, "유효한 유튜브 URL을 입력해주세요.")
 
 @app.post("/api/summary")
 async def process_uploaded_video(
@@ -280,9 +221,6 @@ async def process_uploaded_video(
 ):
     temp_video_path = None
     temp_audio_path = None
-
-   
-
     # 파일 업로드인 경우 (mp4, mov, mp3)
     if file:
         try:

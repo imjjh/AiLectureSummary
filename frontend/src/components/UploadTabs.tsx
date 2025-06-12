@@ -12,6 +12,8 @@ import { motion } from "framer-motion"
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { customFetch } from "@/lib/fetch";
+import axios from "@/lib/axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL;
 
@@ -31,7 +33,7 @@ export default function UploadTabs() {
     setProgress(0);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/lectures/youtube`, {
+      const res = await customFetch(`${API_BASE_URL}/api/lectures/youtube`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,31 +83,20 @@ export default function UploadTabs() {
       const formData = new FormData();
       formData.append("file", audioFile);
 
-      const response = await new Promise<any>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-
-        xhr.upload.addEventListener("progress", event => {
-          if (event.lengthComputable) {
-            setProgress(Math.round((event.loaded / event.total) * 100));
+      const response = await axios.post(`${API_BASE_URL}/api/lectures/mediaFile`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+        onUploadProgress: (event) => {
+          if (event.total) {
+            const percentCompleted = Math.round((event.loaded * 100) / event.total);
+            setProgress(percentCompleted);
           }
-        });
-
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              resolve(JSON.parse(xhr.responseText));
-            } else {
-              reject(new Error(`HTTP ${xhr.status}: ${xhr.responseText || xhr.statusText}`));
-            }
-          }
-        };
-
-        xhr.open("POST", `${API_BASE_URL}/api/lectures/mediaFile`);
-        xhr.withCredentials = true;
-        xhr.send(formData);
+        },
       });
 
-      const lectureId = response.data.id;
+      const lectureId = response.data.data.id;
       router.push(`/summary/${lectureId}`);
     }
     catch (error: any) {
@@ -146,7 +137,7 @@ export default function UploadTabs() {
           </motion.div>
           <div>
             <h3 className="text-lg font-medium">음성 파일 업로드</h3>
-            <p className="text-sm text-muted-foreground">녹음 파일(MP3, WAV 등)을 업로드하세요</p>
+            <p className="text-sm text-muted-foreground">음성 파일(MP3, WAV 등)을 업로드하세요</p>
           </div>
           <input
             id="audio-upload"
