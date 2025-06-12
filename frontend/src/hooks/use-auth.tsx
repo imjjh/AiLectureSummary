@@ -41,38 +41,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL // 환경변수로부터 API base URL 읽기
 
-  // 컴포넌트 마운트 시 자동 로그인 여부 확인
   useEffect(() => {
-    const storedToken = localStorage.getItem("access_token")
-    if (storedToken) {
-      setToken(storedToken)
-      fetchUserWithToken(storedToken)
-    } else {
-      setIsLoading(false)
-    }
-    async function fetchUserWithToken(token: string) {
+    const fetchUser = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/members/me`, {
-          credentials: "include", // 쿠키 포함
-          headers: { Authorization: `Bearer ${token}` }
+          credentials: "include",
         })
-
         if (res.ok) {
           const data = await res.json()
           const loggedInUser: User = {
-            id: String(data.data.id),
-            name: data.data.username,
-            email: data.data.email,
-            joinDate: "",
+            id: String(data.id),
+            name: data.username,
+            email: data.email,
+            joinDate: "", // 서버에 joinDate가 없으면 빈 값
           }
           setUser(loggedInUser)
         }
       } catch (err) {
-        console.error("자동 로그인 실패:", err)
+        console.error("자동 로그인 확인 실패:", err)
       } finally {
         setIsLoading(false)
       }
     }
+
+    fetchUser()
   }, [])
 
   // 로그인 함수
