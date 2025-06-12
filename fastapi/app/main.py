@@ -12,9 +12,9 @@ from PIL import Image
 import io
 import re
 import base64
-from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, NoTranscriptFound
 
-# Load environment variables
+# 환경 변수 로드
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
@@ -42,7 +42,6 @@ class SummaryResponse(BaseModel):
 
 class YoutubeSummaryRequest(BaseModel):
     youtubeUrl: str
-    languages: list = ['ko', 'en', 'ja']  # 기본 우선순위: 한/영/일
 
 class YoutubeSummaryResponse(BaseModel):
     title: str
@@ -111,15 +110,27 @@ def extract_video_id(url_or_id: str) -> str:
         return match.group(1)
     raise HTTPException(status_code=400, detail="유효하지 않은 유튜브 URL 또는 ID입니다.")
 
-def extract_youtube_caption_by_api(youtube_url: str, languages: list):
+def extract_caption_with_auto(video_id: str):
     """
-    youtube_transcript_api로 여러 언어 우선순위로 자막 추출
+    영어, 한국어(수동/자동 생성) 자막을 우선순위로 추출
     """
-    video_id = extract_video_id(youtube_url)
     try:
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=languages)
-        caption_text = " ".join([entry['text'] for entry in transcript])
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        # 우선순위: 영어(수동) → 영어(자동) → 한국어(수동) → 한국어(자동)
+        try:
+            transcript = transcript_list.find_manually_created_transcript(['en'])
+        except NoTranscriptFound:
+            try:
+                transcript = transcript_list.find_generated_transcript(['en'])
+            except NoTranscriptFound:
+                try:
+                    transcript = transcript_list.find_manually_created_transcript(['ko'])
+                except NoTranscriptFound:
+                    transcript = transcript_list.find_generated_transcript(['ko'])
+        caption_text = " ".join([entry.text for entry in transcript.fetch()])
         return caption_text
+    except (TranscriptsDisabled, NoTranscriptFound):
+        return None
     except Exception as e:
         logger.error(f"자막 추출 실패: {e}")
         return None
@@ -131,7 +142,10 @@ def get_whisper_transcription(audio_path, file_name):
     with open(audio_path, "rb") as audio_file:
         response = requests.post(
             "https://api.openai.com/v1/audio/transcriptions",
-            headers={"Authorization": f"Bearer {api_key}"},
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            },
             files={"file": (file_name, audio_file, "audio/wav")},
             data={"model": "whisper-1"}
         )
@@ -193,10 +207,10 @@ def get_gpt_summary(text):
 @app.post("/api/youtubeSummary")
 async def process_youtube_video(data: YoutubeSummaryRequest):
     youtube_url = data.youtubeUrl
-    languages = data.languages if hasattr(data, 'languages') and data.languages else ['ko', 'en', 'ja']
     if youtube_url and is_youtube_url(youtube_url):
         try:
-            caption_text = extract_youtube_caption_by_api(youtube_url, languages)
+            video_id = extract_video_id(youtube_url)
+            caption_text = extract_caption_with_auto(video_id)
             if not caption_text or not caption_text.strip():
                 raise HTTPException(404, "자막을 찾을 수 없습니다. (수동/자동 생성 자막 모두 없음)")
             gpt_title, gpt_summary = get_gpt_summary(caption_text)
