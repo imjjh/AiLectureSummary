@@ -17,6 +17,9 @@ from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled, No
 # 환경 변수 로드
 load_dotenv()
 
+# 파일 업로드 최대 크기 (MB 단위, 환경변수로 설정 가능)
+MAX_FILE_SIZE = int(os.getenv("MAX_UPLOAD_SIZE_MB", "2000")) * 1024 * 1024  # default 2000MB
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -211,22 +214,56 @@ async def process_youtube_video(data: YoutubeSummaryRequest):
         try:
             video_id = extract_video_id(youtube_url)
             caption_text = extract_caption_with_auto(video_id)
+
             if not caption_text or not caption_text.strip():
-                raise HTTPException(404, "자막을 찾을 수 없습니다. (수동/자동 생성 자막 모두 없음)")
+                raise ValueError("자막 없음")
+
             gpt_title, gpt_summary = get_gpt_summary(caption_text)
             return {
                 "title": gpt_title,
                 "aiSummary": gpt_summary,
                 "originalText": caption_text,
-                "duration": 0,  # yt-dlp 제거로 길이 정보 없음
+                "duration": 0,
                 "url": youtube_url,
                 "timestamp": datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S"),
             }
-        except HTTPException:
-            raise
         except Exception as e:
-            logger.error(str(e), exc_info=True)
-            raise HTTPException(500, "유튜브 영상 처리 중 서버 오류")
+            logger.warning(f"자막 실패, Whisper로 시도: {e}")
+            try:
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    video_id = extract_video_id(youtube_url)
+                    output_path = os.path.join(tmpdir, f"{video_id}.mp4")
+                    audio_path = os.path.join(tmpdir, f"{video_id}.wav")
+                    ydl_cmd = [
+                        "yt-dlp", "-f", "best[ext=mp4]", "-o", output_path, youtube_url
+                    ]
+                    subprocess.run(ydl_cmd, check=True)
+
+                    if not os.path.exists(output_path):
+                        raise HTTPException(400, "영상 다운로드 실패")
+
+                    ffmpeg_cmd = [
+                        "ffmpeg", "-y", "-i", output_path,
+                        "-vn", "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1", audio_path
+                    ]
+                    subprocess.run(ffmpeg_cmd, check=True)
+
+                    if not os.path.exists(audio_path):
+                        raise HTTPException(400, "오디오 추출 실패")
+
+                    caption_text = get_whisper_transcription(audio_path, f"{video_id}.wav")
+                    gpt_title, gpt_summary = get_gpt_summary(caption_text)
+                    return {
+                        "title": gpt_title,
+                        "aiSummary": gpt_summary,
+                        "originalText": caption_text,
+                        "duration": 0,
+                        "url": youtube_url,
+                        "timestamp": datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S"),
+                    }
+            except Exception as e:
+                logger.error("Whisper 처리 실패", exc_info=True)
+                raise HTTPException(500, "유튜브 자막 및 Whisper 분석 실패")
     raise HTTPException(400, "유효한 유튜브 URL을 입력해주세요.")
 
 @app.post("/api/summary")
@@ -243,8 +280,8 @@ async def process_uploaded_video(
 
             with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as temp_file:
                 content = await file.read()
-                if len(content) > 500 * 1024 * 1024:
-                    raise HTTPException(413, "파일 크기 초과 (최대 500MB)")
+                if len(content) > MAX_FILE_SIZE:
+                    raise HTTPException(413, f"파일 크기 초과 (최대 {MAX_FILE_SIZE // (1024 * 1024)}MB)")
                 temp_file.write(content)
                 temp_video_path = temp_file.name
 
