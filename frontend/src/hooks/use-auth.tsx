@@ -45,20 +45,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const fetchUser = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/members/me`, {
-          credentials: "include",
+          credentials: "include", // 쿠키 포함
         })
         if (res.ok) {
           const data = await res.json()
           const loggedInUser: User = {
-            id: String(data.id),
-            name: data.username,
-            email: data.email,
-            joinDate: "", // 서버에 joinDate가 없으면 빈 값
+            id: String(data.data.id),
+            name: data.data.username,
+            email: data.data.email,
+            joinDate: "",
           }
           setUser(loggedInUser)
         }
       } catch (err) {
-        console.error("자동 로그인 확인 실패:", err)
+        console.error("자동 로그인 실패:", err)
       } finally {
         setIsLoading(false)
       }
@@ -66,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     fetchUser()
   }, [])
+
 
   // 로그인 함수
   const login = async (email: string, password: string): Promise<boolean> => {
