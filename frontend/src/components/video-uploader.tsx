@@ -10,6 +10,7 @@ import { Upload } from "lucide-react"
 import { motion } from "framer-motion"
 import { useAuth } from "@/hooks/use-auth"
 import { toast } from "@/hooks/use-toast"
+import axios from "@/lib/axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL;
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
@@ -91,31 +92,19 @@ export default function VideoUploader() {
       const formData = new FormData()
       formData.append('file', file)
 
-      const response = await new Promise<any>((resolve, reject) => {
-        const xhr = new XMLHttpRequest()
-
-        xhr.upload.addEventListener('progress', event => {
-          if (event.lengthComputable) {
+      const res = await axios.post(`${API_BASE_URL}/api/lectures/mediaFile`, formData, {
+        withCredentials: true,
+        onUploadProgress: (event) => {
+          if (event.total) {
             setProgress(Math.round((event.loaded / event.total) * 100))
           }
-        })
-
-        xhr.onreadystatechange = () => {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              resolve(JSON.parse(xhr.responseText))
-            } else {
-              reject(new Error(`HTTP ${xhr.status}: ${xhr.responseText || xhr.statusText}`))
-            }
-          }
+        },
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-
-        xhr.open('POST', `${API_BASE_URL}/api/lectures/mediaFile`)
-        xhr.withCredentials = true
-        xhr.send(formData)
       })
 
-      const lectureId = response.data.id
+      const lectureId = res.data.data.id
       router.push(`/summary/${lectureId}`)
     } catch (error: any) {
       alert("업로드 실패: " + error.message)

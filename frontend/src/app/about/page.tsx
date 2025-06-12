@@ -54,28 +54,28 @@ export default function AboutPage() {
       <motion.section variants={container} className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-24">
         {[
           {
-            step: "1. 동영상 업로드",
+            step: "1. 강의 업로드",
             imgSrc: "/images/1.png",
             imgAlt: "동영상 업로드 화면",
-            desc: "강의 동영상을 업로드하세요. 다양한 형식의 파일을 지원하며, 드래그 앤 드롭 또는 버튼을 통해 손쉽게 업로드할 수 있습니다.",
+            desc: "영상/음성 파일 또는 YouTube 링크를 업로드하여 강의를 등록하세요.",
           },
           {
-            step: "2. AI 분석",
+            step: "2. AI 요약 생성",
             imgSrc: "/images/2.png",
-            imgAlt: "AI 분석 과정",
-            desc: "AI가 동영상 음성을 텍스트로 변환하고 핵심 내용을 파악하여 요약을 생성합니다.",
+            imgAlt: "AI 요약 과정",
+            desc: "AI가 강의 내용을 분석하여 텍스트로 변환하고, 핵심 내용을 추출해 요약본을 생성합니다.",
           },
           {
-            step: "3. 요약 결과 확인",
+            step: "3. 요약 결과 확인 및 메모",
             imgSrc: "/images/3.png",
             imgAlt: "요약 결과 화면",
-            desc: "핵심 요약과 전체 요약 두 가지 방식으로 결과를 제공합니다.",
+            desc: "요약본은 핵심 요약과 전체 요약으로 제공되며, 사용자는 직접 메모를 작성할 수 있습니다.",
           },
           {
-            step: "4. 요약 저장 및 관리",
+            step: "4. 강의 요약 관리 및 저장",
             imgSrc: "/images/4.png",
             imgAlt: "마이 페이지 화면",
-            desc: "회원 가입 후 로그인하면 요약 결과가 자동 저장되며, 마이 페이지에서 관리할 수 있습니다.",
+            desc: "로그인하면 요약된 강의가 자동 저장되며, 마이 페이지에서 관리할 수 있습니다.",
           },
         ].map((itemData, index) => (
           // 각 단계별 카드 컴포넌트
@@ -106,18 +106,18 @@ export default function AboutPage() {
           {[
             {
               icon: <Brain className="h-12 w-12 text-primary" />,
-              title: "고급 AI 기술",
-              desc: "최신 자연어 처리 모델을 활용해 더 정확한 요약을 제공합니다.",
+              title: "최신 AI 요약 기술",
+              desc: "강의 내용을 음성에서 텍스트로 변환하고, 핵심 정보만 정확하게 추출해 학습을 빠르게 도와줍니다.",
             },
             {
               icon: <Layers className="h-12 w-12 text-primary" />,
-              title: "이중 요약 시스템",
-              desc: "핵심 요약과 전체 요약을 동시에 제공해 원하는 정보만 빠르게 확인할 수 있습니다.",
+              title: "다양한 요약 방식",
+              desc: "AI가 생성한 핵심 요약과 전체 요약을 모두 제공해, 원하는 깊이로 학습할 수 있습니다.",
             },
             {
               icon: <Clock className="h-12 w-12 text-primary" />,
-              title: "시간 절약",
-              desc: "1시간짜리 강의도 단 5분 만에 요약해 학습 효율을 높여줍니다.",
+              title: "학습 시간 단축",
+              desc: "긴 강의도 몇 분 만에 핵심 내용을 파악할 수 있어, 학습 효율을 높여줍니다.",
             },
           ].map((feature, idx) => (
             // 각 가치별 카드 컴포넌트

@@ -13,12 +13,7 @@ import { motion } from "framer-motion"
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
-  const { user, isLoading } = useAuth()
-
-  // 로그인 페이지와 회원가입 페이지에서는 헤더를 표시하지 않음
-  {/*if (pathname === "/login" || pathname === "/register") {
-    return null
-  }*/}
+  const { isLoading } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-sm supports-backdrop-filter:bg-background/60 border-b border-border/40">
@@ -39,7 +34,7 @@ export default function Header() {
               pathname === "/" ? "text-primary" : ""
             }`}
           >
-            홈
+            Home
           </Link>
           <Link
             href="/about"
@@ -47,7 +42,7 @@ export default function Header() {
               pathname === "/about" ? "text-primary" : ""
             }`}
           >
-            서비스 소개
+            About
           </Link>
           <Link
             href="/dashboard"
@@ -55,7 +50,7 @@ export default function Header() {
               pathname === "/dashboard" ? "text-primary" : ""
             }`}
           >
-            요약
+            Mypage
           </Link>
         </nav>
 
@@ -100,7 +95,7 @@ export default function Header() {
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
-              홈
+              Home
             </Link>
             <Link
               href="/about"
@@ -109,7 +104,7 @@ export default function Header() {
               }`}
               onClick={() => setIsMenuOpen(false)}
             >
-              서비스 소개
+              About
             </Link>
             <div className="flex flex-col gap-2 pt-2 border-t">
               {isLoading ? (
