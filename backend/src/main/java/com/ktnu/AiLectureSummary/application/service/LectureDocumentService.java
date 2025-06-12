@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -38,21 +39,13 @@ public class LectureDocumentService {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
+        com.lowagie.text.pdf.BaseFont baseFont = loadNanumGothicFont();
+
         // PDF 문서를 생성하고 내용을 추가합니다.
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, outputStream);
 
-            // 폰트 설정
-            String fontPath = URLDecoder.decode( // 클래스패스 리소스 접근
-                    getClass().getClassLoader().getResource("fonts/NanumGothic.ttf").getPath(),
-                    StandardCharsets.UTF_8
-            );
-            com.lowagie.text.pdf.BaseFont baseFont = com.lowagie.text.pdf.BaseFont.createFont(
-                    fontPath,
-                    com.lowagie.text.pdf.BaseFont.IDENTITY_H,
-                    com.lowagie.text.pdf.BaseFont.EMBEDDED
-            );
             com.lowagie.text.Font font = new com.lowagie.text.Font(baseFont, 12);
             document.open();
 
@@ -67,11 +60,23 @@ public class LectureDocumentService {
             document.close();
 
             // PDF 생성 중 오류가 발생한 경우 예외를 처리
-        } catch (IOException | DocumentException e) {
+        } catch (DocumentException e) {
             throw new PdfGenerateFailException("PDF 생성 중 오류 발생", e);
         }
 
         return outputStream.toByteArray();
 
+    }
+
+    private com.lowagie.text.pdf.BaseFont loadNanumGothicFont() {
+        try (InputStream fontStream = getClass().getClassLoader().getResourceAsStream("fonts/NanumGothic.ttf")) {
+            if (fontStream == null) {
+                throw new PdfGenerateFailException("폰트 파일을 찾을 수 없습니다.");
+            }
+            byte[] fontBytes = fontStream.readAllBytes();
+            return com.lowagie.text.pdf.BaseFont.createFont("NanumGothic.ttf", com.lowagie.text.pdf.BaseFont.IDENTITY_H, com.lowagie.text.pdf.BaseFont.EMBEDDED, false, fontBytes, null);
+        } catch (IOException | DocumentException e) {
+            throw new PdfGenerateFailException("폰트 로딩 중 오류 발생", e);
+        }
     }
 }
