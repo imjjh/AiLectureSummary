@@ -64,29 +64,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const API_BASE_URL = process.env.NEXT_PUBLIC_SPRING_API_URL! // 환경변수로부터 API base URL 읽기
 
-  // 컴포넌트 마운트 시 자동 로그인 여부 확인
   useEffect(() => {
-    const hasAuthCookie = () => {
-      // 간단한 방식: document.cookie에서 refresh_token 또는 access_token 포함 여부 검사
-      return document.cookie.includes("access_token") || document.cookie.includes("refresh_token");
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/members/me`, {
+          credentials: "include", // 쿠키 포함
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const loggedInUser: User = {
+            id: String(data.data.id),
+            name: data.data.username,
+            email: data.data.email,
+            joinDate: "",
+          }
+          setUser(loggedInUser)
+        }
+      } catch (err) {
+        console.error("자동 로그인 실패:", err)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    if (hasAuthCookie()) {
-      fetchUserInfo(API_BASE_URL)
-        .then((user) => {
-          if (user) setUser(user)
-        })
-        .catch((err) => {
-          console.error("자동 로그인 실패:", err)
-        })
-        .finally(() => {
-          setIsLoading(false)
-        });
-    } else {
-      setIsLoading(false); // 쿠키가 없으면 로그인하지 않은 상태로 간주
-    }
-  }, []);
-  
+    fetchUser()
+  }, [])
+
+
   // 로그인 함수
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -150,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       throw new Error(message)
     } catch (error: any) {
+      ~
       console.error("API 오류:", error)
       throw new Error(error?.message || "서버 오류가 발생했습니다.")
     }
